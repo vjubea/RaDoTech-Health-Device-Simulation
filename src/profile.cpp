@@ -8,6 +8,19 @@ Profile::Profile(int id)
 }
 
 
+Snapshot* getSnapshot(int id){
+    //if snapshot is associated with the profile, and the id exists, get it. Else return nullptr.
+    return new Snapshot(id);
+}
+
+Snapshot* getMostRecentSnapshot(){
+    //find the most recent one from db.
+
+    return getSnapshot(0);
+}
+
+
+
 std::string Profile::getFullName() {return (fname + " " + lname);}
 
 std::string Profile::getFName() {return fname;}

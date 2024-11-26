@@ -12,12 +12,16 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     model.cpp \
-    profile.cpp
+    profile.cpp \
+    scanner.cpp \
+    snapshot.cpp
 
 HEADERS += \
     mainwindow.h \
     model.h \
-    profile.h
+    profile.h \
+    scanner.h \
+    snapshot.h
 
 FORMS += \
     mainwindow.ui

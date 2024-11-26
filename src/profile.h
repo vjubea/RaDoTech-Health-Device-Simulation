@@ -2,6 +2,7 @@
 #define PROFILE_H
 
 #include <string>
+#include "snapshot.h"
 
 
 class Profile{
@@ -19,6 +20,10 @@ public:
     Profile(int id);
 
     //functions for scanning to go here... will create bases for them tomorrow!
+
+
+    Snapshot* getSnapshot(int id);
+    Snapshot* getMostRecentSnapshot();
 
 
     //getters

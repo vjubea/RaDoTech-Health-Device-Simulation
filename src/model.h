@@ -3,6 +3,7 @@
 
 #include <string>
 #include "profile.h"
+#include "scanner.h"
 
 class Model{
 
@@ -12,6 +13,8 @@ private:
 
 public:
     Model();
+
+    Scanner* startScan();
 
     bool selectProfile(int index);
 

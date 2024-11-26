@@ -16,6 +16,17 @@ Model::Model()
 
 }
 
+
+Scanner* Model::startScan(){
+    if(currentProfile == nullptr) {return nullptr;}
+
+    return new Scanner(currentProfile);
+
+
+}
+
+
+
 bool Model::selectProfile(int index){
     //Functions are to be operated all under the current profile, so this is a really important, if simple, function towards not overcomplicating the system.
 
