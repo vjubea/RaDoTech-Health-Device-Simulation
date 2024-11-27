@@ -6,7 +6,7 @@ Profile::Profile(
     int id, const QString& fname, const QString& lname, float weight,
     float height, const QString& bday)
     :
-    id(id), fname(fname), lname(lname), weight(weight), 
+    id(id), fname(fname), lname(lname), weight(weight),
     height(height), bday(bday)
 {}
 
