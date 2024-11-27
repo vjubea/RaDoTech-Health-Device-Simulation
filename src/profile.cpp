@@ -1,34 +1,30 @@
 #include "profile.h"
 
-Profile::Profile(int id)
-{
-    // PROFILE IS TO BE LOADED FROM DATABASE
-    // no profile objects should be created unless they correspond to a known repository entry, so it *should* be safe to presume that an entry exists
+Profile::Profile() : id(0), weight(0), height(0) {}
 
-}
+Profile::Profile(
+    int id, const QString& fname, const QString& lname, float weight,
+    float height, const QString& bday)
+    :
+    id(id), fname(fname), lname(lname), weight(weight), 
+    height(height), bday(bday)
+{}
 
+int Profile::getId() const { return id; }
+void Profile::setId(int id) { this->id = id; }
 
-Snapshot* getSnapshot(int id){
-    //if snapshot is associated with the profile, and the id exists, get it. Else return nullptr.
-    return new Snapshot(id);
-}
+QString Profile::getFname() const { return fname };
+void Profile::setFname(const QString& fname) { this->fname = fname; }
 
-Snapshot* getMostRecentSnapshot(){
-    //find the most recent one from db.
+QString Profile::getLname() const { return lname; }
+void Profile::setLname(const QString& lname) { this->lname = lname; }
 
-    return getSnapshot(0);
-}
+float Profile::getWeight() const { return weight; }
+void Profile::setWeight(float weight) { this->weight = weight; }
 
+float Profile::getHeight() const { return height; }
+void Profile::setHeight(float height) { this->height = height; }
 
+QString Profile::getBday() const { return bday; }
 
-std::string Profile::getFullName() {return (fname + " " + lname);}
-
-std::string Profile::getFName() {return fname;}
-
-std::string Profile::getLName() {return lname;}
-
-int Profile::getWeight() {return weight;}
-
-int Profile::getHeight() {return height;}
-
-int* Profile::getDob() {return dob;}
+void Profile::setBday(const QString& bday) { this->bday = bday; }
