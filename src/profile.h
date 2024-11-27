@@ -1,40 +1,40 @@
 #ifndef PROFILE_H
 #define PROFILE_H
 
-#include <string>
-#include "snapshot.h"
+#include <QString>
 
+class Profile {
+public:
+    // Constructors
+    Profile();
+    Profile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday, const QString& country);
 
-class Profile{
+    // Getters and Setters
+    int getId() const;
+    void setId(int id);
+    
+    QString getFname() const;
+    void setFname(const QString& fname);
+
+    QString getLname() const;
+    void setLname(const QString& lname);
+
+    float getWeight() const;
+    void setWeight(float weight);
+
+    float getHeight() const;
+    void setHeight(float height);
+
+    QString getBday() const;
+    void setBday(const QString& bday);
 
 private:
-    int id;
-    std::string fname;
-    std::string lname;
-    int weight; // stored in GRAMS so we can keep it in an int.
-    int height; // in CM
-    int dob[3]; // date of birth as an array of 3 ints - mm/dd/yyyy
-
-
-public:
-    Profile(int id);
-
-    //functions for scanning to go here... will create bases for them tomorrow!
-
-
-    Snapshot* getSnapshot(int id);
-    Snapshot* getMostRecentSnapshot();
-
-
-    //getters
-    std::string getFullName();
-    std::string getFName();
-    std::string getLName();
-    int getWeight();
-    int getHeight();
-    int* getDob();
-
-
+    int id;  // Profile ID
+    QString fname;  // First name
+    QString lname;  // Last name
+    float weight;  // Weight in kg
+    float height;  // Height in cm
+    QString bday;  // Birthdate (mm-dd-yyyy)
 };
 
 #endif // PROFILE_H
