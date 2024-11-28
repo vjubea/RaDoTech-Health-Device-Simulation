@@ -7,7 +7,7 @@ class Profile {
 public:
     // Constructors
     Profile();
-    Profile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday, const QString& country);
+    Profile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday);
 
     // Getters and Setters
     int getId() const;

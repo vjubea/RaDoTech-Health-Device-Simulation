@@ -3,17 +3,13 @@
 
 #include <QString>
 #include <QSqlDatabase>
+#include <QSqlQuery>
 #include <QDateTime>
 #include <QDebug>
-#include <QSqlQuery>
-#include <QList>
 #include <QVector>
 
 #include "profile.h"
 #include "snapshot.h"
-#include "handbloodpressure.h"
-#include "handreadings.h"
-#include "legreadings.h"
 
 /* Class Purpose: Manages interactions between application and database
  *
@@ -33,21 +29,21 @@
  * - getSnapshotByUserAndDate: retrieves a snapshot based on userID, date, and time
  *
  * HandReadings and LegReadings-related functions
- * - createHandReading: adds a new hand reading to the database
- * - createLegReading: adds a new leg reading to the database
- * - getHandReading: retrieves a hand reading by ID and orientation
- * - getLegReading: retrieves a leg reading by ID and orientation
+ * - createHandReadings: adds a new hand reading to the database
+ * - createLegReadings: adds a new leg reading to the database
+ * - getHandReadings: retrieves a hand reading by ID and orientation
+ * - getLegReadings: retrieves a leg reading by ID and orientation
  */
 
 class DBManager {
 public:
-    const QString DATE_FORMAT = "yyyy-MM-dd hh:mm";
+    const QString DATE_FORMAT = "yyyy-MM-dd hh:mm"; // not used yet
     static const QString DATABASE_PATH;
 
     DBManager();
 
     // Profile-related functions
-    bool createProfile(const QString& fname, const QString& lname, float weight, float height, const QString& bday);
+    Profile* createProfile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday);
     bool deleteProfile(const QString& fname, const QString& lname);
     bool updateProfile(Profile* prof, const QString& newFname, const QString& newLname, float newWeight, float newHeight, const QString& newBday);
 
@@ -57,14 +53,14 @@ public:
     bool getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp);
 
     // HandReadings and LegReadings-related functions
-    bool createHandReading(int id, const QString& orientation, const QVector<int>& readings);
-    bool createLegReading(int id, const QString& orientation, const QVector<int>& readings);
-    bool getHandReading(HandReadings& handReading, int id, const QString& orientation);
-    bool getLegReading(LegReadings& legReading, int id, const QString& orientation);
+    bool createHandReadings(int id, const char orientation, const QVector<int>& readings);
+    bool createLegReadings(int id, const char orientation, const QVector<int>& readings);
+    QVector<int> getHandReadings(int id, const char orientation);
+    QVector<int> getLegReadings(int id, const char orientation);
 
 private:
     QSqlDatabase raDoTechDB;
-
+    int profID;
     bool DBInit(); // Initializes the database if not already done
 };
 

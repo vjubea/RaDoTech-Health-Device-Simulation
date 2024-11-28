@@ -4,12 +4,15 @@
 #include <string>
 #include "profile.h"
 #include "scanner.h"
+#include "dbmanager.h"
 
 class Model{
 
 private:
-    Profile* profiles[5];
+    int profileID;
+    QVector<Profile*> profiles;
     Profile* currentProfile;
+    DBManager* dbManager;
 
 public:
     Model();
@@ -17,11 +20,8 @@ public:
     Scanner* startScan();
 
     bool selectProfile(int index);
-
-    bool createProfile(std::string fname = "NULL", std::string lname = "NULL", int weight = 40000, int height = 160, int birthmonth = 1, int birthyear = 1970, int birthday = 1);
-
-    bool deleteProfile(std::string fname, std::string lname);
-
+    bool createProfile(QString& fname, QString& lname, float weight, float height, QString& bday);
+    bool deleteCurrentProfile();
 };
 
 #endif // MODEL_H
