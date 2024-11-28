@@ -22,10 +22,10 @@ public:
     void setBodyTemp(float bodyTemp);
 
     int getLeftHandPressReadId() const;
-    void setLeftHandPressReadId(int leftHandPressReadId);
+    void setLeftHandPressReadId(int lhPressReadId);
 
     int getRightHandPressReadId() const;
-    void setRightHandPressReadId(int rightHandPressReadId);
+    void setRightHandPressReadId(int rhPressReadId);
 
     int getHeartRate() const;
     void setHeartRate(int heartRate);

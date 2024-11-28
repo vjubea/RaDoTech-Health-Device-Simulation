@@ -1,30 +1,32 @@
-#include "DBManager.h"
+#include "dbmanager.h"
 #include "profile.h"
 #include "snapshot.h"
-#include "handbloodpressure.h"
-#include "handreadings.h"
-#include "legreadings.h"
-
+#include <iostream>
 #include <QSqlQuery>
-#include <QVariant>
 #include <QSqlError>
+#include <QVariant>
 
-const QString DBManager::DATABASE_PATH = "path/to/database"; // Update with actual path
+const QString DBManager::DATABASE_PATH = "/database/raDoTech.db"; // Update with actual path
 
 DBManager::DBManager() {
+    qInfo() << "Got here";
+    profID = 1;
+
     // Initialize the database connection
     raDoTechDB = QSqlDatabase::addDatabase("QSQLITE");
-    raDoTechDB.setDatabaseName(DATABASE_PATH);
+    raDoTechDB.setDatabaseName("raDoTech.db");
+
     if (!raDoTechDB.open()) {
         qWarning() << "Database connection failed!";
     }
+    DBInit();
 }
 
 bool DBManager::DBInit() {
     // Ensures the database is initialized (create tables if they don't exist)
     QSqlQuery query;
     query.exec("CREATE TABLE IF NOT EXISTS Profiles ("
-               "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+               "id INTEGER PRIMARY KEY, "
                "fname TEXT NOT NULL, "
                "lname TEXT NOT NULL, "
                "weight REAL NOT NULL, "
@@ -34,13 +36,13 @@ bool DBManager::DBInit() {
     );
     query.exec("CREATE TABLE IF NOT EXISTS Snapshots ("
                "profileID INTEGER NOT NULL, "
-               "timestamp TEXT NOT NULL, "
+               "timestamp VARCHAR(16) NOT NULL, --(yyyy-MM-dd hh:mm)"
                "bodyTemp REAL NOT NULL, "
-               "leftHandPressReadId INTEGER, "
-               "rightHandPressReadId INTEGER, "
+               "leftHandPressReadId INTEGER DEFAULT 0, --can be null"
+               "rightHandPressReadId INTEGER DEFAULT 0, --can be null"
                "heartRate INTEGER NOT NULL, "
-               "sleepHrs INTEGER NOT NULL, "
-               "sleepMins INTEGER NOT NULL, "
+               "sleepHrs INTEGER, --can be null"
+               "sleepMins INTEGER, --can be null"
                "currWeight REAL NOT NULL, "
                "notes TEXT, "
                "handReadingID INTEGER NOT NULL, "
@@ -50,14 +52,14 @@ bool DBManager::DBInit() {
                "ON DELETE CASCADE);"
     );
     query.exec("CREATE TABLE IF NOT EXISTS HandBloodPressure("
-               "id INTEGER NOT NULL AUTOINCREMENT, "
+               "id INTEGER NOT NULL, "
                "orientation CHAR(1) NOT NULL, -- “L” for left, “R” for right "
                "systolic INTEGER NOT NULL, -- Systolic mm Hg "
                "diastolic INTEGER NOT NULL, -- Diastolic mm Hg "
                "PRIMARY KEY (id, orientation));"
     );
     query.exec("CREATE TABLE IF NOT EXISTS HandReadings ("
-               "id INTEGER NOT NULL AUTOINCREMENT, "
+               "id INTEGER NOT NULL, "
                "orientation CHAR(1) NOT NULL, "
                "H1 INTEGER NOT NULL, "
                "H2 INTEGER NOT NULL, "
@@ -68,7 +70,7 @@ bool DBManager::DBInit() {
                "PRIMARY KEY (id, orientation));"
     );
     query.exec("CREATE TABLE IF NOT EXISTS LegReadings ("
-               "id INTEGER NOT NULL AUTOINCREMENT, "
+               "id INTEGER NOT NULL, "
                "orientation CHAR(1) NOT NULL, "
                "F1 INTEGER NOT NULL, "
                "F2 INTEGER NOT NULL, "
@@ -78,13 +80,15 @@ bool DBManager::DBInit() {
                "F6 INTEGER NOT NULL, "
                "PRIMARY KEY (id, orientation));"
     );
+    qInfo() <<"Initialized Database.";
     return true;
 }
 
-bool DBManager::createProfile(const QString& fname, const QString& lname, float weight, float height, const QString& bday) {
+Profile* DBManager::createProfile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday) {
     QSqlQuery query;
-    query.prepare("INSERT INTO Profiles (fname, lname, weight, height, birthDay) "
-                  "VALUES (:fname, :lname, :weight, :height, :birthDay);");
+    query.prepare("INSERT INTO Profiles (id, fname, lname, weight, height, birthDay) "
+                  "VALUES (:id, :fname, :lname, :weight, :height, :birthDay);");
+    query.bindValue(":id", id);
     query.bindValue(":fname", fname);
     query.bindValue(":lname", lname);
     query.bindValue(":weight", weight);
@@ -93,10 +97,9 @@ bool DBManager::createProfile(const QString& fname, const QString& lname, float 
 
     if (!query.exec()) {
         qWarning() << "Error creating profile: " << query.lastError().text();
-        return false;
+        return NULL;
     }
-
-    return true;
+    return new Profile(id, fname, lname, weight, height, bday);
 }
 
 bool DBManager::deleteProfile(const QString& fname, const QString& lname) {
@@ -109,11 +112,10 @@ bool DBManager::deleteProfile(const QString& fname, const QString& lname) {
         qWarning() << "Error deleting profile: " << query.lastError().text();
         return false;
     }
-
     return true;
 }
 
-bool DBManager::updateProfile(Profile* prof, const QString& newFname, const QString& newLname, float newWeight, float newHeight, const QString& newBday, const QString& newCountry) {
+bool DBManager::updateProfile(Profile* prof, const QString& newFname, const QString& newLname, float newWeight, float newHeight, const QString& newBday) {
     QSqlQuery query;
     query.prepare("UPDATE Profiles SET fname = :fname, lname = :lname, weight = :weight, "
                   "height = :height, birthDay = :birthDay, country = :country "
@@ -123,18 +125,17 @@ bool DBManager::updateProfile(Profile* prof, const QString& newFname, const QStr
     query.bindValue(":weight", newWeight);
     query.bindValue(":height", newHeight);
     query.bindValue(":birthDay", newBday);
-    query.bindValue(":country", newCountry);
-    query.bindValue(":id", prof->getId()); // Assuming Profile has a getId() method
+    query.bindValue(":id", prof->getId());
 
     if (!query.exec()) {
         qWarning() << "Error updating profile: " << query.lastError().text();
         return false;
     }
-
     return true;
 }
+
 // Create HandReading
-bool DBManager::createHandReading(int id, const QString& orientation, const QVector<int>& readings) {
+bool DBManager::createHandReadings(int id, char orientation, const QVector<int>& readings) {
     if (readings.size() != 6) {
         qWarning() << "Hand reading must have exactly 6 values!";
         return false;
@@ -159,7 +160,7 @@ bool DBManager::createHandReading(int id, const QString& orientation, const QVec
     return true;
 }
 // Create LegReading
-bool DBManager::createLegReading(int id, const QString& orientation, const QVector<int>& readings) {
+bool DBManager::createLegReadings(int id, char orientation, const QVector<int>& readings) {
     if (readings.size() != 6) {
         qWarning() << "Leg reading must have exactly 6 values!";
         return false;
@@ -186,7 +187,7 @@ bool DBManager::createLegReading(int id, const QString& orientation, const QVect
 
 bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps) {
     // Create a query to retrieve all snapshots from the database
-    QSqlQuery query("SELECT * FROM Snapshots");
+    QSqlQuery query("SELECT * FROM Snapshots;");
 
     // Execute the query
     if (!query.exec()) {
@@ -203,7 +204,7 @@ bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps) {
         snap->setProfileID(query.value("profileID").toInt());
         snap->setTimestamp(query.value("timestamp").toString());
         snap->setBodyTemp(query.value("bodyTemp").toFloat());
-        snap->setLeftHandPressReadId(0); // To set to default NONE = 0
+        snap->setLeftHandPressReadId(0); // 0 would act as null
         snap->setRightHandPressReadId(0);
         snap->setHeartRate(query.value("heartRate").toInt());
         snap->setSleepHrs(query.value("sleepHrs").toInt());
@@ -220,26 +221,19 @@ bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps) {
     return true;
 }
 
-void DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& date, int hour, int minute) {
-    // Prepare the query to retrieve snapshot based on userID, date, hour, and minute
+bool DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp) {
+    // Prepare the query to retrieve snapshot based on userID and timestamp (yyyy-MM-dd hh:mm)
     QSqlQuery query;
     query.prepare("SELECT * FROM Snapshots "
-                  "WHERE profileID = :profileID AND date = :date AND timestamp = :timestamp;");
-    
-    // Prepare the timestamp using the hour and minute (in the format HH:mm)
-    QString timestamp = QString("%1 %2:%3")
-        .arg(date)
-        .arg(hour, 2, 10, QChar('0'))
-        .arg(minute, 2, 10, QChar('0'));
+                  "WHERE profileID = :profileID AND timestamp = :timestamp;");
 
     query.bindValue(":profileID", userID);
-    query.bindValue(":date", date);
     query.bindValue(":timestamp", timestamp);
 
     // Execute the query
     if (!query.exec()) {
         qWarning() << "Error fetching snapshot: " << query.lastError().text();
-        return;  // Handle error appropriately
+        return false;  // Handle error appropriately
     }
 
     // If the snapshot exists, populate the Snapshot object
@@ -262,11 +256,13 @@ void DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QStri
         snap.setLegReadingID(
             query.value("legReadingID").isNull() ? -1 : query.value("legReadingID").toInt()
             );
+        return true;
     }
+    return false;
 }
 
-QList<int> DBManager::getHandReadings(int handReadingID, char orientation) {
-    QList<int> readings;
+QVector<int> DBManager::getHandReadings(int handReadingID, char orientation) {
+    QVector<int> readings;
 
     // Prepare the query to fetch hand readings by handReadingID and orientation
     QSqlQuery query;
@@ -282,18 +278,17 @@ QList<int> DBManager::getHandReadings(int handReadingID, char orientation) {
 
     // If the readings exist, populate the list
     if (query.next()) {
-        readings.append(query.value("H1").toInt());
-        readings.append(query.value("H2").toInt());
-        readings.append(query.value("H3").toInt());
-        readings.append(query.value("H4").toInt());
-        readings.append(query.value("H5").toInt());
-        readings.append(query.value("H6").toInt());
+        readings.push_back(query.value("H1").toInt());
+        readings.push_back(query.value("H2").toInt());
+        readings.push_back(query.value("H3").toInt());
+        readings.push_back(query.value("H4").toInt());
+        readings.push_back(query.value("H5").toInt());
+        readings.push_back(query.value("H6").toInt());
     }
-
     return readings;
 }
-QList<int> DBManager::getLegReadings(int legReadingID, char orientation) {
-    QList<int> readings;
+QVector<int> DBManager::getLegReadings(int legReadingID, char orientation) {
+    QVector<int> readings;
 
     // Prepare the query to fetch leg readings by legReadingID and orientation
     QSqlQuery query;
@@ -309,14 +304,13 @@ QList<int> DBManager::getLegReadings(int legReadingID, char orientation) {
 
     // If the readings exist, populate the list
     if (query.next()) {
-        readings.append(query.value("F1").toInt());
-        readings.append(query.value("F2").toInt());
-        readings.append(query.value("F3").toInt());
-        readings.append(query.value("F4").toInt());
-        readings.append(query.value("F5").toInt());
-        readings.append(query.value("F6").toInt());
+        readings.push_back(query.value("F1").toInt());
+        readings.push_back(query.value("F2").toInt());
+        readings.push_back(query.value("F3").toInt());
+        readings.push_back(query.value("F4").toInt());
+        readings.push_back(query.value("F5").toInt());
+        readings.push_back(query.value("F6").toInt());
     }
-
     return readings;
 }
 
@@ -324,12 +318,12 @@ bool DBManager::addNewSnapshot(const Snapshot& snapshot) {
     // Prepare the SQL query to insert a new snapshot
     QSqlQuery query;
     query.prepare("INSERT INTO Snapshots ("
-                  "profileID, date, timestamp, "
+                  "profileID, timestamp, "
                   "bodyTemp, leftHandPressReadId, rightHandPressReadId, "
                   "heartRate, sleepHrs, sleepMins, currWeight, notes, "
                   "handReadingID, legReadingID) "
                   "VALUES ("
-                    ":profileID, :date, :timestamp, "
+                    ":profileID, :timestamp, "
                     ":bodyTemp, :leftHandPressReadId, :rightHandPressReadId, "
                     ":heartRate, :sleepHrs, :sleepMins, :currWeight, :notes, "
                     ":handReadingID, :legReadingID);"
@@ -337,25 +331,23 @@ bool DBManager::addNewSnapshot(const Snapshot& snapshot) {
 
     // Bind the values from the Snapshot object to the query parameters
     query.bindValue(":profileID", snapshot.getProfileID());
-    query.bindValue(":date", snapshot.getTimestamp().left(10));  // Extract date part
     query.bindValue(":timestamp", snapshot.getTimestamp());  // Full timestamp (yyyy-MM-dd hh:mm)
     query.bindValue(":bodyTemp", snapshot.getBodyTemp());
-    query.bindValue(":leftHandPressReadId", snapshot.getLeftHandPressReadId() == -1 ? QVariant::Null : snapshot.getLeftHandPressReadId());
-    query.bindValue(":rightHandPressReadId", snapshot.getRightHandPressReadId() == -1 ? QVariant::Null : snapshot.getRightHandPressReadId());
+    query.bindValue(":leftHandPressReadId", snapshot.getLeftHandPressReadId());
+    query.bindValue(":rightHandPressReadId", snapshot.getRightHandPressReadId());
     query.bindValue(":heartRate", snapshot.getHeartRate());
     query.bindValue(":sleepHrs", snapshot.getSleepHrs());
     query.bindValue(":sleepMins", snapshot.getSleepMins());
     query.bindValue(":currWeight", snapshot.getCurrWeight());
     query.bindValue(":notes", snapshot.getNotes());
-    query.bindValue(":handReadingID", snapshot.getHandReadingID() == -1 ? QVariant::Null : snapshot.getHandReadingID());
-    query.bindValue(":legReadingID", snapshot.getLegReadingID() == -1 ? QVariant::Null : snapshot.getLegReadingID());
+    query.bindValue(":handReadingID", snapshot.getHandReadingID());
+    query.bindValue(":legReadingID", snapshot.getLegReadingID());
 
     // Execute the query and check if it was successful
     if (!query.exec()) {
         qWarning() << "Failed to add new snapshot: " << query.lastError().text();
         return false;  // Return false if there was an error
     }
-
     // Successfully inserted the snapshot
     return true;
 }

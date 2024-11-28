@@ -3,7 +3,7 @@
 Snapshot::Snapshot() 
     : 
     profileID(0), bodyTemp(0.0f), 
-    leftHandPressReadId(-1), rightHandPressReadId(-1),
+    leftHandPressReadId(0), rightHandPressReadId(0),
     heartRate(0), sleepHrs(0), sleepMins(0),
     currWeight(0.0f), handReadingID(0), legReadingID(0) 
     {}
@@ -19,7 +19,8 @@ Snapshot::Snapshot(
     leftHandPressReadId(leftHandPressReadId), rightHandPressReadId(rightHandPressReadId), 
     heartRate(heartRate), sleepHrs(sleepHrs), sleepMins(sleepMins), 
     currWeight(currWeight), notes(notes),
-    handReadingID(handReadingID), legReadingID(legReadingID) {}
+    handReadingID(handReadingID), legReadingID(legReadingID)
+    {}
 
 /***** Getters-and-Setters *****/
 
@@ -45,21 +46,16 @@ int Snapshot::getSleepHrs() const { return sleepHrs; }
 void Snapshot::setSleepHrs(int sleepHrs) { this->sleepHrs = sleepHrs; }
 
 int Snapshot::getSleepMins() const { return sleepMins; }
-
 void Snapshot::setSleepMins(int sleepMins) { this->sleepMins = sleepMins; }
 
 float Snapshot::getCurrWeight() const { return currWeight; }
-
 void Snapshot::setCurrWeight(float currWeight) { this->currWeight = currWeight; }
 
 QString Snapshot::getNotes() const { return notes; }
-
 void Snapshot::setNotes(const QString& notes) { this->notes = notes; }
 
 int Snapshot::getHandReadingID() const { return handReadingID; }
-
 void Snapshot::setHandReadingID(int handReadingID) { this->handReadingID = handReadingID; }
 
 int Snapshot::getLegReadingID() const { return legReadingID; }
-
 void Snapshot::setLegReadingID(int legReadingID) { this->legReadingID = legReadingID; }

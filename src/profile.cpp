@@ -8,12 +8,12 @@ Profile::Profile(
     :
     id(id), fname(fname), lname(lname), weight(weight), 
     height(height), bday(bday)
-{}
+    {}
 
 int Profile::getId() const { return id; }
 void Profile::setId(int id) { this->id = id; }
 
-QString Profile::getFname() const { return fname };
+QString Profile::getFname() const { return fname; };
 void Profile::setFname(const QString& fname) { this->fname = fname; }
 
 QString Profile::getLname() const { return lname; }
