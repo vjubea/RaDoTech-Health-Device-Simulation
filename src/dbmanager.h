@@ -42,25 +42,28 @@ public:
 
     DBManager();
 
+    // Returns the autoincremented id of last insert operation
+    int getLastInsertId(QSqlQuery& query);
+
     // Profile-related functions
-    Profile* createProfile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday);
-    bool deleteProfile(const QString& fname, const QString& lname);
+    Profile* createProfile(const QString& fname, const QString& lname, float weight, float height, const QString& bday);
+    bool deleteProfile(int id);
+    bool getAllProfiles(QVector<Profile*>& profiles);
     bool updateProfile(Profile* prof, const QString& newFname, const QString& newLname, float newWeight, float newHeight, const QString& newBday);
 
     // Snapshot-related functions
-    bool addNewSnapshot(const Snapshot& snapshot);
-    bool getAllSnapshots(QVector<Snapshot*>& snaps);
-    bool getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp);
+    bool addSnapshotToHistory(const Snapshot& snapshot); // Create snapshot object, then pass as parameter
+    bool getAllSnapshots(QVector<Snapshot*>& snaps); // Updates snaps to DB query result
+    bool getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp); // Updates snap by DB query resuult
 
     // HandReadings and LegReadings-related functions
-    bool createHandReadings(int id, const char orientation, const QVector<int>& readings);
-    bool createLegReadings(int id, const char orientation, const QVector<int>& readings);
-    QVector<int> getHandReadings(int id, const char orientation);
-    QVector<int> getLegReadings(int id, const char orientation);
+    bool createHandReadings(int& id, const char orientation, const QVector<int>& readings);
+    bool createLegReadings(int& id, const char orientation, const QVector<int>& readings);
+    QVector<int> getHReadingsByIdAndOrient(int id, const char orientation);
+    QVector<int> getLReadingsByIdAndOrient(int id, const char orientation);
 
 private:
     QSqlDatabase raDoTechDB;
-    int profID;
     bool DBInit(); // Initializes the database if not already done
 };
 

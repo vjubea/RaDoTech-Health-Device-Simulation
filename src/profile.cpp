@@ -1,4 +1,5 @@
 #include "profile.h"
+#include <iostream>
 
 Profile::Profile() : id(0), weight(0), height(0) {}
 

@@ -8,9 +8,9 @@
 
 const QString DBManager::DATABASE_PATH = "/database/raDoTech.db"; // Update with actual path
 
-DBManager::DBManager() {
+DBManager::DBManager()
+{
     qInfo() << "Got here";
-    profID = 1;
 
     // Initialize the database connection
     raDoTechDB = QSqlDatabase::addDatabase("QSQLITE");
@@ -22,9 +22,16 @@ DBManager::DBManager() {
     DBInit();
 }
 
-bool DBManager::DBInit() {
-    // Ensures the database is initialized (create tables if they don't exist)
+bool DBManager::DBInit()
+{
     QSqlQuery query;
+    // Drop tables if exist
+    query.exec("DROP TABLE IF EXISTS Profiles;");
+    query.exec("DROP TABLE IF EXISTS Snapshots;");
+    query.exec("DROP TABLE IF EXISTS HandBloodPressure;");
+    query.exec("DROP TABLE IF EXISTS HandReadings;");
+    query.exec("DROP TABLE IF EXISTS LegReadings;");
+
     query.exec("CREATE TABLE IF NOT EXISTS Profiles ("
                "id INTEGER PRIMARY KEY, "
                "fname TEXT NOT NULL, "
@@ -38,28 +45,38 @@ bool DBManager::DBInit() {
                "profileID INTEGER NOT NULL, "
                "timestamp VARCHAR(16) NOT NULL, --(yyyy-MM-dd hh:mm)"
                "bodyTemp REAL NOT NULL, "
-               "leftHandPressReadId INTEGER DEFAULT 0, --can be null"
-               "rightHandPressReadId INTEGER DEFAULT 0, --can be null"
+               "leftHandPressReadID INTEGER DEFAULT 0, --can be null"
+               "rightHandPressReadID INTEGER DEFAULT 0, --can be null"
                "heartRate INTEGER NOT NULL, "
                "sleepHrs INTEGER, --can be null"
                "sleepMins INTEGER, --can be null"
                "currWeight REAL NOT NULL, "
                "notes TEXT, "
-               "handReadingID INTEGER NOT NULL, "
-               "legReadingID INTEGER NOT NULL, "
+               "handReadingsID INTEGER NOT NULL, "
+               "legReadingsID INTEGER NOT NULL, "
                "PRIMARY KEY (profileID, timestamp), "
-               "FOREIGN KEY (profileID) REFERENCES Profiles(id) "
-               "ON DELETE CASCADE);"
+               "FOREIGN KEY (profileID) REFERENCES Profiles(id) ON DELETE CASCADE));"
     );
+    //  To be added to Snapshot table creation in case blood pressure is handled:
+    /*  "FOREIGN KEY (leftHandPressReadID) REFERENCES HandBloodPressure(id) "
+        "    ON UPDATE CASCADE "
+        "    ON DELETE SET NULL "
+        "    CHECK (SELECT orientation FROM HandBloodPressure WHERE id = Snapshots.rightHandPressReadID) = 'L', "
+        "FOREIGN KEY (rightHandPressReadID) REFERENCES HandBloodPressure(id) "
+        "    ON UPDATE CASCADE "
+        "    ON DELETE SET NULL "
+        "    CHECK (SELECT orientation FROM HandBloodPressure WHERE id = Snapshots.rightHandPressReadID) = 'R');"
+    */
     query.exec("CREATE TABLE IF NOT EXISTS HandBloodPressure("
                "id INTEGER NOT NULL, "
                "orientation CHAR(1) NOT NULL, -- “L” for left, “R” for right "
                "systolic INTEGER NOT NULL, -- Systolic mm Hg "
                "diastolic INTEGER NOT NULL, -- Diastolic mm Hg "
-               "PRIMARY KEY (id, orientation));"
+               "PRIMARY KEY (id, orientation), "
+               "FOREIGN KEY (id) REFERENCES Profiles(legReadingsID) ON DELETE);"
     );
     query.exec("CREATE TABLE IF NOT EXISTS HandReadings ("
-               "id INTEGER NOT NULL, "
+               "id INTEGER NOT NULL AUTOINCREMENT, "
                "orientation CHAR(1) NOT NULL, "
                "H1 INTEGER NOT NULL, "
                "H2 INTEGER NOT NULL, "
@@ -67,10 +84,11 @@ bool DBManager::DBInit() {
                "H4 INTEGER NOT NULL, "
                "H5 INTEGER NOT NULL, "
                "H6 INTEGER NOT NULL, "
-               "PRIMARY KEY (id, orientation));"
+               "PRIMARY KEY (id, orientation), "
+               "FOREIGN KEY (id) REFERENCES Profiles(handReadingsID) ON DELETE);"
     );
     query.exec("CREATE TABLE IF NOT EXISTS LegReadings ("
-               "id INTEGER NOT NULL, "
+               "id INTEGER NOT NULL AUTOINCREMENT, "
                "orientation CHAR(1) NOT NULL, "
                "F1 INTEGER NOT NULL, "
                "F2 INTEGER NOT NULL, "
@@ -78,17 +96,28 @@ bool DBManager::DBInit() {
                "F4 INTEGER NOT NULL, "
                "F5 INTEGER NOT NULL, "
                "F6 INTEGER NOT NULL, "
-               "PRIMARY KEY (id, orientation));"
+               "PRIMARY KEY (id, orientation), "
+               "FOREIGN KEY (id) REFERENCES Profiles(legReadingsID) ON DELETE);"
     );
     qInfo() <<"Initialized Database.";
     return true;
 }
 
-Profile* DBManager::createProfile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday) {
+int DBManager::getLastInsertId(QSqlQuery& query) {
+    int lastId = query.lastInsertId().toInt();
+    if (lastId != 0)
+        qWarning() << "Last inserted ID:" << lastId;
+    else
+        qWarning() << "Failed to retrieve last inserted ID";
+    return lastId;
+}
+
+Profile* DBManager::createProfile(const QString& fname, const QString& lname,
+                                  float weight, float height, const QString& bday)
+{
     QSqlQuery query;
-    query.prepare("INSERT INTO Profiles (id, fname, lname, weight, height, birthDay) "
-                  "VALUES (:id, :fname, :lname, :weight, :height, :birthDay);");
-    query.bindValue(":id", id);
+    query.prepare("INSERT INTO Profiles (fname, lname, weight, height, birthDay) "
+                  "VALUES (:fname, :lname, :weight, :height, :birthDay);");
     query.bindValue(":fname", fname);
     query.bindValue(":lname", lname);
     query.bindValue(":weight", weight);
@@ -99,26 +128,33 @@ Profile* DBManager::createProfile(int id, const QString& fname, const QString& l
         qWarning() << "Error creating profile: " << query.lastError().text();
         return NULL;
     }
-    return new Profile(id, fname, lname, weight, height, bday);
+    int lastId = getLastInsertId(query);
+    return new Profile(lastId, fname, lname, weight, height, bday);
 }
 
-bool DBManager::deleteProfile(const QString& fname, const QString& lname) {
+bool DBManager::deleteProfile(int id)
+{
     QSqlQuery query;
-    query.prepare("DELETE FROM Profiles WHERE fname = :fname AND lname = :lname;");
-    query.bindValue(":fname", fname);
-    query.bindValue(":lname", lname);
+    // Query cascades deletion to Snapshot table
+    query.prepare("DELETE FROM Profiles WHERE id = :id;");
+    query.bindValue(":id", id);
 
-    if (!query.exec()) {
-        qWarning() << "Error deleting profile: " << query.lastError().text();
+    if (query.exec()) {
+        qWarning() << "Profile by ID:" << id << " and corresponding snapshots deleted successfully.";
+        return true;
+    }
+    else {
+        qWarning() << "Failed to delete profile:" << query.lastError().text();
         return false;
     }
-    return true;
 }
 
-bool DBManager::updateProfile(Profile* prof, const QString& newFname, const QString& newLname, float newWeight, float newHeight, const QString& newBday) {
+bool DBManager::updateProfile(Profile* prof, const QString& newFname, const QString& newLname,
+                              float newWeight, float newHeight, const QString& newBday)
+{
     QSqlQuery query;
     query.prepare("UPDATE Profiles SET fname = :fname, lname = :lname, weight = :weight, "
-                  "height = :height, birthDay = :birthDay, country = :country "
+                  "height = :height, birthDay = :birthDay "
                   "WHERE id = :id;");
     query.bindValue(":fname", newFname);
     query.bindValue(":lname", newLname);
@@ -128,23 +164,29 @@ bool DBManager::updateProfile(Profile* prof, const QString& newFname, const QStr
     query.bindValue(":id", prof->getId());
 
     if (!query.exec()) {
-        qWarning() << "Error updating profile: " << query.lastError().text();
+        qWarning() << "ERR: Could not update Profile: " << query.lastError().text();
         return false;
     }
+    prof->setFname(newFname);
+    prof->setLname(newLname);
+    prof->setWeight(newWeight);
+    prof->setHeight(newHeight);
+    prof->setBday(newBday);
+
     return true;
 }
 
 // Create HandReading
-bool DBManager::createHandReadings(int id, char orientation, const QVector<int>& readings) {
+bool DBManager::createHandReadings(int& lastId, char orientation, const QVector<int>& readings)
+{
     if (readings.size() != 6) {
         qWarning() << "Hand reading must have exactly 6 values!";
         return false;
     }
 
     QSqlQuery query;
-    query.prepare("INSERT INTO HandReadings (id, orientation, H1, H2, H3, H4, H5, H6) "
-                  "VALUES (:id, :orientation, :H1, :H2, :H3, :H4, :H5, :H6);");
-    query.bindValue(":id", id);
+    query.prepare("INSERT INTO HandReadings (orientation, H1, H2, H3, H4, H5, H6) "
+                  "VALUES (:orientation, :H1, :H2, :H3, :H4, :H5, :H6);");
     query.bindValue(":orientation", orientation);
     query.bindValue(":H1", readings[0]);
     query.bindValue(":H2", readings[1]);
@@ -154,22 +196,23 @@ bool DBManager::createHandReadings(int id, char orientation, const QVector<int>&
     query.bindValue(":H6", readings[5]);
 
     if (!query.exec()) {
-        qWarning() << "Error inserting hand reading: " << query.lastError().text();
+        qWarning() << "ERR: Could not insert hand readings: " << query.lastError().text();
         return false;
     }
+    lastId = getLastInsertId(query);
     return true;
 }
 // Create LegReading
-bool DBManager::createLegReadings(int id, char orientation, const QVector<int>& readings) {
+bool DBManager::createLegReadings(int& lastId, char orientation, const QVector<int>& readings) 
+{
     if (readings.size() != 6) {
         qWarning() << "Leg reading must have exactly 6 values!";
         return false;
     }
 
     QSqlQuery query;
-    query.prepare("INSERT INTO LegReadings(id, orientation, F1, F2, F3, F4, F5, F6) "
-                  "VALUES (:id, :orientation, :F1, :F2, :F3, :F4, :F5, :F6);");
-    query.bindValue(":id", id);
+    query.prepare("INSERT INTO LegReadings(orientation, F1, F2, F3, F4, F5, F6) "
+                  "VALUES (:orientation, :F1, :F2, :F3, :F4, :F5, :F6);");
     query.bindValue(":orientation", orientation);
     query.bindValue(":F1", readings[0]);
     query.bindValue(":F2", readings[1]);
@@ -179,19 +222,51 @@ bool DBManager::createLegReadings(int id, char orientation, const QVector<int>& 
     query.bindValue(":F6", readings[5]);
 
     if (!query.exec()) {
-        qWarning() << "Error inserting foot reading: " << query.lastError().text();
+        qWarning() << "ERR: Could not insert foot readings: " << query.lastError().text();
         return false;
+    }
+
+    lastId = getLastInsertId(query);
+    return true;
+}
+
+bool DBManager::getAllProfiles(QVector<Profile*>& profiles)
+{
+    // Create a query to retrieve all snapshots from the database
+    QSqlQuery query("SELECT * FROM Profiles;");
+
+    // Execute the query
+    if (!query.exec()) {
+        qWarning() << "ERR: Could not fetch profiles: " << query.lastError().text();
+        return false;
+    }
+    // Iterate through the query result and populate the `snaps` vector
+    while (query.next()) {
+        // Create a new Snapshot object
+        Profile* prof = new Profile();
+
+        // Populate the Profile object with data from the query
+        prof->setId(query.value("id").toInt());
+        prof->setFname(query.value("fname").toString());
+        prof->setLname(query.value("lname").toString());
+        prof->setWeight(query.value("weight").toFloat());
+        prof->setHeight(query.value("height").toFloat());
+        prof->setBday(query.value("birthDay").toString());
+
+        // Add the Snapshot object to the vector
+        profiles.append(prof);
     }
     return true;
 }
 
-bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps) {
+bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps)
+{
     // Create a query to retrieve all snapshots from the database
     QSqlQuery query("SELECT * FROM Snapshots;");
 
     // Execute the query
     if (!query.exec()) {
-        qWarning() << "Error fetching snapshots: " << query.lastError().text();
+        qWarning() << "ERR: Could not fetch Snapshots: " << query.lastError().text();
         return false;
     }
 
@@ -217,11 +292,11 @@ bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps) {
         // Add the Snapshot object to the vector
         snaps.append(snap);
     }
-
     return true;
 }
 
-bool DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp) {
+bool DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp)
+{
     // Prepare the query to retrieve snapshot based on userID and timestamp (yyyy-MM-dd hh:mm)
     QSqlQuery query;
     query.prepare("SELECT * FROM Snapshots "
@@ -261,7 +336,8 @@ bool DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QStri
     return false;
 }
 
-QVector<int> DBManager::getHandReadings(int handReadingID, char orientation) {
+QVector<int> DBManager::getHReadingsByIdAndOrient(int handReadingID, char orientation)
+{
     QVector<int> readings;
 
     // Prepare the query to fetch hand readings by handReadingID and orientation
@@ -287,7 +363,8 @@ QVector<int> DBManager::getHandReadings(int handReadingID, char orientation) {
     }
     return readings;
 }
-QVector<int> DBManager::getLegReadings(int legReadingID, char orientation) {
+QVector<int> DBManager::getLReadingsByIdAndOrient(int legReadingID, char orientation)
+{
     QVector<int> readings;
 
     // Prepare the query to fetch leg readings by legReadingID and orientation
@@ -314,7 +391,8 @@ QVector<int> DBManager::getLegReadings(int legReadingID, char orientation) {
     return readings;
 }
 
-bool DBManager::addNewSnapshot(const Snapshot& snapshot) {
+bool DBManager::addSnapshotToHistory(const Snapshot& snapshot)
+{
     // Prepare the SQL query to insert a new snapshot
     QSqlQuery query;
     query.prepare("INSERT INTO Snapshots ("
