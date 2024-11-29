@@ -57,10 +57,10 @@ public:
     bool getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp); // Updates snap by DB query resuult
 
     // HandReadings and LegReadings-related functions
-    bool createHandReadings(int& id, const char orientation, const QVector<int>& readings);
-    bool createLegReadings(int& id, const char orientation, const QVector<int>& readings);
-    QVector<int> getHReadingsByIdAndOrient(int id, const char orientation);
-    QVector<int> getLReadingsByIdAndOrient(int id, const char orientation);
+    bool createHandReadings(int& id, const QVector<int>& readings); // 12 readings, L/R H1, ..., L/R H6
+    bool createLegReadings(int& id, const QVector<int>& readings); // 12 readings, L/R F1, ..., L/R F6
+    QVector<int> getHandReadingsById(int id);
+    QVector<int> getLegReadingsById(int id);
 
 private:
     QSqlDatabase raDoTechDB;

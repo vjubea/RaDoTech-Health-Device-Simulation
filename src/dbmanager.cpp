@@ -76,27 +76,35 @@ bool DBManager::DBInit()
                "FOREIGN KEY (id) REFERENCES Profiles(legReadingsID) ON DELETE);"
     );
     query.exec("CREATE TABLE IF NOT EXISTS HandReadings ("
-               "id INTEGER NOT NULL AUTOINCREMENT, "
-               "orientation CHAR(1) NOT NULL, "
-               "H1 INTEGER NOT NULL, "
-               "H2 INTEGER NOT NULL, "
-               "H3 INTEGER NOT NULL, "
-               "H4 INTEGER NOT NULL, "
-               "H5 INTEGER NOT NULL, "
-               "H6 INTEGER NOT NULL, "
-               "PRIMARY KEY (id, orientation), "
+               "id INTEGER PRIMARY KEY, "
+               "LH1 INTEGER NOT NULL, "
+               "LH2 INTEGER NOT NULL, "
+               "LH3 INTEGER NOT NULL, "
+               "LH4 INTEGER NOT NULL, "
+               "LH5 INTEGER NOT NULL, "
+               "LH6 INTEGER NOT NULL, "
+               "RH1 INTEGER NOT NULL, "
+               "RH2 INTEGER NOT NULL, "
+               "RH3 INTEGER NOT NULL, "
+               "RH4 INTEGER NOT NULL, "
+               "RH5 INTEGER NOT NULL, "
+               "RH6 INTEGER NOT NULL, "
                "FOREIGN KEY (id) REFERENCES Profiles(handReadingsID) ON DELETE);"
     );
     query.exec("CREATE TABLE IF NOT EXISTS LegReadings ("
-               "id INTEGER NOT NULL AUTOINCREMENT, "
-               "orientation CHAR(1) NOT NULL, "
-               "F1 INTEGER NOT NULL, "
-               "F2 INTEGER NOT NULL, "
-               "F3 INTEGER NOT NULL, "
-               "F4 INTEGER NOT NULL, "
-               "F5 INTEGER NOT NULL, "
-               "F6 INTEGER NOT NULL, "
-               "PRIMARY KEY (id, orientation), "
+               "id INTEGER PRIMARY KEY, "
+               "LF1 INTEGER NOT NULL, "
+               "LF2 INTEGER NOT NULL, "
+               "LF3 INTEGER NOT NULL, "
+               "LF4 INTEGER NOT NULL, "
+               "LF5 INTEGER NOT NULL, "
+               "LF6 INTEGER NOT NULL, "
+               "RF1 INTEGER NOT NULL, "
+               "RF2 INTEGER NOT NULL, "
+               "RF3 INTEGER NOT NULL, "
+               "RF4 INTEGER NOT NULL, "
+               "RF5 INTEGER NOT NULL, "
+               "RF6 INTEGER NOT NULL, "
                "FOREIGN KEY (id) REFERENCES Profiles(legReadingsID) ON DELETE);"
     );
     qInfo() <<"Initialized Database.";
@@ -177,23 +185,29 @@ bool DBManager::updateProfile(Profile* prof, const QString& newFname, const QStr
 }
 
 // Create HandReading
-bool DBManager::createHandReadings(int& lastId, char orientation, const QVector<int>& readings)
+bool DBManager::createHandReadings(int& lastId, const QVector<int>& readings)
 {
-    if (readings.size() != 6) {
+    if (readings.size() != 12) {
         qWarning() << "Hand reading must have exactly 6 values!";
         return false;
     }
 
     QSqlQuery query;
-    query.prepare("INSERT INTO HandReadings (orientation, H1, H2, H3, H4, H5, H6) "
-                  "VALUES (:orientation, :H1, :H2, :H3, :H4, :H5, :H6);");
-    query.bindValue(":orientation", orientation);
-    query.bindValue(":H1", readings[0]);
-    query.bindValue(":H2", readings[1]);
-    query.bindValue(":H3", readings[2]);
-    query.bindValue(":H4", readings[3]);
-    query.bindValue(":H5", readings[4]);
-    query.bindValue(":H6", readings[5]);
+    query.prepare("INSERT INTO HandReadings (LH1, LH2, LH3, LH4, LH5, LH6, RH1, RH2, RH3, RH4, RH5, RH6) "
+                  "VALUES (:LH1, :LH2, :LH3, :LH4, :LH5, :LH6, :RH1, :RH2, :RH3, :RH4, :RH5, :RH6);");
+
+    query.bindValue(":LH1", readings[0]);
+    query.bindValue(":RH1", readings[1]);
+    query.bindValue(":LH2", readings[2]);
+    query.bindValue(":RH2", readings[3]);
+    query.bindValue(":LH3", readings[4]);
+    query.bindValue(":RH3", readings[5]);
+    query.bindValue(":LH4", readings[6]);
+    query.bindValue(":RH4", readings[7]);
+    query.bindValue(":LH5", readings[8]);
+    query.bindValue(":RH5", readings[9]);
+    query.bindValue(":LH6", readings[10]);
+    query.bindValue(":RH6", readings[11]);
 
     if (!query.exec()) {
         qWarning() << "ERR: Could not insert hand readings: " << query.lastError().text();
@@ -203,23 +217,30 @@ bool DBManager::createHandReadings(int& lastId, char orientation, const QVector<
     return true;
 }
 // Create LegReading
-bool DBManager::createLegReadings(int& lastId, char orientation, const QVector<int>& readings) 
+bool DBManager::createLegReadings(int& lastId, const QVector<int>& readings)
 {
-    if (readings.size() != 6) {
-        qWarning() << "Leg reading must have exactly 6 values!";
+    if (readings.size() != 12) {
+        qWarning() << "Hand reading must have exactly 6 values!";
         return false;
     }
 
     QSqlQuery query;
-    query.prepare("INSERT INTO LegReadings(orientation, F1, F2, F3, F4, F5, F6) "
-                  "VALUES (:orientation, :F1, :F2, :F3, :F4, :F5, :F6);");
-    query.bindValue(":orientation", orientation);
-    query.bindValue(":F1", readings[0]);
-    query.bindValue(":F2", readings[1]);
-    query.bindValue(":F3", readings[2]);
-    query.bindValue(":F4", readings[3]);
-    query.bindValue(":F5", readings[4]);
-    query.bindValue(":F6", readings[5]);
+    query.prepare("INSERT INTO LegReadings (LF1, LF2, LF3, LF4, LF5, LF6, RF1, RF2, RF3, RF4, RF5, RF6) "
+                  "VALUES (:LF1, :LF2, :LF3, :LF4, :LF5, :LF6, :RF1, :RF2, :RF3, :RF4, :RF5, :RF6);");
+
+    query.bindValue(":LF1", readings[0]);
+    query.bindValue(":RF1", readings[1]);
+    query.bindValue(":LF2", readings[2]);
+    query.bindValue(":RF2", readings[3]);
+    query.bindValue(":LF3", readings[4]);
+    query.bindValue(":RF3", readings[5]);
+    query.bindValue(":LF4", readings[6]);
+    query.bindValue(":RF4", readings[7]);
+    query.bindValue(":LF5", readings[8]);
+    query.bindValue(":RF5", readings[9]);
+    query.bindValue(":LF6", readings[10]);
+    query.bindValue(":RF6", readings[11]);
+
 
     if (!query.exec()) {
         qWarning() << "ERR: Could not insert foot readings: " << query.lastError().text();
@@ -336,16 +357,14 @@ bool DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QStri
     return false;
 }
 
-QVector<int> DBManager::getHReadingsByIdAndOrient(int handReadingID, char orientation)
+QVector<int> DBManager::getHandReadingsById(int handReadingID)
 {
     QVector<int> readings;
 
-    // Prepare the query to fetch hand readings by handReadingID and orientation
+    // Prepare the query to fetch hand readings by handReadingID
     QSqlQuery query;
-    query.prepare("SELECT * FROM HandReadings WHERE id = :handReadingID AND orientation = :orientation;");
-
+    query.prepare("SELECT * FROM HandReadings WHERE id = :handReadingID;");
     query.bindValue(":handReadingID", handReadingID);
-    query.bindValue(":orientation", orientation);
 
     if (!query.exec()) {
         qWarning() << "Error fetching hand readings: " << query.lastError().text();
@@ -354,25 +373,29 @@ QVector<int> DBManager::getHReadingsByIdAndOrient(int handReadingID, char orient
 
     // If the readings exist, populate the list
     if (query.next()) {
-        readings.push_back(query.value("H1").toInt());
-        readings.push_back(query.value("H2").toInt());
-        readings.push_back(query.value("H3").toInt());
-        readings.push_back(query.value("H4").toInt());
-        readings.push_back(query.value("H5").toInt());
-        readings.push_back(query.value("H6").toInt());
+        readings.push_back(query.value("LH1").toInt());
+        readings.push_back(query.value("RH1").toInt());
+        readings.push_back(query.value("LH2").toInt());
+        readings.push_back(query.value("RH2").toInt());
+        readings.push_back(query.value("LH3").toInt());
+        readings.push_back(query.value("RH3").toInt());
+        readings.push_back(query.value("LH4").toInt());
+        readings.push_back(query.value("RH4").toInt());
+        readings.push_back(query.value("LH5").toInt());
+        readings.push_back(query.value("RH5").toInt());
+        readings.push_back(query.value("LH6").toInt());
+        readings.push_back(query.value("RH6").toInt());
     }
     return readings;
 }
-QVector<int> DBManager::getLReadingsByIdAndOrient(int legReadingID, char orientation)
+QVector<int> DBManager::getLegReadingsById(int legReadingID)
 {
     QVector<int> readings;
 
-    // Prepare the query to fetch leg readings by legReadingID and orientation
+    // Prepare the query to fetch leg readings by legReadingID
     QSqlQuery query;
-    query.prepare("SELECT * FROM LegReadings WHERE id = :legReadingID AND orientation = :orientation;");
-
+    query.prepare("SELECT * FROM LegReadings WHERE id = :legReadingID;");
     query.bindValue(":legReadingID", legReadingID);
-    query.bindValue(":orientation", orientation);
 
     if (!query.exec()) {
         qWarning() << "Error fetching leg readings: " << query.lastError().text();
@@ -381,12 +404,18 @@ QVector<int> DBManager::getLReadingsByIdAndOrient(int legReadingID, char orienta
 
     // If the readings exist, populate the list
     if (query.next()) {
-        readings.push_back(query.value("F1").toInt());
-        readings.push_back(query.value("F2").toInt());
-        readings.push_back(query.value("F3").toInt());
-        readings.push_back(query.value("F4").toInt());
-        readings.push_back(query.value("F5").toInt());
-        readings.push_back(query.value("F6").toInt());
+        readings.push_back(query.value("LF1").toInt());
+        readings.push_back(query.value("RF1").toInt());
+        readings.push_back(query.value("LF2").toInt());
+        readings.push_back(query.value("RF2").toInt());
+        readings.push_back(query.value("LF3").toInt());
+        readings.push_back(query.value("RF3").toInt());
+        readings.push_back(query.value("LF4").toInt());
+        readings.push_back(query.value("RF4").toInt());
+        readings.push_back(query.value("LF5").toInt());
+        readings.push_back(query.value("RF5").toInt());
+        readings.push_back(query.value("LF6").toInt());
+        readings.push_back(query.value("RF6").toInt());
     }
     return readings;
 }
