@@ -11,6 +11,8 @@ public:
              int heartRate, int sleepHrs, int sleepMins, float currWeight, const QString& notes, 
              int handReadingID, int legReadingID);
 
+    bool operator==(const Snapshot& other) const;
+
     // Getters and Setters
     int getProfileID() const;
     void setProfileID(int profileID);

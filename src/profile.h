@@ -14,6 +14,9 @@ public:
     Profile();
     Profile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday, DBManager* dbm = nullptr);
 
+    QVector<Snapshot*> getSnapshots();
+    void refreshSnapshots(DBManager* dbm);
+
     // Getters and Setters
     int getId() const;
     void setId(int id);

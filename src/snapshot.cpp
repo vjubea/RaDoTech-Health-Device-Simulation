@@ -22,6 +22,14 @@ Snapshot::Snapshot(
     handReadingID(handReadingID), legReadingID(legReadingID)
     {}
 
+
+bool Snapshot::operator==(const Snapshot& other) const {
+    return getProfileID() == other.getProfileID() &&
+           getTimestamp() == other.getTimestamp();
+}
+
+
+
 /***** Getters-and-Setters *****/
 
 int Snapshot::getProfileID() const { return profileID; }

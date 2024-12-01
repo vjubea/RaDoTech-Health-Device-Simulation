@@ -15,6 +15,29 @@ Profile::Profile(
         if(dbm != nullptr) {dbm->getAllSnapshotsOfUser(snapshots, id);}
     }
 
+QVector<Snapshot*> Profile::getSnapshots(){return snapshots;}
+
+void Profile::refreshSnapshots(DBManager *dbm){
+   // function reloads snapshots from the dbm, then adds only the new snapshots to the snapshots array
+
+   QVector<Snapshot*> newsnaps;
+   dbm->getAllSnapshotsOfUser(newsnaps, id);
+
+   auto it = newsnaps.begin();
+   while (it != newsnaps.end()) {
+       Snapshot* newsnap = *it;
+       if (std::any_of(snapshots.begin(), snapshots.end(),
+                       [newsnap](Snapshot* snap) { return *snap == *newsnap; })) {
+           delete newsnap;
+           it = newsnaps.erase(it);
+       } else {
+           snapshots.append(newsnap);
+           ++it;
+       }
+   }
+}
+
+
 int Profile::getId() const { return id; }
 void Profile::setId(int id) { this->id = id; }
 
