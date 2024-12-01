@@ -137,7 +137,7 @@ Profile* DBManager::createProfile(const QString& fname, const QString& lname,
         return NULL;
     }
     int lastId = getLastInsertId(query);
-    return new Profile(lastId, fname, lname, weight, height, bday);
+    return new Profile(lastId, fname, lname, weight, height, bday, this);
 }
 
 bool DBManager::deleteProfile(int id)

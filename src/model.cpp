@@ -62,6 +62,8 @@ bool Model::createProfile(QString& fname, QString& lname, float weight, float he
             profiles.push_back(newProf);
             return true;
         }
+        qWarning() <<"ERR: Could not creat Profile. Database entry error.";
+        return false;
     }
     qWarning() << "ERR: Could not Create Profile. Profiles exceed capacity.";
     return false;
