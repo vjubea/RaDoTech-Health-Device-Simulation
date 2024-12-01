@@ -316,6 +316,47 @@ bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps)
     return true;
 }
 
+
+bool DBManager::getAllSnapshotsOfUser(QVector<Snapshot*>& snaps, int userID)
+{
+    // Create a query to retrieve all snapshots from the database
+    QSqlQuery query("SELECT * FROM Snapshots"
+                    "WHERE profileID = :profileID;");
+
+    query.bindValue(":profileID", userID);
+
+    // Execute the query
+    if (!query.exec()) {
+        qWarning() << "ERR: Could not fetch Snapshots: " << query.lastError().text();
+        return false;
+    }
+
+    // Iterate through the query result and populate the `snaps` vector
+    while (query.next()) {
+        // Create a new Snapshot object
+        Snapshot* snap = new Snapshot();
+
+        // Populate the Snapshot object with data from the query
+        snap->setProfileID(query.value("profileID").toInt());
+        snap->setTimestamp(query.value("timestamp").toString());
+        snap->setBodyTemp(query.value("bodyTemp").toFloat());
+        snap->setLeftHandPressReadId(0); // 0 would act as null
+        snap->setRightHandPressReadId(0);
+        snap->setHeartRate(query.value("heartRate").toInt());
+        snap->setSleepHrs(query.value("sleepHrs").toInt());
+        snap->setSleepMins(query.value("sleepMins").toInt());
+        snap->setCurrWeight(query.value("currWeight").toFloat());
+        snap->setNotes(query.value("notes").toString());
+        snap->setHandReadingID(query.value("handReadingID").toInt());
+        snap->setLegReadingID(query.value("legReadingID").toInt());
+
+        // Add the Snapshot object to the vector
+        snaps.append(snap);
+    }
+    return true;
+}
+
+
 bool DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp)
 {
     // Prepare the query to retrieve snapshot based on userID and timestamp (yyyy-MM-dd hh:mm)

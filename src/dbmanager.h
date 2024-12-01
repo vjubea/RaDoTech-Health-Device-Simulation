@@ -54,6 +54,7 @@ public:
     // Snapshot-related functions
     bool addSnapshotToHistory(const Snapshot& snapshot); // Create snapshot object, then pass as parameter
     bool getAllSnapshots(QVector<Snapshot*>& snaps); // Updates snaps to DB query result
+    bool getAllSnapshotsOfUser(QVector<Snapshot*>& snaps, int userID); //Updats snaps by DB query result
     bool getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp); // Updates snap by DB query resuult
 
     // HandReadings and LegReadings-related functions
