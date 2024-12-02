@@ -2,13 +2,18 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 
-
+#include "scanner.h"
+#include "model.h"
+#include "snapshot.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    curScanner = nullptr;
+    displayedSnap = nullptr;
 
 
     //!!! Initialize the temporary credentials
@@ -770,6 +775,12 @@ void MainWindow::measureWrist()
     // // You could update the UI here, e.g., showing a status or progress
     // // Example: QLabel to show status
     // statusLabel->setText("Wrist measurement in progress...");
+
+    //includes calls to...
+    curScanner->registerReading('l','h',0,-1);
+    //and...
+    curScanner->registerReading('r','h',0,-1);
+    // but call each a total of 6 times (left and right), with 0 incrementing up by one for each call. -1 is the value, and should be replaced with a random.
 }
 
 
@@ -779,29 +790,36 @@ void MainWindow::measureAnkle()
     // qDebug() << "Ankle measurement started.";
     // // You could similarly update the UI here
     // statusLabel->setText("Ankle measurement in progress...");
+
+    //includes calls to...
+    curScanner->registerReading('l','f',0,-1);
+    //and...
+    curScanner->registerReading('r','f',0,-1);
+    // but call each a total of 6 times (left and right), with 0 incrementing up by one for each call. -1 is the value, and should be replaced with a random.
+
 }
 
 
 void MainWindow::finishMeasurement()
 {
-    // // Simulate measurement results
-    // QString result = "Measurement Results:\nWrist: Normal\nAnkle: Slightly Above Normal";
+    if(curScanner->finishScan()){
+        displayedSnap = curScanner->getFinishedSnap();
+        delete curScanner;
+
+        // snapshot can be shown from the curSnap, which has all the general params directly accesible, and the specific hand/leg readings in DB
+
+        // // Optionally, show a confirmation to the user
+        // statusLabel->setText("Measurement complete. Results saved.");
 
 
-    // // Here, we hardcode a result entry. You will later replace this with real data.
-    // qDebug() << result;
+        // // Navigate to the History page (or you could show the results in a different view)
+        // stackedWidget->setCurrentIndex(1);  // Assuming index 1 is the History page
+    }
+    else{
+        // scenario where scan has incomplete params (or db saving fails, for some reason)
 
+    }
 
-    // // Add result to history (for now, we can simulate this by adding a row in History)
-    // addMeasurementToHistory(result);
-
-
-    // // Optionally, show a confirmation to the user
-    // statusLabel->setText("Measurement complete. Results saved.");
-
-
-    // // Navigate to the History page (or you could show the results in a different view)
-    // stackedWidget->setCurrentIndex(1);  // Assuming index 1 is the History page
 }
 
 
@@ -817,8 +835,6 @@ void MainWindow::addMeasurementToHistory(const QString &result) {
     // historyTable->setItem(row, 0, new QTableWidgetItem(QDate::currentDate().toString()));  // Date
     // historyTable->setItem(row, 1, new QTableWidgetItem(result));  // Measurement result
 }
-
-
 
 
 
@@ -850,69 +866,33 @@ void MainWindow::onHistoryRowClicked(int row, int column)
 
 
 
-void MainWindow::editProfile(int row) //!!!check this
+void MainWindow::editProfile() //!!!check this
 {
-    /*
-    // Example: Fetch profile data and pre-fill the Create Profile Page for editing
-    // Implement similar to onSaveProfButtonClicked() but with UPDATE SQL queries
-    void MainWindow::editProfile(int row)
-    {
-    // Get the profile ID or primary key from the table
-    int profileId = profilesTable->item(row, 0)->text().toInt(); // Assuming ID is in the first column
+    QString fname, lname, bday = "";
+    float height = -1.0f;
+    float weight = -1.0f;
 
+    //GATHER PARAMS FROM ENTRY BOXES HERE; if nothing keep at defaults to indicate no change
 
-
-
-    QSqlQuery query;
-    query.prepare("SELECT fname, lname, weight, height, birthDay, country FROM Profiles WHERE id = :id");
-    query.bindValue(":id", profileId);
-
-
-
-
-    if (query.exec() && query.next())
-    {
-        // Populate the Create Profile Page fields
-        fNameInput->setText(query.value("fname").toString());
-        lNameInput->setText(query.value("lname").toString());
-        weightInput->setText(query.value("weight").toString());
-        heightInput->setText(query.value("height").toString());
-        dobInput->setText(query.value("birthDay").toString());
-        countryInput->setText(query.value("country").toString());
-
-
-
-
-        // Switch to the Create Profile Page for editing
-        stackedWidget->setCurrentIndex(1);
+    if(model.editCurProfile(fname,lname,weight,height,bday)){
+        // ON SUCCESS, REFRESH DISPLAY IF NEEDED
     }
-    else
-    {
-        QMessageBox::warning(this, "Error", "Failed to load profile data for editing.");
+    else{
+        // ON FAILURE MESSAGE MAY BE DISPLAYED
     }
-}
 
-*/
+
+
 }
 
 
-
-void MainWindow::deleteProfile(int row) //!!!check this
+void MainWindow::deleteProfile() //!!!check this
 {
-    /*
-    // Example: Remove the profile from the database
-    QSqlQuery query;
-    query.prepare("DELETE FROM Profiles WHERE id = :id");
-    query.bindValue(":id", row); // Replace with actual ID or primary key
+    if(model.deleteCurrentProfile()){
+        // ON SUCCESSFUL DELETION PLACE USER BACK IN SELECT/CREATE PROFILE MENU
 
-
-
-
-    if (query.exec()) {
-        QMessageBox::information(this, "Profile Deleted", "Profile successfully deleted!");
-        setupProfilesPage(); // Refresh the page
-    } else {
-        QMessageBox::critical(this, "Error", "Failed to delete profile: " + query.lastError().text());
     }
-    */
+    else{
+        // ON FAILURE MESSAGE MAY BE DISPLAYED
+    }
 }

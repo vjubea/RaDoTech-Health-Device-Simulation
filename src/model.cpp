@@ -69,6 +69,17 @@ bool Model::createProfile(QString& fname, QString& lname, float weight, float he
     return false;
 }
 
+bool Model::editCurProfile(QString &fname, QString &lname, float weight, float height, QString &bday){
+    if(fname == "") fname = currentProfile->getFname();
+    if(lname == "") lname = currentProfile->getLname();
+    if(weight == -1.0f) weight = currentProfile->getWeight();
+    if(height == -1.0f) height = currentProfile->getHeight();
+    if(bday == "") bday = currentProfile->getBday();
+
+    return dbManager->updateProfile(currentProfile, fname, lname, weight, height, bday);
+}
+
+
 bool Model::deleteCurrentProfile() {
     bool wasDeleted = false;
     for (int i = 0;  i < profiles.size(); i++) {

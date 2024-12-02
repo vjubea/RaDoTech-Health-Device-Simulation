@@ -23,6 +23,10 @@
 // #include <QSqlTableModel>
 
 
+class Scanner;
+class Snapshot;
+#include "model.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -44,7 +48,7 @@ private slots:
   void onCreateProfButtonClicked(); // Slot for create profile button
   void onSaveProfButtonClicked(); // Slot for save profile button
   void onHistoryRowClicked(int row, int column); // Slot for history row click
-  void addMeasurementToHistory(const QString& result);
+  void addMeasurementToHistory(const QString& result);  // NO LONGER NEEDED - HANDLED IN finishMeasurement()
   void measureWrist(); // Slot for wrist measurement
   void measureAnkle(); // Slot for ankle measurement
   void finishMeasurement(); // Slot for finishing measurement
@@ -53,6 +57,11 @@ private slots:
 
 private:
   Ui::MainWindow *ui;
+
+  Model model;
+  Snapshot* displayedSnap;
+  Scanner* curScanner;
+
 
 
   QMap<QString, QString> userCredentials; //!!! Temporary credentials store
@@ -154,8 +163,8 @@ private:
   void showHistoryPage(); // Show the history page
   // void showBarGraph(const QString &reading); // Show the bar graph
   void setupProfilesPage(); // Set up the Profiles page
-  void editProfile(int row); // Edit profile
-  void deleteProfile(int row); // Delete profile
+  void editProfile(); // Edit profile
+  void deleteProfile(); // Delete profile
   void setupChartPage(); // Set up the Chart page
   void setupIndicatorsPage(); // Set up the Indicators page
   void setupRecommendationsPage(); // Set up the Recommendations page
