@@ -38,7 +38,7 @@ Model::Model() {
 Scanner* Model::startScan() {
     if(currentProfile == nullptr) {return nullptr;}
 
-    return new Scanner(currentProfile);
+    return new Scanner(currentProfile, dbManager);
 }
 
 bool Model::selectProfile(int index) {

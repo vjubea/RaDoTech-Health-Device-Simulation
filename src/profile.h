@@ -13,6 +13,7 @@ public:
     // Constructors
     Profile();
     Profile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday, DBManager* dbm = nullptr);
+    ~Profile();
 
     QVector<Snapshot*> getSnapshots();
     void refreshSnapshots(DBManager* dbm);
@@ -35,6 +36,8 @@ public:
 
     QString getBday() const;
     void setBday(const QString& bday);
+
+    void addSnap(Snapshot* snap);
 
 private:
     int id;  // Profile ID

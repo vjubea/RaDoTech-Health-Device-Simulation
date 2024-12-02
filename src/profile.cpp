@@ -15,6 +15,14 @@ Profile::Profile(
         if(dbm != nullptr) {dbm->getAllSnapshotsOfUser(snapshots, id);}
     }
 
+Profile::~Profile(){
+    auto it = snapshots.begin();
+    while (it != snapshots.end()){
+        delete *it;
+        it = snapshots.erase(it);
+    }
+}
+
 QVector<Snapshot*> Profile::getSnapshots(){return snapshots;}
 
 void Profile::refreshSnapshots(DBManager *dbm){
@@ -55,3 +63,7 @@ void Profile::setHeight(float height) { this->height = height; }
 
 QString Profile::getBday() const { return bday; }
 void Profile::setBday(const QString& bday) { this->bday = bday; }
+
+void Profile::addSnap(Snapshot* snap){
+    if(snap != nullptr) snapshots.append(snap);
+}
