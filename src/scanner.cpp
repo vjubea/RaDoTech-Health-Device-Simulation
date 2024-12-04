@@ -97,10 +97,8 @@ bool Scanner::finishScan(){
     QVector<int> feet;
     for(int i = 0; i < 6; i++){
         hands.append(lHandRead[i]);
-        feet.append(lFootRead[i]);
-    }
-    for(int i = 0; i < 6; i++){
         hands.append(rHandRead[i]);
+        feet.append(lFootRead[i]);
         feet.append(rFootRead[i]);
     }
     if(! dbm->createHandReadings(hrID, hands)) return false;
