@@ -302,11 +302,23 @@ void MainWindow::setupHistoryPage()
 
 
     // Create a table widget for displaying history data
+    /*
+    VLAD: Each Entry in History Table should have 2 columns, as Date and Time of snapshot are merged as timestamp
+    in format "yyyy-MM-dd hh:mm". The other one should be the Profile to whom the Snapshot belongs:
+    I could make the Database return the snapshots by the newest first if needed. Just text me.
+        Ex:
+        08-12=2024 07:29        AnotherProfile
+        08-10=2024 11:29        VladProfile
+    */
     QTableWidget *historyTable = new QTableWidget(this);
     historyTable->setColumnCount(3); // Example: Date, Time, Summary
     historyTable->setHorizontalHeaderLabels({"Date", "Time", "Summary"});
-
-
+    /* 
+    VLAD: The Snapshot page should display bargraph with H1-F6 with their corresponding body part name, 
+    with a bar showing the average of Right and Left Readings.
+    We should pass the snapshot obj represented by the historyTable object we click.
+    */
+    
     /*
     // !!!Check if the database connection is open
     if (db.isOpen()) {
