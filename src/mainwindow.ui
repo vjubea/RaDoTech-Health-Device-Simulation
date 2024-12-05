@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="loginPage">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -420,25 +420,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="heartLabel">
-          <property name="text">
-           <string>Heart</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="kidneyLabel">
-          <property name="text">
-           <string>Kidney</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="liverLabel">
-          <property name="text">
-           <string>Liver</string>
-          </property>
-         </widget>
+         <widget class="QTableWidget" name="organTable"/>
         </item>
         <item>
          <widget class="QPushButton" name="chartButton">
@@ -714,16 +696,30 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="wristButton">
+         <widget class="QPushButton" name="rightHandButton">
           <property name="text">
-           <string>Wrist</string>
+           <string>Right Hand</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="ankleButton">
+         <widget class="QPushButton" name="leftHandButton">
           <property name="text">
-           <string>Ankle</string>
+           <string>Left Hand</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="rightFootButton">
+          <property name="text">
+           <string>RIght Foot</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="leftFootButton">
+          <property name="text">
+           <string>Left Foot</string>
           </property>
          </widget>
         </item>

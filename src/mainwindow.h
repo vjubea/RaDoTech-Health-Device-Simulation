@@ -18,6 +18,7 @@
 #include <QComboBox>
 #include <QInputDialog>
 #include <QTimer>
+#include <QRandomGenerator>
 // #include <QSqlQuery>
 // #include <QSqlDatabase>
 // #include <QSqlError>
@@ -161,6 +162,8 @@ private:
   void setupMenuPage();  // Function to initialize Menu Page
   void updateGreeting(const QString &firstName, const QString &lastName);  // Update greeting labels
   void setupMeasurePage(); // Set up the Measure page
+  void measureHands(const QString &side);
+  void measureFeet(const QString &side);
   void setupBattery();
   void depleteBattery(); // Deplete the battery
   void setupHistoryPage();// Set up the History page

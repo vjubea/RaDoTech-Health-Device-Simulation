@@ -236,71 +236,157 @@ void MainWindow::setupMenuPage()
 
 void MainWindow::setupMeasurePage()
 {
-    // Create the measure page
-    QWidget *measurePage = new QWidget(this);
-
-
-    // Create layout
-    measureLayout = new QVBoxLayout;
-
-    // Add battery label
-    batteryLabel = new QLabel("Battery: 100%", this);
-    batteryLabel->setAlignment(Qt::AlignCenter);
-    measureLayout->addWidget(batteryLabel);
-
-    // Instruction Label
-    QLabel *instructionLabel = new QLabel("Follow the instructions to measure your body parts:", this);
-    QFont labelFont5("Arial", 16, QFont::Bold);
-    instructionLabel->setFont(labelFont5);
-    measureLayout->addWidget(instructionLabel);
-
-    // Start button for measurement
-    QPushButton *startMeasureButton = new QPushButton("Start Measurement", this);
-    connect(startMeasureButton, &QPushButton::clicked, this, &MainWindow::startMeasurement);
-    measureLayout->addWidget(startMeasureButton);
+   // Create the measure page
+   QWidget *measurePage = new QWidget(this);
 
 
 
-    // Buttons for body parts
-    QPushButton *wristButton = new QPushButton("Measure Wrist", this);
-    connect(wristButton, &QPushButton::clicked, this, &MainWindow::measureWrist);
-    measureLayout->addWidget(wristButton);
+
+   // Create layout
+   QVBoxLayout *measureLayout = new QVBoxLayout;
 
 
-    QPushButton *ankleButton = new QPushButton("Measure Ankle", this);
-    connect(ankleButton, &QPushButton::clicked, this, &MainWindow::measureAnkle);
-    measureLayout->addWidget(ankleButton);
+   // Add the battery label
+   batteryLabel = new QLabel("Battery: 100%", this);
+   batteryLabel->setAlignment(Qt::AlignCenter);
+   measureLayout->addWidget(batteryLabel);
 
 
-    // Add more buttons for other body parts as needed...
+   // Instruction Label
+   QLabel *instructionLabel = new QLabel("Follow the instructions to measure your body parts:", this);
+   QFont labelFont5("Arial", 16, QFont::Bold);
+   instructionLabel->setFont(labelFont5);
+   measureLayout->addWidget(instructionLabel);
 
 
-    // Finish Button to go back to History or Menu page
-    QPushButton* finishButton = new QPushButton("Finish Measurement", this);
-    connect(finishButton, &QPushButton::clicked, this, &MainWindow::finishMeasurement);
-    measureLayout->addWidget(finishButton);
 
 
-    // Create a "Back" button
-    QPushButton *measureBackButton = new QPushButton("Back", this);
-    connect(measureBackButton, &QPushButton::clicked, [this]() {
-        stackedWidget->setCurrentIndex(2); // Go back to Menu page
-    });
+   // Start button for measurement
+   QPushButton *startMeasureButton = new QPushButton("Start Measurement", this);
+   connect(startMeasureButton, &QPushButton::clicked, this, &MainWindow::startMeasurement);
+   measureLayout->addWidget(startMeasureButton);
 
 
-    // Add Back button to layout
-    measureLayout->addWidget(measureBackButton);
-
-    // Set the layout for the history page
-    measurePage->setLayout(measureLayout);
 
 
-    // Add the history page to stacked widget
-    stackedWidget->addWidget(measurePage);
+   QPushButton *rightHandButton = new QPushButton("Measure Right Hand", this);
+   connect(rightHandButton, &QPushButton::clicked, this, [this]() { measureHands("Right"); });
+   measureLayout->addWidget(rightHandButton);
 
-    //qDebug() << "Measure Now page index: " << stackedWidget->indexOf(measurePage);
+
+   QPushButton *leftHandButton = new QPushButton("Measure Left Hand", this);
+   connect(leftHandButton, &QPushButton::clicked, this, [this]() { measureHands("Left"); });
+   measureLayout->addWidget(leftHandButton);
+
+
+   QPushButton *rightFootButton = new QPushButton("Measure Right Foot", this);
+   connect(rightFootButton, &QPushButton::clicked, this, [this]() { measureFeet("Right"); });
+   measureLayout->addWidget(rightFootButton);
+
+
+   QPushButton *leftFootButton = new QPushButton("Measure Left Foot", this);
+   connect(leftFootButton, &QPushButton::clicked, this, [this]() { measureFeet("Left"); });
+   measureLayout->addWidget(leftFootButton);
+
+
+
+
+   // Finish Button to go back to History or Menu page
+   QPushButton* finishButton = new QPushButton("Finish Measurement", this);
+   connect(finishButton, &QPushButton::clicked, this, &MainWindow::finishMeasurement);
+   measureLayout->addWidget(finishButton);
+
+
+
+
+   // Create a "Back" button
+   QPushButton *measureBackButton = new QPushButton("Back", this);
+   connect(measureBackButton, &QPushButton::clicked, [this]() {
+       stackedWidget->setCurrentIndex(2); // Go back to Menu page
+   });
+
+
+
+
+   // Add Back button to layout
+   measureLayout->addWidget(measureBackButton);
+
+
+   // Set the layout for the measure page
+   measurePage->setLayout(measureLayout);
+
+
+
+
+   // Add the history page to stacked widget
+   stackedWidget->addWidget(measurePage);
+
+
+   //qDebug() << "Measure Now page index: " << stackedWidget->indexOf(measurePage);
+
 
 }
+
+
+//void MainWindow::measureHands(const QString &side) {
+//   // Logic for measuring hands
+//   qDebug() << "Measuring " << side << " Hand";
+//   // Handle the measurement for the specified side (Left/Right)
+//   // You can store the result in a database or QVector later
+//}
+
+
+//void MainWindow::measureFeet(const QString &side) {
+//   // Logic for measuring feet
+//   qDebug() << "Measuring " << side << " Foot";
+//   // Handle the measurement for the specified side (Left/Right)
+//   // Store the result or update UI
+//}
+
+
+void MainWindow::measureHands(const QString &side) {
+   // Simulate data for measurement
+   int reading = QRandomGenerator::global()->bounded(50, 150); // Generate a random reading
+
+
+   qDebug() << "Measuring" << side << "Hand with reading:" << reading;
+
+
+   // Assuming Scanner is initialized as a member variable
+//   if (scanner) {
+//       char sideChar = (side == "Left") ? 'L' : 'R';
+//       scanner->registerReading(sideChar, 'H', reading); // H for Hand
+//   } else {
+//       qWarning() << "Scanner not initialized.";
+//   }
+
+
+   // TODO: Update UI or indicate that the hand measurement was successful
+   QMessageBox::information(this, "Measurement Complete", side + " Hand measurement recorded.");
+}
+
+
+void MainWindow::measureFeet(const QString &side) {
+   // Simulate data for measurement
+   int reading = QRandomGenerator::global()->bounded(50, 150); // Generate a random reading
+
+
+   qDebug() << "Measuring" << side << "Foot with reading:" << reading;
+
+
+   // Assuming Scanner is initialized as a member variable
+//   if (scanner) {
+//       char sideChar = (side == "Left") ? 'L' : 'R';
+//       scanner->registerReading(sideChar, 'F', reading); // F for Foot
+//   } else {
+//       qWarning() << "Scanner not initialized.";
+//   }
+
+
+   // TODO: Update UI or indicate that the foot measurement was successful
+   QMessageBox::information(this, "Measurement Complete", side + " Foot measurement recorded.");
+}
+
 
 
 void MainWindow::setupBattery()
@@ -539,7 +625,7 @@ void MainWindow::populateProfilesTable()
 }
 
 
-
+/*
 void MainWindow::setupBodyScreen()
 {
     QWidget *bodyWidget = new QWidget(this);
@@ -603,6 +689,127 @@ void MainWindow::setupBodyScreen()
     stackedWidget->addWidget(bodyWidget);
 
 }
+*/
+void MainWindow::setupBodyScreen()
+{
+   QWidget *bodyWidget = new QWidget(this);
+   QVBoxLayout *bodyLayout = new QVBoxLayout;
+
+
+   QLabel *bodyScreenLabel = new QLabel("Body Screen", this);
+   QFont labelFont4("Arial", 16, QFont::Bold);
+   bodyScreenLabel->setFont(labelFont4);
+   bodyLayout->addWidget(bodyScreenLabel);
+
+
+   // Create table for organ readings
+   QTableWidget *organTable = new QTableWidget(this);
+   organTable->setRowCount(12); // 12 organs to display (6 from H1-H6 and 6 from F1-F6)
+   organTable->setColumnCount(2); // Column 1: Organ, Column 2: Status
+
+
+   // Set table headers
+   QStringList headers = {"Organ", "Status"};
+   organTable->setHorizontalHeaderLabels(headers);
+
+
+   // Define font for organ rows
+   QFont labelFont5("Arial", 14, QFont::Bold);
+
+
+   // Sample snapshot data - assuming snapshot data is available from a previous scan
+   //Snapshot currentSnapshot = getCurrentSnapshot(); // This should be obtained dynamically from the current snapshot
+
+
+   // Populate the table with organ data and color
+   struct Organ {
+       QString name;
+       int reading;
+       int goodStart;
+       int goodEnd;
+   };
+
+
+   // Define organ readings and ranges (from defs.h)
+   /*
+   QList<Organ> organs = {
+       {"Lung (H1)", currentSnapshot.getLeftHandPressReadId(), H1_GoodReadSTART, H1_GoodReadEND},
+       {"Pericardium (H2)", currentSnapshot.getRightHandPressReadId(), H2_GoodReadSTART, H2_GoodReadEND},
+       {"Heart (H3)", currentSnapshot.getHeartRate(), H3_GoodReadSTART, H3_GoodReadEND},
+       {"Small Intestine (H4)", currentSnapshot.getLeftHandPressReadId(), H4_GoodReadSTART, H4_GoodReadEND},
+       {"Lymph Vessels (H5)", currentSnapshot.getRightHandPressReadId(), H5_GoodReadSTART, H5_GoodReadEND},
+       {"Large Intestine (H6)", currentSnapshot.getHeartRate(), H6_GoodReadSTART, H6_GoodReadEND},
+       {"Lung (F1)", currentSnapshot.getLeftHandPressReadId(), F1_GoodReadSTART, F1_GoodReadEND},
+       {"Pericardium (F2)", currentSnapshot.getRightHandPressReadId(), F2_GoodReadSTART, F2_GoodReadEND},
+       {"Heart (F3)", currentSnapshot.getHeartRate(), F3_GoodReadSTART, F3_GoodReadEND},
+       {"Small Intestine (F4)", currentSnapshot.getLeftHandPressReadId(), F4_GoodReadSTART, F4_GoodReadEND},
+       {"Lymph Vessels (F5)", currentSnapshot.getRightHandPressReadId(), F5_GoodReadSTART, F5_GoodReadEND},
+       {"Large Intestine (F6)", currentSnapshot.getHeartRate(), F6_GoodReadSTART, F6_GoodReadEND}
+   };
+  `
+
+   // Loop through the organs and set their color based on the reading
+   for (int i = 0; i < organs.size(); ++i) {
+       QTableWidgetItem *organItem = new QTableWidgetItem(organs[i].name);
+       organItem->setFont(labelFont5);
+       organTable->setItem(i, 0, organItem);
+
+
+       // Determine the status color based on the reading
+       QString status;
+       QColor color;
+
+
+       if (organs[i].reading < organs[i].goodStart) {
+           status = "Below Normal";
+           color = Qt::red;
+       } else if (organs[i].reading > organs[i].goodEnd) {
+           status = "Above Normal";
+           color = Qt::purple;
+       } else {
+           status = "Normal";
+           color = Qt::green;
+       }
+
+
+       QTableWidgetItem *statusItem = new QTableWidgetItem(status);
+       statusItem->setBackgroundColor(color);
+       statusItem->setFont(labelFont5);
+       organTable->setItem(i, 1, statusItem);
+   }
+   */
+
+   // Add the table to the layout
+   bodyLayout->addWidget(organTable);
+
+
+   // Add buttons for navigation
+   QPushButton *chartButton = new QPushButton("Chart", this);
+   QPushButton *indicatorsButton = new QPushButton("Indicators", this);
+   QPushButton *recommendationsButton = new QPushButton("Recommendations", this);
+   QPushButton *backBodyButton = new QPushButton("Back", this);
+
+
+   // Add buttons to the layout
+   bodyLayout->addWidget(chartButton);
+   bodyLayout->addWidget(indicatorsButton);
+   bodyLayout->addWidget(recommendationsButton);
+   bodyLayout->addWidget(backBodyButton);
+
+
+   // Connect buttons to respective slots (or pages in stackedWidget)
+   connect(chartButton, &QPushButton::clicked, this, &MainWindow::showChartPage);
+   connect(indicatorsButton, &QPushButton::clicked, this, &MainWindow::showIndicatorsPage);
+   connect(recommendationsButton, &QPushButton::clicked, this, &MainWindow::showRecommendationsPage);
+   connect(backBodyButton, &QPushButton::clicked, this, [this]() {
+       stackedWidget->setCurrentIndex(5); // Navigate back to the History Page
+   });
+
+
+   bodyWidget->setLayout(bodyLayout);
+   stackedWidget->addWidget(bodyWidget);
+}
+
 
 
 void MainWindow::setupChartPage()
