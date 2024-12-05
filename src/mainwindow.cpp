@@ -10,12 +10,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-
-    //!!! Initialize the temporary credentials
-    userCredentials.insert("testuser", "password123");
-    userCredentials.insert("user2", "pass456");
-
-
     // Set up the stacked widget
     stackedWidget = new QStackedWidget(this);
     setCentralWidget(stackedWidget);
@@ -239,9 +233,6 @@ void MainWindow::setupMeasurePage()
    // Create the measure page
    QWidget *measurePage = new QWidget(this);
 
-
-
-
    // Create layout
    QVBoxLayout *measureLayout = new QVBoxLayout;
 
@@ -258,16 +249,10 @@ void MainWindow::setupMeasurePage()
    instructionLabel->setFont(labelFont5);
    measureLayout->addWidget(instructionLabel);
 
-
-
-
    // Start button for measurement
    QPushButton *startMeasureButton = new QPushButton("Start Measurement", this);
    connect(startMeasureButton, &QPushButton::clicked, this, &MainWindow::startMeasurement);
    measureLayout->addWidget(startMeasureButton);
-
-
-
 
    QPushButton *rightHandButton = new QPushButton("Measure Right Hand", this);
    connect(rightHandButton, &QPushButton::clicked, this, [this]() { measureHands("Right"); });
@@ -289,15 +274,10 @@ void MainWindow::setupMeasurePage()
    measureLayout->addWidget(leftFootButton);
 
 
-
-
    // Finish Button to go back to History or Menu page
    QPushButton* finishButton = new QPushButton("Finish Measurement", this);
    connect(finishButton, &QPushButton::clicked, this, &MainWindow::finishMeasurement);
    measureLayout->addWidget(finishButton);
-
-
-
 
    // Create a "Back" button
    QPushButton *measureBackButton = new QPushButton("Back", this);
@@ -305,43 +285,19 @@ void MainWindow::setupMeasurePage()
        stackedWidget->setCurrentIndex(2); // Go back to Menu page
    });
 
-
-
-
    // Add Back button to layout
    measureLayout->addWidget(measureBackButton);
-
 
    // Set the layout for the measure page
    measurePage->setLayout(measureLayout);
 
 
-
-
    // Add the history page to stacked widget
    stackedWidget->addWidget(measurePage);
 
-
    //qDebug() << "Measure Now page index: " << stackedWidget->indexOf(measurePage);
 
-
 }
-
-
-//void MainWindow::measureHands(const QString &side) {
-//   // Logic for measuring hands
-//   qDebug() << "Measuring " << side << " Hand";
-//   // Handle the measurement for the specified side (Left/Right)
-//   // You can store the result in a database or QVector later
-//}
-
-
-//void MainWindow::measureFeet(const QString &side) {
-//   // Logic for measuring feet
-//   qDebug() << "Measuring " << side << " Foot";
-//   // Handle the measurement for the specified side (Left/Right)
-//   // Store the result or update UI
-//}
 
 
 void MainWindow::measureHands(const QString &side) {
@@ -383,7 +339,7 @@ void MainWindow::measureFeet(const QString &side) {
 //   }
 
 
-   // TODO: Update UI or indicate that the foot measurement was successful
+   //Update UI or indicate that the foot measurement was successful
    QMessageBox::information(this, "Measurement Complete", side + " Foot measurement recorded.");
 }
 
@@ -449,7 +405,6 @@ void MainWindow::setupHistoryPage()
 
     // Create layout
     QVBoxLayout *historyLayout = new QVBoxLayout;
-
 
     historyLabel = new QLabel("History", this);
     QFont labelFont3("Arial", 16, QFont::Bold);
@@ -600,11 +555,10 @@ void MainWindow::setupProfilesPage()
 
     populateProfilesTable();
 
-
-
     connect(editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
     connect(deleteProfileButton, &QPushButton::clicked, this, &MainWindow::onDeleteProfileClicked);
 }
+
 
 void MainWindow::populateProfilesTable()
 {
@@ -625,71 +579,6 @@ void MainWindow::populateProfilesTable()
 }
 
 
-/*
-void MainWindow::setupBodyScreen()
-{
-    QWidget *bodyWidget = new QWidget(this);
-    QVBoxLayout *bodyLayout = new QVBoxLayout;
-
-
-    QLabel *bodyScreenLabel = new QLabel("Body Screen", this);
-    QFont labelFont4("Arial", 16, QFont::Bold);
-    bodyScreenLabel->setFont(labelFont4);
-    bodyLayout->addWidget(bodyScreenLabel);
-
-
-    // Define the font style for the labels
-    QFont labelFont5("Arial", 16, QFont::Bold);
-
-
-    // Create labels for each organ/part (based on database data)
-    QLabel *heartLabel = new QLabel("Heart: Normal");
-    heartLabel->setStyleSheet("color: green;");
-    heartLabel->setFont(labelFont5);
-    bodyLayout->addWidget(heartLabel);
-
-
-    QLabel *liverLabel = new QLabel("Liver: Above Normal");
-    liverLabel->setStyleSheet("color: blue;");
-    liverLabel->setFont(labelFont5);
-    bodyLayout->addWidget(liverLabel);
-
-
-
-    QLabel *kidneyLabel = new QLabel("Kidney: Below Normal");
-    kidneyLabel->setStyleSheet("color: red;");
-    kidneyLabel->setFont(labelFont5);
-    bodyLayout->addWidget(kidneyLabel);
-
-
-    // Add buttons for navigation
-    QPushButton *chartButton = new QPushButton("Chart", this);
-    QPushButton *indicatorsButton = new QPushButton("Indicators", this);
-    QPushButton *recommendationsButton = new QPushButton("Recommendations", this);
-    QPushButton *backBodyButton = new QPushButton("Back", this);
-
-
-    // Add buttons to the layout
-    bodyLayout->addWidget(chartButton);
-    bodyLayout->addWidget(indicatorsButton);
-    bodyLayout->addWidget(recommendationsButton);
-    bodyLayout->addWidget(backBodyButton);
-
-
-    // Connect buttons to respective slots (or pages in stackedWidget)
-    connect(chartButton, &QPushButton::clicked, this, &MainWindow::showChartPage);
-    connect(indicatorsButton, &QPushButton::clicked, this, &MainWindow::showIndicatorsPage);
-    connect(recommendationsButton, &QPushButton::clicked, this, &MainWindow::showRecommendationsPage);
-    connect(backBodyButton, &QPushButton::clicked, this, [this]() {
-        stackedWidget->setCurrentIndex(5); // Navigate back to the History Page
-    });
-
-
-    bodyWidget->setLayout(bodyLayout);
-    stackedWidget->addWidget(bodyWidget);
-
-}
-*/
 void MainWindow::setupBodyScreen()
 {
    QWidget *bodyWidget = new QWidget(this);
@@ -915,8 +804,6 @@ void MainWindow::setupRecommendationsPage()
 }
 
 
-
-
 void MainWindow::showChartPage()
 {
     // Placeholder for chart page
@@ -945,9 +832,6 @@ void MainWindow::showHistoryPage()
 }
 
 
-
-
-
 void MainWindow::onLogoutButtonClicked()
 {
     // Clear session-specific data
@@ -956,8 +840,6 @@ void MainWindow::onLogoutButtonClicked()
     // Navigate to the Login Page
     stackedWidget->setCurrentIndex(0);
 }
-
-
 
 
 void MainWindow::onLoginButtonClicked()
@@ -987,18 +869,12 @@ void MainWindow::onLoginButtonClicked()
 }
 
 
-
-
-
-
 // Slot for handling create profile button click
 void MainWindow::onCreateProfButtonClicked()
 {
     // Switch to the create profile page (index 1)
     stackedWidget->setCurrentIndex(1);
 }
-
-
 
 
 // Slot for handling save profile button click
@@ -1045,30 +921,10 @@ void MainWindow::onSaveProfButtonClicked()
 }
 
 
-
 void MainWindow::updateGreeting(const QString &firstName, const QString &lastName)
 {
     userGreetingLabel->setText("Hello, ");
     userNameLabel->setText(firstName + " " + lastName); // Display full name
-}
-
-
-void MainWindow::measureWrist()
-{
-    // // Simulate wrist measurement logic
-    // qDebug() << "Wrist measurement started.";
-    // // You could update the UI here, e.g., showing a status or progress
-    // // Example: QLabel to show status
-    // statusLabel->setText("Wrist measurement in progress...");
-}
-
-
-void MainWindow::measureAnkle()
-{
-    // // Simulate ankle measurement logic
-    // qDebug() << "Ankle measurement started.";
-    // // You could similarly update the UI here
-    // statusLabel->setText("Ankle measurement in progress...");
 }
 
 
@@ -1084,8 +940,6 @@ void MainWindow::addMeasurementToHistory(const QString &result) {
     // historyTable->setItem(row, 0, new QTableWidgetItem(QDate::currentDate().toString()));  // Date
     // historyTable->setItem(row, 1, new QTableWidgetItem(result));  // Measurement result
 }
-
-
 
 
 
@@ -1187,6 +1041,6 @@ void MainWindow::onDeleteProfileClicked()
     QMessageBox::information(this, "Profile Deleted", "The profile has been deleted.");
 
     // Navigate back to the Welcome Page
-    stackedWidget->setCurrentIndex(0); // Assuming Welcome Page is index 0
+    stackedWidget->setCurrentIndex(0);
 }
 

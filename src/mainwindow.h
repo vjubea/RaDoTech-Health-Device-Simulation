@@ -10,7 +10,6 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
-#include <QMap> //!!!for testing user loggin in -> menu page
 #include <QMessageBox>
 #include <QModelIndex>
 #include <QString>
@@ -53,10 +52,7 @@ private slots:
   void onHistoryRowClicked(int row, int column); // Slot for history row click
   void addMeasurementToHistory(const QString& result);
   void startMeasurement(); // Start the measurement
-  void measureWrist(); // Slot for wrist measurement
-  void measureAnkle(); // Slot for ankle measurement
   void finishMeasurement(); // Slot for finishing measurement
-
 
 
 private:
@@ -172,7 +168,6 @@ private:
   void showIndicatorsPage(); // Show the indicators page
   void showRecommendationsPage(); // Show the recommendations page
   void showHistoryPage(); // Show the history page
-  // void showBarGraph(const QString &reading); // Show the bar graph
   void setupProfilesPage(); // Set up the Profiles page
   void populateProfilesTable(); // Populate the profiles table
   void setupChartPage(); // Set up the Chart page
