@@ -26,6 +26,31 @@ Model::Model() {
     dbManager->updateProfile(profiles.at(3), name, lname, 90, 150, bday);
     selectProfile(3);
 
+    Scanner* scanner = startScan();
+    for (int i=0; i<6; ++i) {
+        scanner->registerReading('L','H',10);
+        scanner->registerReading('R','H',10);
+        scanner->registerReading('L','F',10);
+        scanner->registerReading('R','F',10);
+    }
+    scanner->registerHeartRate(10);
+    scanner->registerSleepTime(7, 30);
+    scanner->registerBodyTemp(36);
+    scanner->registerDate(10, 4, 2024);
+    scanner->registerTime(23, 59);
+    scanner->finishScan();
+    QVector<Snapshot*> snaps;
+    dbManager->getAllSnapshots(snaps);
+    qWarning() << (snaps.size());
+    Snapshot* snap = snaps.at(0);
+    qWarning() << "Here are the readings for ProfileID:" << snap->getProfileID();
+    qWarning() << "LegReadID and HandReadID: " << snap->getFootReadingID() << snap->getHandReadingID();
+
+    QVector<int> readings = dbManager->getFootReadingsById(snap->getFootReadingID());
+    for (int i=0; i<6; ++i) {
+        qWarning() <<"Foot Reading at ("<<i<<") is: "<<readings.at(i);
+    }
+
     /*
     -For scans, we create them in model, then use dbManager->createLeg/HandReadings()
         id& parameter passed used to save the auto-incremented id of the insertion, and the QVector<int>& will
@@ -38,7 +63,7 @@ Model::Model() {
 Scanner* Model::startScan() {
     if(currentProfile == nullptr) {return nullptr;}
 
-    return new Scanner(currentProfile);
+    return new Scanner(currentProfile, dbManager);
 }
 
 bool Model::selectProfile(int index) {
@@ -51,20 +76,30 @@ bool Model::selectProfile(int index) {
     return true;
 }
 
-
 bool Model::createProfile(QString& fname, QString& lname, float weight, float height, QString& birthday) {
     // attempts to create profile. If no room for another, false. If creation fails, false. etc...
-    // DATABASE STORAGE GOES HERE FIRST, SINCE PROFILE OBJECTS ARE CREATED OUT OF THE DATABASE
-    // after a successful database entry has been created, create object in a free space in the profile array
     if (profiles.size() < 5){
         Profile* newProf = dbManager->createProfile(fname, lname, weight, height, birthday);
         if (newProf != NULL) {
+            // Pushes new profile to the profiles list
             profiles.push_back(newProf);
             return true;
         }
+        qWarning() <<"ERR: Could not Create Profile. Database entry error.";
+        return false;
     }
     qWarning() << "ERR: Could not Create Profile. Profiles exceed capacity.";
     return false;
+}
+
+bool Model::editCurProfile(QString &fname, QString &lname, float weight, float height, QString &bday){
+    if(fname == "") fname = currentProfile->getFname();
+    if(lname == "") lname = currentProfile->getLname();
+    if(weight == -1.0f) weight = currentProfile->getWeight();
+    if(height == -1.0f) height = currentProfile->getHeight();
+    if(bday == "") bday = currentProfile->getBday();
+
+    return dbManager->updateProfile(currentProfile, fname, lname, weight, height, bday);
 }
 
 bool Model::deleteCurrentProfile() {

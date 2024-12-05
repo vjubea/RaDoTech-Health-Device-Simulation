@@ -26,7 +26,7 @@
  *
  * Snapshot-related functions
  * - getAllSnapshots: retrieves all snapshots for a profile
- * - getSnapshotByUserAndDate: retrieves a snapshot based on userID, date, and time
+ * - getSnapshotByUserAndTime: retrieves a snapshot based on userID, date, and time
  *
  * HandReadings and LegReadings-related functions
  * - createHandReadings: adds a new hand reading to the database
@@ -54,13 +54,14 @@ public:
     // Snapshot-related functions
     bool addSnapshotToHistory(const Snapshot& snapshot); // Create snapshot object, then pass as parameter
     bool getAllSnapshots(QVector<Snapshot*>& snaps); // Updates snaps to DB query result
-    bool getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp); // Updates snap by DB query resuult
+    bool getAllSnapshotsOfUser(QVector<Snapshot*>& snaps, int userID); //Updats snaps by DB query result
+    bool getSnapshotByUserAndTime(Snapshot& snap, int userID, const QString& timestamp); // Updates snap by DB query result
 
-    // HandReadings and LegReadings-related functions
+    // HandReadings and FFootReadings-related functions
     bool createHandReadings(int& id, const QVector<int>& readings); // 12 readings, L/R H1, ..., L/R H6
-    bool createLegReadings(int& id, const QVector<int>& readings); // 12 readings, L/R F1, ..., L/R F6
+    bool createFootReadings(int& id, const QVector<int>& readings); // 12 readings, L/R F1, ..., L/R F6
     QVector<int> getHandReadingsById(int id);
-    QVector<int> getLegReadingsById(int id);
+    QVector<int> getFootReadingsById(int id);
 
 private:
     QSqlDatabase raDoTechDB;

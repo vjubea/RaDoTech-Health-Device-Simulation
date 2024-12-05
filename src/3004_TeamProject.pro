@@ -20,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     dbmanager.h \
+    defs.h \
     header.h \
     mainwindow.h \
     model.h \

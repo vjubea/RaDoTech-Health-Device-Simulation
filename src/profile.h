@@ -2,12 +2,21 @@
 #define PROFILE_H
 
 #include <QString>
+#include <QVector>
+
+#include "snapshot.h"
+
+class DBManager;
 
 class Profile {
 public:
     // Constructors
     Profile();
-    Profile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday);
+    Profile(int id, const QString& fname, const QString& lname, float weight, float height, const QString& bday, DBManager* dbm = nullptr);
+    ~Profile();
+
+    QVector<Snapshot*> getSnapshots();
+    void refreshSnapshots(DBManager* dbm);
 
     // Getters and Setters
     int getId() const;
@@ -28,6 +37,8 @@ public:
     QString getBday() const;
     void setBday(const QString& bday);
 
+    void addSnap(Snapshot* snap);
+
 private:
     int id;  // Profile ID
     QString fname;  // First name
@@ -35,6 +46,7 @@ private:
     float weight;  // Weight in kg
     float height;  // Height in cm
     QString bday;  // Birthdate (mm-dd-yyyy)
+    QVector<Snapshot*> snapshots;
 };
 
 #endif // PROFILE_H

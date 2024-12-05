@@ -6,15 +6,808 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1319</width>
+    <height>612</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
-  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QStackedWidget" name="stackedWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>1281</width>
+      <height>561</height>
+     </rect>
+    </property>
+    <property name="currentIndex">
+     <number>6</number>
+    </property>
+    <widget class="QWidget" name="loginPage">
+     <widget class="QWidget" name="verticalLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>1271</width>
+        <height>375</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>10</number>
+       </property>
+       <property name="leftMargin">
+        <number>10</number>
+       </property>
+       <property name="topMargin">
+        <number>10</number>
+       </property>
+       <property name="rightMargin">
+        <number>10</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="welcomeLabel">
+         <property name="font">
+          <font>
+           <family>Quicksand Medium</family>
+           <pointsize>42</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Welcome</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="pleaseLogInStatement">
+         <property name="font">
+          <font>
+           <family>Quicksand</family>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Please Log In</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="userLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>24</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Username:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="pwLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>24</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Password:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="noAccLabel">
+         <property name="font">
+          <font>
+           <family>Quicksand</family>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>No Account? Please Create Profile</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="userInput">
+         <property name="maxLength">
+          <number>30000</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="pwInput"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="loginButton">
+         <property name="font">
+          <font>
+           <family>Liberation Mono</family>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Log in</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="createProfButton">
+         <property name="font">
+          <font>
+           <family>Liberation Sans</family>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Create Profile</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="createProfPage">
+     <widget class="QWidget" name="verticalLayoutWidget_2">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>0</y>
+        <width>1021</width>
+        <height>509</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="createProfLabel">
+         <property name="font">
+          <font>
+           <family>Quicksand Medium</family>
+           <pointsize>28</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Create New Profile</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="fNameLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>First Name:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lNameLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Last Name:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="weightLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Weight (kg):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="heightLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Height (cm):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="dobLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Date Of Birth (mm-dd-yyyy):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="countryLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Country:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="pwLabel2">
+         <property name="font">
+          <font>
+           <family>DejaVu Serif</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Password:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="fnameInput"/>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lNameInput"/>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="weightInput"/>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="heightInput"/>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="dobInput"/>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="countryInput"/>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="pwInput2"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="saveProfButton">
+         <property name="font">
+          <font>
+           <family>Liberation Mono</family>
+           <pointsize>12</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Save Profile</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="menuPage">
+     <widget class="QWidget" name="verticalLayoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>1072</width>
+        <height>511</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <property name="leftMargin">
+          <number>20</number>
+         </property>
+         <property name="topMargin">
+          <number>40</number>
+         </property>
+         <property name="rightMargin">
+          <number>900</number>
+         </property>
+         <property name="bottomMargin">
+          <number>40</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="userGreetingLabel">
+           <property name="text">
+            <string>Hello,</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="userNameLabel">
+           <property name="text">
+            <string>userNameLabel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="measureNowButton">
+         <property name="text">
+          <string>Measure Now</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="profilesButton">
+         <property name="text">
+          <string>Profiles</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="historyButton">
+         <property name="text">
+          <string>History</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="logoutButton">
+         <property name="text">
+          <string>Log Out</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="historyPage">
+     <widget class="QWidget" name="verticalLayoutWidget_4">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>20</y>
+        <width>361</width>
+        <height>80</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="historyLayout">
+       <item>
+        <widget class="QLabel" name="historyLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Sans</family>
+           <pointsize>15</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>History</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QPushButton" name="historyBackButton">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>520</y>
+        <width>83</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Back</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="historyTable">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>1281</width>
+        <height>391</height>
+       </rect>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>1281</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="bodyScreenPage">
+     <widget class="QWidget" name="bodyWidget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>20</y>
+        <width>1271</width>
+        <height>441</height>
+       </rect>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_6">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>60</y>
+         <width>1241</width>
+         <height>371</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="bodyLayout">
+        <item>
+         <widget class="QLabel" name="bodyScreenLabel">
+          <property name="text">
+           <string>Body Screen</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="heartLabel">
+          <property name="text">
+           <string>Heart</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="kidneyLabel">
+          <property name="text">
+           <string>Kidney</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="liverLabel">
+          <property name="text">
+           <string>Liver</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="chartButton">
+          <property name="text">
+           <string>Chart</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="indicatorsButton">
+          <property name="text">
+           <string>Indicators</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="recommendationsButton">
+          <property name="text">
+           <string>Recommendations</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="backBodyButton">
+          <property name="text">
+           <string>Back</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="profilesPage">
+     <widget class="QWidget" name="verticalLayoutWidget_5">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>1071</width>
+        <height>521</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="profilesLayout">
+       <item>
+        <widget class="QLabel" name="profilesLabel">
+         <property name="font">
+          <font>
+           <family>DejaVu Sans</family>
+           <pointsize>13</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Profiles</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableWidget" name="profilesTable">
+         <column>
+          <property name="text">
+           <string>First Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Last Name</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Weight</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Height</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Actions</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="profilesBackButton">
+         <property name="text">
+          <string>Back</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="widget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>1130</x>
+        <y>230</y>
+        <width>120</width>
+        <height>80</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="chartPage">
+     <widget class="QWidget" name="chartWidget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>40</x>
+        <y>30</y>
+        <width>1231</width>
+        <height>521</height>
+       </rect>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_7">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>20</y>
+         <width>1201</width>
+         <height>491</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="chartLayout">
+        <item>
+         <widget class="QLabel" name="chartLabel">
+          <property name="text">
+           <string>Chart</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="chartBackButton">
+          <property name="text">
+           <string>Back</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="indicatorsPage">
+     <widget class="QWidget" name="indicatorsWidget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>40</y>
+        <width>1211</width>
+        <height>511</height>
+       </rect>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_8">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>10</y>
+         <width>1181</width>
+         <height>481</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="indicatorsLayout">
+        <item>
+         <widget class="QLabel" name="indicatorsLabel">
+          <property name="text">
+           <string>Indicators</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="indBackButton">
+          <property name="text">
+           <string>Back</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="recommendationsPage">
+     <widget class="QWidget" name="recommendationsWidget" native="true">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>1221</width>
+        <height>491</height>
+       </rect>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_9">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>1201</width>
+         <height>461</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="recommendationsLayout">
+        <item>
+         <widget class="QLabel" name="recommendationsLabel">
+          <property name="text">
+           <string>Recommendations</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="recBackButton">
+          <property name="text">
+           <string>Back</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="measureNowPage">
+     <widget class="QWidget" name="measurePage" native="true">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>30</y>
+        <width>1241</width>
+        <height>521</height>
+       </rect>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_10">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>1221</width>
+         <height>491</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="measureLayout">
+        <item>
+         <widget class="QLabel" name="instructionLabel">
+          <property name="text">
+           <string>Instruction</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="wristButton">
+          <property name="text">
+           <string>Wrist</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="ankleButton">
+          <property name="text">
+           <string>Ankle</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="finishButton">
+          <property name="text">
+           <string>Finish</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="measureBackButton">
+          <property name="text">
+           <string>Back</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1319</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>

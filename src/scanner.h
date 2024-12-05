@@ -2,9 +2,13 @@
 #define SCANNER_H
 
 #include<string>
+#include <QString>
+#include <QVector>
+#include "snapshot.h"
 
 //imports in .cpp to avoid circular imports in headers
 class Profile;
+class DBManager;
 
 class Scanner{
 /*
@@ -15,35 +19,39 @@ There should only ever be one scanner object at a time for this application's de
 
     private:
         Profile* profile;
+        Snapshot* newSnap;
+        DBManager* dbm;
 
-        int date[3]; // mm/dd/yyy
+        int date[3]; // mm/dd/yyyy
         int time[2]; // hh:mm
 
-        float rHandRead[6];
-        float lHandRead[6];
-        float rFootRead[6];
-        float lFootRead[6];
+        QVector<int>* rHandRead;
+        QVector<int>* lHandRead;
+        QVector<int>* rFootRead;
+        QVector<int>* lFootRead;
         int rHandBlood[2];
         int lHandBlood[2];
-        int weight; //in grams
+        float weight; //in grams
         int heartRate;
         float bodyTemp; //in Celcius
         int sleepTime[2]; // hh:mm
-        std::string text;
+        QString notes;
 
     public:
-        Scanner(Profile* profile);
+        Scanner(Profile* profile, DBManager* dbm);
 
-        void registerReading(char side, char limb, int point, float reading);
+        void registerReading(char side, char limb, int reading);
         void registerBlood(char side, int dyst, int syst);
-        void registerWeight(int w);
+        void registerWeight(float w);
         void registerHeartRate(int h);
         void registerBodyTemp(float t);
         void registerDate(int m, int d, int y);
         void registerTime(int h, int m);
         void registerSleepTime(int h, int m);
+        void registerNotes(QString n);
 
-        int finishScan();
+        bool finishScan();
+        Snapshot* getFinishedSnap();
 };
 
 #endif // SCANNER_H
