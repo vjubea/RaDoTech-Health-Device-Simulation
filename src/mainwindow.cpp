@@ -514,7 +514,7 @@ void MainWindow::setupBodyScreen()
     liverLabel->setFont(labelFont5);
     bodyLayout->addWidget(liverLabel);
 
-
+    
     QLabel *kidneyLabel = new QLabel("Kidney: Below Normal");
     kidneyLabel->setStyleSheet("color: red;");
     kidneyLabel->setFont(labelFont5);
@@ -547,7 +547,6 @@ void MainWindow::setupBodyScreen()
     bodyWidget->setLayout(bodyLayout);
     stackedWidget->addWidget(bodyWidget);
 }
-
 
 void MainWindow::setupChartPage()
 {
@@ -673,8 +672,6 @@ void MainWindow::onLogoutButtonClicked()
 }
 
 
-
-
 void MainWindow::onLoginButtonClicked()
 {
     QString username = userInput->text();
@@ -728,8 +725,7 @@ void MainWindow::onSaveProfButtonClicked()
     QString weight = weightInput->text();
     QString height = heightInput->text();
     QString dob = dobInput->text();
-
-
+    
     if (firstName.isEmpty() || lastName.isEmpty() || weight.isEmpty() ||
         height.isEmpty() || dob.isEmpty()) {
             QMessageBox::warning(this, "Save Failed", "Please fill out all fields.");
@@ -739,6 +735,7 @@ void MainWindow::onSaveProfButtonClicked()
     bool created = model.createProfile(firstName, lastName, weight.toFloat(), height.toFloat(), dob);
 
     if (!created) return; // Change to handle below:
+  
     //    if (query.exec()) {
     //        QMessageBox::information(this, "Profile Saved", "Profile created successfully!");
     //        stackedWidget->setCurrentIndex(0); // Go back to login page

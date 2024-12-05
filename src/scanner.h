@@ -36,6 +36,7 @@ There should only ever be one scanner object at a time for this application's de
         float bodyTemp; //in Celcius
         int sleepTime[2]; // hh:mm
         QString notes;
+    
 
     public:
         Scanner(Profile* profile, DBManager* dbm);
