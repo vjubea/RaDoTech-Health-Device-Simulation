@@ -14,6 +14,10 @@
 #include <QMessageBox>
 #include <QModelIndex>
 #include <QString>
+#include <QVector>
+#include <QComboBox>
+#include <QInputDialog>
+#include <QTimer>
 // #include <QSqlQuery>
 // #include <QSqlDatabase>
 // #include <QSqlError>
@@ -43,8 +47,11 @@ private slots:
   void onLogoutButtonClicked(); // Slot for logout button
   void onCreateProfButtonClicked(); // Slot for create profile button
   void onSaveProfButtonClicked(); // Slot for save profile button
+  void onDeleteProfileClicked(); // Slot for delete profile button
+  void onEditProfileClicked(); // Slot for edit profile button
   void onHistoryRowClicked(int row, int column); // Slot for history row click
   void addMeasurementToHistory(const QString& result);
+  void startMeasurement(); // Start the measurement
   void measureWrist(); // Slot for wrist measurement
   void measureAnkle(); // Slot for ankle measurement
   void finishMeasurement(); // Slot for finishing measurement
@@ -62,12 +69,9 @@ private:
   QLabel *welcomeLabel;
   QLabel *pleaseLogInStatement;
   QLabel *noAccLabel;
-  QLabel *userLabel;
-  QLabel *pwLabel;
-  QLineEdit *userInput;
-  QLineEdit *pwInput;
-  QPushButton *loginButton;
   QPushButton *createProfButton;
+  QVector<QString> userProfiles; // List of "First Last" user names
+  QComboBox *userDropdown;
 
 
   // GUI elements for Create Profile Page
@@ -78,20 +82,22 @@ private:
   QLabel *heightLabel;
   QLabel *dobLabel;
   QLabel *countryLabel;
-  QLabel *pwLabel2;
   QLineEdit *fNameInput;
   QLineEdit *lNameInput;
   QLineEdit *weightInput;
   QLineEdit *heightInput;
   QLineEdit *dobInput;
   QLineEdit *countryInput;
-  QLineEdit *pwInput2;
   QPushButton *saveProfButton;
 
 
   // GUI elements for Menu Page
   QLabel *userGreetingLabel;
   QLabel *userNameLabel;
+  QString currentFirstName;
+  QString currentLastName;
+  double currentWeight;
+  double currentHeight;
   QPushButton *measureNowButton;
   QPushButton *profilesButton;
   QPushButton *historyButton;
@@ -106,10 +112,18 @@ private:
 
   //GUI elements for Profiles Page
   QLabel *profilesLabel;
+  QWidget *profilesPage = nullptr;
   QTableWidget *profilesTable;    // Table for displaying profiles
   QPushButton *profilesBackButton;       // Back button on Profiles page
   QPushButton *editProfileButton; // Edit profile button
   QPushButton *deleteProfileButton; // Delete profile button
+
+  // GUI elements for Measure Page
+  // Battery variables
+  QLabel *batteryLabel;
+  int batteryLevel = 100; // Start at 100% battery
+  QTimer *batteryDepletionTimer; // Timer to simulate battery depletion
+  QVBoxLayout *measureLayout;
 
 
   // GUI elements for Body Screen
@@ -143,9 +157,12 @@ private:
   // Functions
   void setupLoginPage(); // Function to initialize Login Page
   void setupCreateProfilePage(); // Function to initialize Create Profile Page
+  void populateUserDropdown(); // Populate the user dropdown
   void setupMenuPage();  // Function to initialize Menu Page
   void updateGreeting(const QString &firstName, const QString &lastName);  // Update greeting labels
   void setupMeasurePage(); // Set up the Measure page
+  void setupBattery();
+  void depleteBattery(); // Deplete the battery
   void setupHistoryPage();// Set up the History page
   void setupBodyScreen(); // Show the body screen
   void showChartPage(); // Show the chart page
@@ -154,8 +171,7 @@ private:
   void showHistoryPage(); // Show the history page
   // void showBarGraph(const QString &reading); // Show the bar graph
   void setupProfilesPage(); // Set up the Profiles page
-  void editProfile(int row); // Edit profile
-  void deleteProfile(int row); // Delete profile
+  void populateProfilesTable(); // Populate the profiles table
   void setupChartPage(); // Set up the Chart page
   void setupIndicatorsPage(); // Set up the Indicators page
   void setupRecommendationsPage(); // Set up the Recommendations page
