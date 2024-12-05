@@ -514,8 +514,7 @@ void MainWindow::setupBodyScreen()
     liverLabel->setFont(labelFont5);
     bodyLayout->addWidget(liverLabel);
 
-
-
+    
     QLabel *kidneyLabel = new QLabel("Kidney: Below Normal");
     kidneyLabel->setStyleSheet("color: red;");
     kidneyLabel->setFont(labelFont5);
@@ -547,10 +546,7 @@ void MainWindow::setupBodyScreen()
 
     bodyWidget->setLayout(bodyLayout);
     stackedWidget->addWidget(bodyWidget);
-
 }
-
-
 
 void MainWindow::setupChartPage()
 {
@@ -582,7 +578,6 @@ void MainWindow::setupChartPage()
     chartWidget->setLayout(chartLayout);
     stackedWidget->addWidget(chartWidget);
 }
-
 
 
 void MainWindow::setupIndicatorsPage()
@@ -639,8 +634,6 @@ void MainWindow::setupRecommendationsPage()
 }
 
 
-
-
 void MainWindow::showChartPage()
 {
     // Placeholder for chart page
@@ -669,9 +662,6 @@ void MainWindow::showHistoryPage()
 }
 
 
-
-
-
 void MainWindow::onLogoutButtonClicked()
 {
     // Clear session-specific data
@@ -680,8 +670,6 @@ void MainWindow::onLogoutButtonClicked()
     // Navigate to the Login Page
     stackedWidget->setCurrentIndex(0);
 }
-
-
 
 
 void MainWindow::onLoginButtonClicked()
@@ -719,10 +707,6 @@ void MainWindow::onLoginButtonClicked()
 }
 
 
-
-
-
-
 // Slot for handling create profile button click
 void MainWindow::onCreateProfButtonClicked()
 {
@@ -741,36 +725,23 @@ void MainWindow::onSaveProfButtonClicked()
     QString weight = weightInput->text();
     QString height = heightInput->text();
     QString dob = dobInput->text();
-    QString country = countryInput->text();
-    QString password = pwInput2->text();
-
-
-    if (firstName.isEmpty() || lastName.isEmpty() || weight.isEmpty() || height.isEmpty() || dob.isEmpty() || country.isEmpty() || password.isEmpty()) {
-        QMessageBox::warning(this, "Save Failed", "Please fill out all fields.");
-        return;
+    
+    if (firstName.isEmpty() || lastName.isEmpty() || weight.isEmpty() ||
+        height.isEmpty() || dob.isEmpty()) {
+            QMessageBox::warning(this, "Save Failed", "Please fill out all fields.");
+            return;
     }
+    // Model attempts creating Profile, logs error if failure
+    bool created = model.createProfile(firstName, lastName, weight.toFloat(), height.toFloat(), dob);
 
-
-    // Save to database !!!check this
-    // QSqlQuery query;
-    // query.prepare("INSERT INTO Profiles (fname, lname, weight, height, birthDay, country) VALUES (:fname, :lname, :weight, :height, :birthDay, :country)");
-    // query.bindValue(":fname", firstName);
-    // query.bindValue(":lname", lastName);
-    // query.bindValue(":weight", weight);
-    // query.bindValue(":height", height);
-    // query.bindValue(":birthDay", dob);
-    // query.bindValue(":country", country);
-
-
-
-
+    if (!created) return; // Change to handle below:
+  
     //    if (query.exec()) {
     //        QMessageBox::information(this, "Profile Saved", "Profile created successfully!");
     //        stackedWidget->setCurrentIndex(0); // Go back to login page
     //    } else {
     //        QMessageBox::critical(this, "Database Error", "Failed to save profile: " + query.lastError().text());
     //    }
-
 }
 
 void MainWindow::updateGreeting(const QString &firstName, const QString &lastName)
@@ -789,9 +760,9 @@ void MainWindow::measureWrist()
     // statusLabel->setText("Wrist measurement in progress...");
 
     //includes calls to...
-    curScanner->registerReading('l','h',0,-1);
+    curScanner->registerReading('l','h',0);
     //and...
-    curScanner->registerReading('r','h',0,-1);
+    curScanner->registerReading('r','h',0);
     // but call each a total of 6 times (left and right), with 0 incrementing up by one for each call. -1 is the value, and should be replaced with a random.
 }
 
@@ -804,9 +775,9 @@ void MainWindow::measureAnkle()
     // statusLabel->setText("Ankle measurement in progress...");
 
     //includes calls to...
-    curScanner->registerReading('l','f',0,-1);
+    curScanner->registerReading('l','f',0);
     //and...
-    curScanner->registerReading('r','f',0,-1);
+    curScanner->registerReading('r','f',0);
     // but call each a total of 6 times (left and right), with 0 incrementing up by one for each call. -1 is the value, and should be replaced with a random.
 
 }

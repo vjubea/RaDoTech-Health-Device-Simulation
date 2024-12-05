@@ -11,10 +11,10 @@ Scanner::Scanner(Profile* profile, DBManager* dbm) : profile(profile), dbm(dbm)
     std::fill(std::begin(lHandBlood), std::end(lHandBlood), -1);
     std::fill(std::begin(sleepTime), std::end(sleepTime), -1);
     heartRate = -1;
-    std::fill(std::begin(rHandRead), std::end(rHandRead), -1.0f);
-    std::fill(std::begin(lHandRead), std::end(lHandRead), -1.0f);
-    std::fill(std::begin(rFootRead), std::end(rFootRead), -1.0f);
-    std::fill(std::begin(lFootRead), std::end(lFootRead), -1.0f);
+    rHandRead = new QVector<int>();
+    lHandRead = new QVector<int>();
+    rFootRead = new QVector<int>();
+    lFootRead = new QVector<int>();
     weight = -1.0f;
     bodyTemp = -1.0f;
     notes = "";
@@ -22,20 +22,29 @@ Scanner::Scanner(Profile* profile, DBManager* dbm) : profile(profile), dbm(dbm)
 }
 
 
-void Scanner::registerReading(char side, char limb, int point, float reading){
-    float* arr;
-    if(side == 'l'){
-        if(limb == 'h') {arr = lHandRead;}
-        else {arr = lFootRead;}
+void Scanner::registerReading(char side, char limb, int reading){
+    QVector<int>* arr;
+    if(side == 'L'){
+        if(limb == 'H') {
+            arr = lHandRead;
+        }
+        else {
+            arr = lFootRead;
+        }
     }
     else {
-        if(limb == 'h'){arr = rHandRead;}
-        else {arr = rFootRead;}
+        if(limb == 'H') {
+            arr = rHandRead;
+        }
+        else {
+            arr = rFootRead;
+        }
     }
-    arr[point] = reading;
-
+    if(arr->size() < 6)
+        arr->append(reading);
+    else
+        qWarning() << "Scanner l/r Hand/Foot Read array is at max capacity (6).";
 }
-
 
 void Scanner::registerBlood(char side, int dyst, int syst){
     int* arr;
@@ -45,7 +54,6 @@ void Scanner::registerBlood(char side, int dyst, int syst){
     arr[1] = syst;
 
 }
-
 
 void Scanner::registerWeight(float w){
     if(w == -1){
@@ -71,46 +79,60 @@ bool Scanner::finishScan(){
     registerWeight(weight);
     //check if any data invalid, return false if so
     if (heartRate == -1 || weight == -1.0f || bodyTemp == -1.0f) {
+        qWarning()<<"Missing fields, please populate before finishing Snapshot.";
         return false;
     }
 
     for (int i = 0; i < 3; ++i) {
-        if (date[i] == -1) return false;
-    }
-    for (int i = 0; i < 2; ++i) {
-        if (time[i] == -1) return false;
-        if (sleepTime[i] == -1) return false;
-    }
-    for (int i = 0; i < 6; ++i) {
-        if (rHandRead[i] == -1.0f || lHandRead[i] == -1.0f || rFootRead[i] == -1.0f || lFootRead[i] == -1.0f) {
+        if (date[i] == -1) {
+            qWarning() << "Missing date";
             return false;
         }
     }
+    for (int i = 0; i < 2; ++i) {
+        if (time[i] == -1) {
+            qWarning() << "Missing time";
+            return false;
+        }
+        if (sleepTime[i] == -1) {
+            qWarning() << "Missing sleepTime";
+            return false;
+        }
+    }
+    if (rHandRead->size() != 6 || lHandRead->size() != 6 ||
+        rFootRead->size() != 6 || lFootRead->size() != 6) {
+            qWarning() << "Hand and Leg Readings are missing readings.";
+            return false;
+    }
 
-
-    //create Snapshot object
-    newSnap = new Snapshot();
     //register hand, foot, and blood pressure readings in db, set in object
     int hrID, lrID, bpID = 0;
 
     QVector<int> hands;
     QVector<int> feet;
+    // Add hand and feet readings
     for(int i = 0; i < 6; i++){
-        hands.append(lHandRead[i]);
-        hands.append(rHandRead[i]);
-        feet.append(lFootRead[i]);
-        feet.append(rFootRead[i]);
+        hands.append(lHandRead->at(i));
+        hands.append(rHandRead->at(i));
+        feet.append(lFootRead->at(i));
+        feet.append(rFootRead->at(i));
     }
+
     if(! dbm->createHandReadings(hrID, hands)) return false;
-    if(! dbm->createLegReadings(lrID, feet)) return false;
+    if(! dbm->createFootReadings(lrID, feet)) return false;
+
+    //create Snapshot object
+    newSnap = new Snapshot();
+    newSnap->setHandReadingID(hrID);
+    newSnap->setFootReadingID(lrID);
+
     QString formattedTimeStamp = QString::asprintf("%04d-%02d-%02d %02d:%02d",
                                                   date[2], date[0], date[1],
                                                   time[0], time[1]);
-
+    newSnap->setTimestamp(formattedTimeStamp);
 
     //register other values
     newSnap->setProfileID(profile->getId());
-    newSnap->setTimestamp(formattedTimeStamp);
     newSnap->setBodyTemp(bodyTemp);
     newSnap->setLeftHandPressReadId(bpID);
     newSnap->setRightHandPressReadId(bpID);
@@ -119,15 +141,15 @@ bool Scanner::finishScan(){
     newSnap->setSleepMins(sleepTime[1]);
     newSnap->setCurrWeight(weight);
     newSnap->setNotes(notes);
-    newSnap->setHandReadingID(hrID);
-    newSnap->setLegReadingID(lrID);
 
-    if(dbm->addSnapshotToHistory(*newSnap)){
+    // Attempts adding snapshot to DB
+    if(dbm->addSnapshotToHistory(*newSnap)) {
+        qInfo() << "Saving Snapshot to the DB";
         profile->addSnap(newSnap);
         return true;
     }
-
-    else{
+    else {
+        qWarning() << "Deleting Incomplete Snapshot";
         delete newSnap;
         newSnap = nullptr;
         return false;

@@ -9,7 +9,9 @@ public:
     Snapshot();
     Snapshot(int profileID, const QString& timestamp, float bodyTemp, int leftHandPressReadId, int rightHandPressReadId, 
              int heartRate, int sleepHrs, int sleepMins, float currWeight, const QString& notes, 
-             int handReadingID, int legReadingID);
+             int handReadingID, int footReadingID);
+
+    bool operator==(const Snapshot& other) const;
 
     bool operator==(const Snapshot& other) const;
 
@@ -47,8 +49,8 @@ public:
     int getHandReadingID() const;
     void setHandReadingID(int handReadingID);
 
-    int getLegReadingID() const;
-    void setLegReadingID(int legReadingID);
+    int getFootReadingID() const;
+    void setFootReadingID(int footReadingID);
 
 private:
     int profileID;  // Foreign key linking to Profile
@@ -62,7 +64,7 @@ private:
     float currWeight;  // Current weight in kg
     QString notes;  // Optional notes
     int handReadingID;  // Foreign key for hand readings
-    int legReadingID;  // Foreign key for leg readings
+    int footReadingID;  // Foreign key for leg readings
 };
 
 #endif // SNAPSHOT_H

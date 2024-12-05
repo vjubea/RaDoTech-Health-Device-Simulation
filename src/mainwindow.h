@@ -22,7 +22,6 @@
 // #include <QSqlQueryModel>
 // #include <QSqlTableModel>
 
-
 class Scanner;
 class Snapshot;
 #include "model.h"
@@ -52,8 +51,7 @@ private slots:
   void measureWrist(); // Slot for wrist measurement
   void measureAnkle(); // Slot for ankle measurement
   void finishMeasurement(); // Slot for finishing measurement
-
-
+  
 
 private:
   Ui::MainWindow *ui;
@@ -61,9 +59,7 @@ private:
   Model model;
   Snapshot* displayedSnap;
   Scanner* curScanner;
-
-
-
+  
   QMap<QString, QString> userCredentials; //!!! Temporary credentials store
 
 

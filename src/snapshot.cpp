@@ -5,7 +5,7 @@ Snapshot::Snapshot()
     profileID(0), bodyTemp(0.0f), 
     leftHandPressReadId(0), rightHandPressReadId(0),
     heartRate(0), sleepHrs(0), sleepMins(0),
-    currWeight(0.0f), handReadingID(0), legReadingID(0) 
+    currWeight(0.0f), handReadingID(0), footReadingID(0)
     {}
 
 Snapshot::Snapshot(
@@ -13,13 +13,13 @@ Snapshot::Snapshot(
     int leftHandPressReadId, int rightHandPressReadId,
     int heartRate, int sleepHrs, int sleepMins, 
     float currWeight, const QString& notes,
-    int handReadingID, int legReadingID)
+    int handReadingID, int footReadingID)
     : 
     profileID(profileID), timestamp(timestamp), bodyTemp(bodyTemp),
     leftHandPressReadId(leftHandPressReadId), rightHandPressReadId(rightHandPressReadId), 
     heartRate(heartRate), sleepHrs(sleepHrs), sleepMins(sleepMins), 
     currWeight(currWeight), notes(notes),
-    handReadingID(handReadingID), legReadingID(legReadingID)
+    handReadingID(handReadingID), footReadingID(footReadingID)
     {}
 
 
@@ -27,8 +27,6 @@ bool Snapshot::operator==(const Snapshot& other) const {
     return getProfileID() == other.getProfileID() &&
            getTimestamp() == other.getTimestamp();
 }
-
-
 
 /***** Getters-and-Setters *****/
 
@@ -65,5 +63,5 @@ void Snapshot::setNotes(const QString& notes) { this->notes = notes; }
 int Snapshot::getHandReadingID() const { return handReadingID; }
 void Snapshot::setHandReadingID(int handReadingID) { this->handReadingID = handReadingID; }
 
-int Snapshot::getLegReadingID() const { return legReadingID; }
-void Snapshot::setLegReadingID(int legReadingID) { this->legReadingID = legReadingID; }
+int Snapshot::getFootReadingID() const { return footReadingID; }
+void Snapshot::setFootReadingID(int footReadingID) { this->footReadingID = footReadingID; }

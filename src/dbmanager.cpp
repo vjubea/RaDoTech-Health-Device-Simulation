@@ -30,82 +30,76 @@ bool DBManager::DBInit()
     query.exec("DROP TABLE IF EXISTS Snapshots;");
     query.exec("DROP TABLE IF EXISTS HandBloodPressure;");
     query.exec("DROP TABLE IF EXISTS HandReadings;");
-    query.exec("DROP TABLE IF EXISTS LegReadings;");
+    query.exec("DROP TABLE IF EXISTS FootReadings;");
 
     query.exec("CREATE TABLE IF NOT EXISTS Profiles ("
-               "id INTEGER PRIMARY KEY, "
-               "fname TEXT NOT NULL, "
-               "lname TEXT NOT NULL, "
-               "weight REAL NOT NULL, "
-               "height REAL NOT NULL, "
-               "birthDay TEXT NOT NULL, "
-               "UNIQUE (fname, lname));"
+                   "id INTEGER PRIMARY KEY, "
+                   "fname TEXT NOT NULL, "
+                   "lname TEXT NOT NULL, "
+                   "weight REAL NOT NULL, "
+                   "height REAL NOT NULL, "
+                   "birthDay TEXT NOT NULL, "
+                   "UNIQUE (fname, lname)"
+               ");"
     );
     query.exec("CREATE TABLE IF NOT EXISTS Snapshots ("
-               "profileID INTEGER NOT NULL, "
-               "timestamp VARCHAR(16) NOT NULL, --(yyyy-MM-dd hh:mm)"
-               "bodyTemp REAL NOT NULL, "
-               "leftHandPressReadID INTEGER DEFAULT 0, --can be null"
-               "rightHandPressReadID INTEGER DEFAULT 0, --can be null"
-               "heartRate INTEGER NOT NULL, "
-               "sleepHrs INTEGER, --can be null"
-               "sleepMins INTEGER, --can be null"
-               "currWeight REAL NOT NULL, "
-               "notes TEXT, "
-               "handReadingsID INTEGER NOT NULL, "
-               "legReadingsID INTEGER NOT NULL, "
-               "PRIMARY KEY (profileID, timestamp), "
-               "FOREIGN KEY (profileID) REFERENCES Profiles(id) ON DELETE CASCADE));"
+                   "profileID INTEGER NOT NULL, "
+                   "timestamp VARCHAR(16) NOT NULL, "
+                   "bodyTemp REAL NOT NULL, "
+                   "leftHandPressReadID INTEGER DEFAULT 0, "
+                   "rightHandPressReadID INTEGER DEFAULT 0, "
+                   "heartRate INTEGER NOT NULL, "
+                   "sleepHrs INTEGER, "
+                   "sleepMins INTEGER, "
+                   "currWeight REAL NOT NULL, "
+                   "notes TEXT, "
+                   "handReadingsID INTEGER NOT NULL, "
+                   "footReadingsID INTEGER NOT NULL, "
+                   "PRIMARY KEY (profileID, timestamp), "
+                   "FOREIGN KEY (profileID) REFERENCES Profiles(id) ON DELETE CASCADE"
+               ");"
     );
-    //  To be added to Snapshot table creation in case blood pressure is handled:
-    /*  "FOREIGN KEY (leftHandPressReadID) REFERENCES HandBloodPressure(id) "
-        "    ON UPDATE CASCADE "
-        "    ON DELETE SET NULL "
-        "    CHECK (SELECT orientation FROM HandBloodPressure WHERE id = Snapshots.rightHandPressReadID) = 'L', "
-        "FOREIGN KEY (rightHandPressReadID) REFERENCES HandBloodPressure(id) "
-        "    ON UPDATE CASCADE "
-        "    ON DELETE SET NULL "
-        "    CHECK (SELECT orientation FROM HandBloodPressure WHERE id = Snapshots.rightHandPressReadID) = 'R');"
-    */
     query.exec("CREATE TABLE IF NOT EXISTS HandBloodPressure("
-               "id INTEGER NOT NULL, "
-               "orientation CHAR(1) NOT NULL, -- “L” for left, “R” for right "
-               "systolic INTEGER NOT NULL, -- Systolic mm Hg "
-               "diastolic INTEGER NOT NULL, -- Diastolic mm Hg "
-               "PRIMARY KEY (id, orientation), "
-               "FOREIGN KEY (id) REFERENCES Profiles(legReadingsID) ON DELETE);"
+                   "id INTEGER NOT NULL, "
+                   "orientation CHAR(1) NOT NULL, -- “L” for left, “R” for right "
+                   "systolic INTEGER NOT NULL, -- Systolic mm Hg "
+                   "diastolic INTEGER NOT NULL, -- Diastolic mm Hg "
+                   "PRIMARY KEY (id, orientation)"
+               ");"
     );
     query.exec("CREATE TABLE IF NOT EXISTS HandReadings ("
-               "id INTEGER PRIMARY KEY, "
-               "LH1 INTEGER NOT NULL, "
-               "LH2 INTEGER NOT NULL, "
-               "LH3 INTEGER NOT NULL, "
-               "LH4 INTEGER NOT NULL, "
-               "LH5 INTEGER NOT NULL, "
-               "LH6 INTEGER NOT NULL, "
-               "RH1 INTEGER NOT NULL, "
-               "RH2 INTEGER NOT NULL, "
-               "RH3 INTEGER NOT NULL, "
-               "RH4 INTEGER NOT NULL, "
-               "RH5 INTEGER NOT NULL, "
-               "RH6 INTEGER NOT NULL, "
-               "FOREIGN KEY (id) REFERENCES Profiles(handReadingsID) ON DELETE);"
+                   "id INTEGER PRIMARY KEY, "
+                   "LH1 INTEGER NOT NULL, "
+                   "LH2 INTEGER NOT NULL, "
+                   "LH3 INTEGER NOT NULL, "
+                   "LH4 INTEGER NOT NULL, "
+                   "LH5 INTEGER NOT NULL, "
+                   "LH6 INTEGER NOT NULL, "
+                   "RH1 INTEGER NOT NULL, "
+                   "RH2 INTEGER NOT NULL, "
+                   "RH3 INTEGER NOT NULL, "
+                   "RH4 INTEGER NOT NULL, "
+                   "RH5 INTEGER NOT NULL, "
+                   "RH6 INTEGER NOT NULL, "
+                   "FOREIGN KEY (id) REFERENCES Profiles(handReadingsID) ON DELETE CASCADE"
+               ");"
     );
-    query.exec("CREATE TABLE IF NOT EXISTS LegReadings ("
-               "id INTEGER PRIMARY KEY, "
-               "LF1 INTEGER NOT NULL, "
-               "LF2 INTEGER NOT NULL, "
-               "LF3 INTEGER NOT NULL, "
-               "LF4 INTEGER NOT NULL, "
-               "LF5 INTEGER NOT NULL, "
-               "LF6 INTEGER NOT NULL, "
-               "RF1 INTEGER NOT NULL, "
-               "RF2 INTEGER NOT NULL, "
-               "RF3 INTEGER NOT NULL, "
-               "RF4 INTEGER NOT NULL, "
-               "RF5 INTEGER NOT NULL, "
-               "RF6 INTEGER NOT NULL, "
-               "FOREIGN KEY (id) REFERENCES Profiles(legReadingsID) ON DELETE);"
+    query.exec("CREATE TABLE IF NOT EXISTS FootReadings ("
+                   "id INTEGER PRIMARY KEY, "
+                   "LF1 INTEGER NOT NULL, "
+                   "LF2 INTEGER NOT NULL, "
+                   "LF3 INTEGER NOT NULL, "
+                   "LF4 INTEGER NOT NULL, "
+                   "LF5 INTEGER NOT NULL, "
+                   "LF6 INTEGER NOT NULL, "
+                   "RF1 INTEGER NOT NULL, "
+                   "RF2 INTEGER NOT NULL, "
+                   "RF3 INTEGER NOT NULL, "
+                   "RF4 INTEGER NOT NULL, "
+                   "RF5 INTEGER NOT NULL, "
+                   "RF6 INTEGER NOT NULL, "
+                   "FOREIGN KEY (id) REFERENCES Profiles(footReadingsID) ON DELETE CASCADE"
+               ");"
     );
     qInfo() <<"Initialized Database.";
     return true;
@@ -184,11 +178,11 @@ bool DBManager::updateProfile(Profile* prof, const QString& newFname, const QStr
     return true;
 }
 
-// Create HandReading
+// Create HandReadings
 bool DBManager::createHandReadings(int& lastId, const QVector<int>& readings)
 {
     if (readings.size() != 12) {
-        qWarning() << "Hand reading must have exactly 6 values!";
+        qWarning() << "Hand reading must have exactly 12 values!";
         return false;
     }
 
@@ -196,18 +190,18 @@ bool DBManager::createHandReadings(int& lastId, const QVector<int>& readings)
     query.prepare("INSERT INTO HandReadings (LH1, LH2, LH3, LH4, LH5, LH6, RH1, RH2, RH3, RH4, RH5, RH6) "
                   "VALUES (:LH1, :LH2, :LH3, :LH4, :LH5, :LH6, :RH1, :RH2, :RH3, :RH4, :RH5, :RH6);");
 
-    query.bindValue(":LH1", readings[0]);
-    query.bindValue(":RH1", readings[1]);
-    query.bindValue(":LH2", readings[2]);
-    query.bindValue(":RH2", readings[3]);
-    query.bindValue(":LH3", readings[4]);
-    query.bindValue(":RH3", readings[5]);
-    query.bindValue(":LH4", readings[6]);
-    query.bindValue(":RH4", readings[7]);
-    query.bindValue(":LH5", readings[8]);
-    query.bindValue(":RH5", readings[9]);
-    query.bindValue(":LH6", readings[10]);
-    query.bindValue(":RH6", readings[11]);
+    query.bindValue(":LH1", readings.at(0));
+    query.bindValue(":RH1", readings.at(1));
+    query.bindValue(":LH2", readings.at(2));
+    query.bindValue(":RH2", readings.at(3));
+    query.bindValue(":LH3", readings.at(4));
+    query.bindValue(":RH3", readings.at(5));
+    query.bindValue(":LH4", readings.at(6));
+    query.bindValue(":RH4", readings.at(7));
+    query.bindValue(":LH5", readings.at(8));
+    query.bindValue(":RH5", readings.at(9));
+    query.bindValue(":LH6", readings.at(10));
+    query.bindValue(":RH6", readings.at(11));
 
     if (!query.exec()) {
         qWarning() << "ERR: Could not insert hand readings: " << query.lastError().text();
@@ -216,31 +210,30 @@ bool DBManager::createHandReadings(int& lastId, const QVector<int>& readings)
     lastId = getLastInsertId(query);
     return true;
 }
-// Create LegReading
-bool DBManager::createLegReadings(int& lastId, const QVector<int>& readings)
+// Create FootReadings
+bool DBManager::createFootReadings(int& lastId, const QVector<int>& readings)
 {
     if (readings.size() != 12) {
-        qWarning() << "Hand reading must have exactly 6 values!";
+        qWarning() << "Hand reading must have exactly 12 values!";
         return false;
     }
 
     QSqlQuery query;
-    query.prepare("INSERT INTO LegReadings (LF1, LF2, LF3, LF4, LF5, LF6, RF1, RF2, RF3, RF4, RF5, RF6) "
+    query.prepare("INSERT INTO FootReadings (LF1, LF2, LF3, LF4, LF5, LF6, RF1, RF2, RF3, RF4, RF5, RF6) "
                   "VALUES (:LF1, :LF2, :LF3, :LF4, :LF5, :LF6, :RF1, :RF2, :RF3, :RF4, :RF5, :RF6);");
 
-    query.bindValue(":LF1", readings[0]);
-    query.bindValue(":RF1", readings[1]);
-    query.bindValue(":LF2", readings[2]);
-    query.bindValue(":RF2", readings[3]);
-    query.bindValue(":LF3", readings[4]);
-    query.bindValue(":RF3", readings[5]);
-    query.bindValue(":LF4", readings[6]);
-    query.bindValue(":RF4", readings[7]);
-    query.bindValue(":LF5", readings[8]);
-    query.bindValue(":RF5", readings[9]);
-    query.bindValue(":LF6", readings[10]);
-    query.bindValue(":RF6", readings[11]);
-
+    query.bindValue(":LF1", readings.at(0));
+    query.bindValue(":RF1", readings.at(1));
+    query.bindValue(":LF2", readings.at(2));
+    query.bindValue(":RF2", readings.at(3));
+    query.bindValue(":LF3", readings.at(4));
+    query.bindValue(":RF3", readings.at(5));
+    query.bindValue(":LF4", readings.at(6));
+    query.bindValue(":RF4", readings.at(7));
+    query.bindValue(":LF5", readings.at(8));
+    query.bindValue(":RF5", readings.at(9));
+    query.bindValue(":LF6", readings.at(10));
+    query.bindValue(":RF6", readings.at(11));
 
     if (!query.exec()) {
         qWarning() << "ERR: Could not insert foot readings: " << query.lastError().text();
@@ -307,8 +300,8 @@ bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps)
         snap->setSleepMins(query.value("sleepMins").toInt());
         snap->setCurrWeight(query.value("currWeight").toFloat());
         snap->setNotes(query.value("notes").toString());
-        snap->setHandReadingID(query.value("handReadingID").toInt());
-        snap->setLegReadingID(query.value("legReadingID").toInt());
+        snap->setHandReadingID(query.value("handReadingsID").toInt());
+        snap->setFootReadingID(query.value("footReadingsID").toInt());
 
         // Add the Snapshot object to the vector
         snaps.append(snap);
@@ -347,8 +340,8 @@ bool DBManager::getAllSnapshotsOfUser(QVector<Snapshot*>& snaps, int userID)
         snap->setSleepMins(query.value("sleepMins").toInt());
         snap->setCurrWeight(query.value("currWeight").toFloat());
         snap->setNotes(query.value("notes").toString());
-        snap->setHandReadingID(query.value("handReadingID").toInt());
-        snap->setLegReadingID(query.value("legReadingID").toInt());
+        snap->setHandReadingID(query.value("handReadingsID").toInt());
+        snap->setFootReadingID(query.value("footReadingsID").toInt());
 
         // Add the Snapshot object to the vector
         snaps.append(snap);
@@ -357,7 +350,7 @@ bool DBManager::getAllSnapshotsOfUser(QVector<Snapshot*>& snaps, int userID)
 }
 
 
-bool DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QString& timestamp)
+bool DBManager::getSnapshotByUserAndTime(Snapshot& snap, int userID, const QString& timestamp)
 {
     // Prepare the query to retrieve snapshot based on userID and timestamp (yyyy-MM-dd hh:mm)
     QSqlQuery query;
@@ -388,10 +381,10 @@ bool DBManager::getSnapshotByUserAndDate(Snapshot& snap, int userID, const QStri
 
         // Set the Hand and Leg readings
         snap.setHandReadingID(
-            query.value("handReadingID").isNull() ? -1 : query.value("handReadingID").toInt()
+            query.value("handReadingsID").isNull() ? -1 : query.value("handReadingsID").toInt()
             );
-        snap.setLegReadingID(
-            query.value("legReadingID").isNull() ? -1 : query.value("legReadingID").toInt()
+        snap.setFootReadingID(
+            query.value("footReadingsID").isNull() ? -1 : query.value("footReadingsID").toInt()
             );
         return true;
     }
@@ -402,9 +395,9 @@ QVector<int> DBManager::getHandReadingsById(int handReadingID)
 {
     QVector<int> readings;
 
-    // Prepare the query to fetch hand readings by handReadingID
+    // Prepare the query to fetch hand readings by handReadingsID
     QSqlQuery query;
-    query.prepare("SELECT * FROM HandReadings WHERE id = :handReadingID;");
+    query.prepare("SELECT * FROM HandReadings WHERE id = :handReadingsID;");
     query.bindValue(":handReadingID", handReadingID);
 
     if (!query.exec()) {
@@ -429,14 +422,14 @@ QVector<int> DBManager::getHandReadingsById(int handReadingID)
     }
     return readings;
 }
-QVector<int> DBManager::getLegReadingsById(int legReadingID)
+QVector<int> DBManager::getFootReadingsById(int footReadingsID)
 {
     QVector<int> readings;
 
-    // Prepare the query to fetch leg readings by legReadingID
+    // Prepare the query to fetch leg readings by footReadingsID
     QSqlQuery query;
-    query.prepare("SELECT * FROM LegReadings WHERE id = :legReadingID;");
-    query.bindValue(":legReadingID", legReadingID);
+    query.prepare("SELECT * FROM FootReadings WHERE id = :footReadingsID;");
+    query.bindValue(":footReadingsID", footReadingsID);
 
     if (!query.exec()) {
         qWarning() << "Error fetching leg readings: " << query.lastError().text();
@@ -466,34 +459,31 @@ bool DBManager::addSnapshotToHistory(const Snapshot& snapshot)
     // Prepare the SQL query to insert a new snapshot
     QSqlQuery query;
     query.prepare("INSERT INTO Snapshots ("
-                  "profileID, timestamp, "
-                  "bodyTemp, leftHandPressReadId, rightHandPressReadId, "
-                  "heartRate, sleepHrs, sleepMins, currWeight, notes, "
-                  "handReadingID, legReadingID) "
-                  "VALUES ("
-                    ":profileID, :timestamp, "
-                    ":bodyTemp, :leftHandPressReadId, :rightHandPressReadId, "
-                    ":heartRate, :sleepHrs, :sleepMins, :currWeight, :notes, "
-                    ":handReadingID, :legReadingID);"
+                      "profileID, timestamp, bodyTemp, "
+                      "heartRate, sleepHrs, sleepMins, currWeight, notes, "
+                      "handReadingsID, footReadingsID"
+                  ") VALUES ("
+                      ":profileID, :timestamp, :bodyTemp, "
+                      ":heartRate, :sleepHrs, :sleepMins, :currWeight, :notes, "
+                      ":handReadingsID, :footReadingsID"
+                  ");"
     );
 
     // Bind the values from the Snapshot object to the query parameters
     query.bindValue(":profileID", snapshot.getProfileID());
     query.bindValue(":timestamp", snapshot.getTimestamp());  // Full timestamp (yyyy-MM-dd hh:mm)
     query.bindValue(":bodyTemp", snapshot.getBodyTemp());
-    query.bindValue(":leftHandPressReadId", snapshot.getLeftHandPressReadId());
-    query.bindValue(":rightHandPressReadId", snapshot.getRightHandPressReadId());
     query.bindValue(":heartRate", snapshot.getHeartRate());
     query.bindValue(":sleepHrs", snapshot.getSleepHrs());
     query.bindValue(":sleepMins", snapshot.getSleepMins());
     query.bindValue(":currWeight", snapshot.getCurrWeight());
     query.bindValue(":notes", snapshot.getNotes());
-    query.bindValue(":handReadingID", snapshot.getHandReadingID());
-    query.bindValue(":legReadingID", snapshot.getLegReadingID());
+    query.bindValue(":handReadingsID", snapshot.getHandReadingID());
+    query.bindValue(":footReadingsID", snapshot.getFootReadingID());
 
     // Execute the query and check if it was successful
     if (!query.exec()) {
-        qWarning() << "Failed to add new snapshot: " << query.lastError().text();
+        qWarning() << "Failed to add new Snapshot: " << query.lastError().text();
         return false;  // Return false if there was an error
     }
     // Successfully inserted the snapshot
