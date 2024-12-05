@@ -13,8 +13,6 @@ public:
 
     bool operator==(const Snapshot& other) const;
 
-    bool operator==(const Snapshot& other) const;
-
     // Getters and Setters
     int getProfileID() const;
     void setProfileID(int profileID);
