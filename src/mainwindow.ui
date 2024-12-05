@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>6</number>
+     <number>4</number>
     </property>
     <widget class="QWidget" name="loginPage">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -80,34 +80,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="userLabel">
-         <property name="font">
-          <font>
-           <family>DejaVu Serif</family>
-           <pointsize>24</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Username:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="pwLabel">
-         <property name="font">
-          <font>
-           <family>DejaVu Serif</family>
-           <pointsize>24</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Password:</string>
-         </property>
-        </widget>
+        <widget class="QComboBox" name="userDropdown"/>
        </item>
        <item>
         <widget class="QLabel" name="noAccLabel">
@@ -121,30 +94,6 @@
          </property>
          <property name="text">
           <string>No Account? Please Create Profile</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="userInput">
-         <property name="maxLength">
-          <number>30000</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="pwInput"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="loginButton">
-         <property name="font">
-          <font>
-           <family>Liberation Mono</family>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Log in</string>
          </property>
         </widget>
        </item>
@@ -282,21 +231,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="pwLabel2">
-         <property name="font">
-          <font>
-           <family>DejaVu Serif</family>
-           <pointsize>15</pointsize>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>Password:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QLineEdit" name="fnameInput"/>
        </item>
        <item>
@@ -313,9 +247,6 @@
        </item>
        <item>
         <widget class="QLineEdit" name="countryInput"/>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="pwInput2"/>
        </item>
        <item>
         <widget class="QPushButton" name="saveProfButton">
@@ -347,7 +278,7 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0">
          <property name="spacing">
           <number>10</number>
          </property>
@@ -363,13 +294,6 @@
          <property name="bottomMargin">
           <number>40</number>
          </property>
-         <item>
-          <widget class="QLabel" name="userGreetingLabel">
-           <property name="text">
-            <string>Hello,</string>
-           </property>
-          </widget>
-         </item>
          <item>
           <widget class="QLabel" name="userNameLabel">
            <property name="text">
@@ -496,25 +420,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="heartLabel">
-          <property name="text">
-           <string>Heart</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="kidneyLabel">
-          <property name="text">
-           <string>Kidney</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="liverLabel">
-          <property name="text">
-           <string>Liver</string>
-          </property>
-         </widget>
+         <widget class="QTableWidget" name="organTable"/>
         </item>
         <item>
          <widget class="QPushButton" name="chartButton">
@@ -651,6 +557,17 @@
          </widget>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="barLayout">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QPushButton" name="chartBackButton">
           <property name="text">
            <string>Back</string>
@@ -758,6 +675,13 @@
        </property>
        <layout class="QVBoxLayout" name="measureLayout">
         <item>
+         <widget class="QLabel" name="batteryLabel">
+          <property name="text">
+           <string>Battery</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLabel" name="instructionLabel">
           <property name="text">
            <string>Instruction</string>
@@ -765,16 +689,37 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="wristButton">
+         <widget class="QPushButton" name="startMeasureButton">
           <property name="text">
-           <string>Wrist</string>
+           <string>Start</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="ankleButton">
+         <widget class="QPushButton" name="rightHandButton">
           <property name="text">
-           <string>Ankle</string>
+           <string>Right Hand</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="leftHandButton">
+          <property name="text">
+           <string>Left Hand</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="rightFootButton">
+          <property name="text">
+           <string>RIght Foot</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="leftFootButton">
+          <property name="text">
+           <string>Left Foot</string>
           </property>
          </widget>
         </item>
