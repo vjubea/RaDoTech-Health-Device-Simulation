@@ -169,8 +169,6 @@ void MainWindow::setupCreateProfilePage()
     createProfLayout->addWidget(heightInput);
     createProfLayout->addWidget(dobLabel);
     createProfLayout->addWidget(dobInput);
-    createProfLayout->addWidget(countryLabel);
-    createProfLayout->addWidget(countryInput);
     createProfLayout->addWidget(saveProfButton);
 
 
@@ -507,16 +505,16 @@ void MainWindow::populateProfilesTable()
 {
     if (!profilesTable) return;
 
-    qDebug() << "Updating profile table for user: " << currentFirstName << currentLastName;
+    qDebug() << "Updating profile table for user: " << model.getCurProfile()->getFullName();
 
 
     profilesTable->clearContents(); // Clear existing data
     profilesTable->setRowCount(1); // Display only the current user
 
-    profilesTable->setItem(0, 0, new QTableWidgetItem(currentFirstName));
-    profilesTable->setItem(0, 1, new QTableWidgetItem(currentLastName));
-    profilesTable->setItem(0, 2, new QTableWidgetItem(QString::number(currentWeight))); // Assuming currentWeight is stored
-    profilesTable->setItem(0, 3, new QTableWidgetItem(QString::number(currentHeight))); // Assuming currentHeight is stored
+    profilesTable->setItem(0, 0, new QTableWidgetItem(model.getCurProfile()->getFname()));
+    profilesTable->setItem(0, 1, new QTableWidgetItem(model.getCurProfile()->getLname()));
+    profilesTable->setItem(0, 2, new QTableWidgetItem(QString::number(model.getCurProfile()->getWeight())));
+    profilesTable->setItem(0, 3, new QTableWidgetItem(QString::number(model.getCurProfile()->getHeight())));
 
     profilesTable->setEditTriggers(QAbstractItemView::NoEditTriggers); // Prevent direct editing
 }
@@ -785,7 +783,9 @@ void MainWindow::onLogoutButtonClicked()
 
 void MainWindow::onLoginButtonClicked()
 {
-    QString selectedUser = userDropdown->currentText();
+    model.selectProfile(userDropdown->currentIndex()-1);
+
+    QString selectedUser = model.getCurProfile()->getFullName();
 
     if (selectedUser == "Select User") {
         QMessageBox::warning(this, "Login Error", "Please select a user!");
@@ -800,8 +800,8 @@ void MainWindow::onLoginButtonClicked()
     }
 
     // Debugging output
-    qDebug() << "Logged in user: " << currentFirstName << currentLastName;
-    qDebug() << "Weight: " << currentWeight << "Height: " << currentHeight;
+    qDebug() << "Logged in user: " << model.getCurProfile()->getFullName();
+    qDebug() << "Weight: " << model.getCurProfile()->getWeight() << "Height: " << model.getCurProfile()->getHeight();
 
 
     // Proceed to the Menu Page
@@ -930,30 +930,37 @@ void MainWindow::onHistoryRowClicked(int row, int column)
 void MainWindow::onEditProfileClicked()
 {
     // Ensure the profile has been selected
-    if (currentFirstName.isEmpty() || currentLastName.isEmpty()) {
+    if (model.getCurProfile()  == nullptr) {
         QMessageBox::warning(this, "Edit Error", "No profile selected. Please log in first.");
         return;
     }
 
     // Create a dialog or input fields to edit the profile
     bool ok;
-    double newWeight = QInputDialog::getDouble(this, "Edit Weight",
-                                              "Enter new weight (kg):", currentWeight,
-                                              0.0, 200.0, 2, &ok);
-    if (ok) {
-        currentWeight = newWeight; // Update weight
-    } else {
-        return; // If user cancels, do nothing
+
+   QString newFname = QInputDialog::getText(this, "Edit First Name", "Enter new weight first name:", QLineEdit::Normal, model.getCurProfile()->getFname(), &ok);
+    if (!ok) {
+        newFname = model.getCurProfile()->getFname();
+    }
+    QString newLname = QInputDialog::getText(this, "Edit First Name", "Enter new weight first name:", QLineEdit::Normal, model.getCurProfile()->getLname(), &ok);
+     if (!ok) {
+         newLname = model.getCurProfile()->getLname();
+     }
+
+    float newWeight = QInputDialog::getDouble(this, "Edit Weight", "Enter new weight (kg):", model.getCurProfile()->getWeight(), 0.0, 200.0, 2, &ok);
+    if (!ok) {
+        newWeight = model.getCurProfile()->getWeight();
     }
 
-    double newHeight = QInputDialog::getDouble(this, "Edit Height",
-                                               "Enter new height (cm):", currentHeight,
-                                               50.0, 300.0, 2, &ok);
-    if (ok) {
-        currentHeight = newHeight; // Update height
-    } else {
-        return; // If user cancels, do nothing
+    float newHeight = QInputDialog::getDouble(this, "Edit Height", "Enter new height (cm):", model.getCurProfile()->getHeight(), 50.0, 300.0, 2, &ok);
+    if (!ok) {
+        newHeight = model.getCurProfile()->getHeight(); // Update height
     }
+
+    QString empty = "";
+    model.editCurProfile(newFname, newLname, newWeight, newHeight, empty);
+
+
 
     // Update the profile table
     populateProfilesTable();
