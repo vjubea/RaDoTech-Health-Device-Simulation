@@ -123,4 +123,11 @@ bool Model::deleteCurrentProfile() {
 }
 
 
+QVector<Snapshot*> Model::getCurSnapshots(){
+    if(currentProfile == nullptr) return QVector<Snapshot*> {};
+    return currentProfile->getSnapshots();
+}
 
+Profile* Model::getCurProfile(){
+    return currentProfile;
+}

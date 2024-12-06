@@ -26,6 +26,10 @@
 // #include <QSqlQueryModel>
 // #include <QSqlTableModel>
 
+#include "model.h"
+#include "scanner.h"
+#include "profile.h"
+#include "snapshot.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -59,7 +63,9 @@ private:
   Ui::MainWindow *ui;
 
 
-  QMap<QString, QString> userCredentials; //!!! Temporary credentials store
+  Model model;
+  Scanner* scanner;
+  Snapshot* curSnap;
 
 
   // GUI elements for Login Page

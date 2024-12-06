@@ -414,67 +414,17 @@ void MainWindow::setupHistoryPage()
 
     // Create a table widget for displaying history data
     QTableWidget *historyTable = new QTableWidget(this);
-    historyTable->setColumnCount(3); // Example: Date, Time, Summary
-    historyTable->setHorizontalHeaderLabels({"Date", "Time", "Summary"});
+    historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
+    historyTable->setColumnCount(3); // Example: Date & Time, Profile, Notes
 
+    QVector<Snapshot*> snaps = model.getCurSnapshots();
+    historyTable->setRowCount(snaps.length());
 
-    /*
-    // !!!Check if the database connection is open
-    if (db.isOpen()) {
-        QSqlQuery query("SELECT * FROM History ORDER BY date DESC");
-
-
-
-
-        int row = 0;
-        while (query.next()) {
-            historyTable->insertRow(row);
-            historyTable->setItem(row, 0, new QTableWidgetItem(query.value("date").toString()));
-            historyTable->setItem(row, 1, new QTableWidgetItem(query.value("metric").toString()));
-            historyTable->setItem(row, 2, new QTableWidgetItem(query.value("value").toString()));
-            historyTable->setItem(row, 3, new QTableWidgetItem(query.value("notes").toString()));
-            row++;
-        }
-    } else {
-        // Database connection is not open, show placeholder data
-        historyTable->insertRow(0);
-        historyTable->setItem(0, 0, new QTableWidgetItem("11-29-2024"));
-        historyTable->setItem(0, 1, new QTableWidgetItem("Blood Pressure"));
-        historyTable->setItem(0, 2, new QTableWidgetItem("120/80"));
-        historyTable->setItem(0, 3, new QTableWidgetItem("Normal"));
-
-
-
-
-        historyTable->insertRow(1);
-        historyTable->setItem(1, 0, new QTableWidgetItem("11-28-2024"));
-        historyTable->setItem(1, 1, new QTableWidgetItem("Heart Rate"));
-        historyTable->setItem(1, 2, new QTableWidgetItem("72 bpm"));
-        historyTable->setItem(1, 3, new QTableWidgetItem("Normal"));
+    for(int i = 0; i< snaps.length(); i++){
+        historyTable->setItem(i, 0, new QTableWidgetItem(snaps[i]->getTimestamp()));
+        historyTable->setItem(i, 1, new QTableWidgetItem(model.getCurProfile()->getFullName()));
+        historyTable->setItem(i, 2, new QTableWidgetItem(snaps[i]->getNotes()));
     }
-
-
-
-
-    */
-
-
-    // !!!Populate with placeholder data
-    historyTable->setRowCount(3); // Example: 3 rows
-    historyTable->setItem(0, 0, new QTableWidgetItem("2024-11-01"));
-    historyTable->setItem(0, 1, new QTableWidgetItem("10:00 AM"));
-    historyTable->setItem(0, 2, new QTableWidgetItem("Good health"));
-
-
-    historyTable->setItem(1, 0, new QTableWidgetItem("2024-11-15"));
-    historyTable->setItem(1, 1, new QTableWidgetItem("02:30 PM"));
-    historyTable->setItem(1, 2, new QTableWidgetItem("Minor concerns"));
-
-
-    historyTable->setItem(2, 0, new QTableWidgetItem("2024-11-27"));
-    historyTable->setItem(2, 1, new QTableWidgetItem("08:45 PM"));
-    historyTable->setItem(2, 2, new QTableWidgetItem("Stable"));
-
 
     // Set table properties
     historyTable->setEditTriggers(QAbstractItemView::NoEditTriggers); // Disable editing

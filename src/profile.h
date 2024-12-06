@@ -28,6 +28,8 @@ public:
     QString getLname() const;
     void setLname(const QString& lname);
 
+    QString getFullName() const;
+
     float getWeight() const;
     void setWeight(float weight);
 

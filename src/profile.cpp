@@ -55,6 +55,8 @@ void Profile::setFname(const QString& fname) { this->fname = fname; }
 QString Profile::getLname() const { return lname; }
 void Profile::setLname(const QString& lname) { this->lname = lname; }
 
+QString Profile::getFullName() const {return fname + " " + lname;}
+
 float Profile::getWeight() const { return weight; }
 void Profile::setWeight(float weight) { this->weight = weight; }
 

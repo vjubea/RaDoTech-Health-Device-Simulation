@@ -23,6 +23,9 @@ class Model
         bool createProfile(QString& fname, QString& lname, float weight, float height, QString& bday);
         bool editCurProfile(QString& fname, QString& lname, float weight, float height, QString& bday);
         bool deleteCurrentProfile();
+
+        QVector<Snapshot*> getCurSnapshots();
+        Profile* getCurProfile();
 };
 
 #endif // MODEL_H
