@@ -3,35 +3,36 @@
 #include <QDebug>
 
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
+    batteryLevel = 100;
+    profilesPage = nullptr;
+
     // Set up the stacked widget
     stackedWidget = new QStackedWidget(this);
     setCentralWidget(stackedWidget);
 
     // Set up the Login Page
-    setupLoginPage();
+    setupMenuPage();
+
+    setupProfilesPage();
 
     // Set up the Create Profile Page
     setupCreateProfilePage();
 
-    setupMenuPage();
+    setupLoginPage();
 
     setupMeasurePage();
-
-    setupProfilesPage();
 
     setupBattery();
 
     setupHistoryPage();
 
     setupBodyScreen();
-
 
     setupChartPage();
     setupIndicatorsPage();
@@ -40,19 +41,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Connect buttons to respective slots
     connect(logoutButton, &QPushButton::clicked, this, &MainWindow::onLogoutButtonClicked);
-    connect(createProfButton, &QPushButton::clicked, this, &MainWindow::onCreateProfButtonClicked);
-    connect(saveProfButton, &QPushButton::clicked, this, &MainWindow::onSaveProfButtonClicked);
-    connect(measureNowButton, &QPushButton::clicked, [this] () { stackedWidget->setCurrentIndex(3);});
+    
+    connect(measureNowButton, &QPushButton::clicked, [this] () { stackedWidget->setCurrentIndex(4);});
     connect(profilesButton, &QPushButton::clicked, [this]() {
-    setupProfilesPage();    // Ensure the Profiles Page is initialized
-    populateProfilesTable(); // Update the table data dynamically
-    stackedWidget->setCurrentIndex(4); // Go to the Profiles Page
+        setupProfilesPage();    // Ensure the Profiles Page is initialized
+        stackedWidget->setCurrentIndex(1); // Go to the Profiles Page
     });
     connect(historyButton, &QPushButton::clicked, [this]() {
-    stackedWidget->setCurrentIndex(5);
-
-
-});
+        stackedWidget->setCurrentIndex(5);
+    });
 }
 
 
@@ -60,125 +57,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-
-
-void MainWindow::setupLoginPage()
-{
-    // Initialize the login page widgets
-    welcomeLabel = new QLabel("Welcome to the App", this);
-    pleaseLogInStatement = new QLabel("Please log in to continue", this);
-
-    userDropdown = new QComboBox(this);
-    userDropdown->setEditable(false); // Prevent manual entry
-    userDropdown->addItem("Select User"); // Default placeholder
-    //Connect the dropdown's signal to the login slot
-    connect(userDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) { if (index > 0) { onLoginButtonClicked(); } });
-
-
-    noAccLabel = new QLabel("Don't have an account?", this);
-    createProfButton = new QPushButton("Create New Profile", this);
-
-
-    // Create a QFont for customizing the font
-    QFont labelFont("Arial", 16, QFont::Bold);
-
-    // Apply the font to the labels
-    welcomeLabel->setFont(labelFont);
-    pleaseLogInStatement->setFont(labelFont);
-    noAccLabel->setFont(labelFont);
-
-
-    // Create layout for login page
-    QVBoxLayout *loginLayout = new QVBoxLayout;
-    loginLayout->addWidget(welcomeLabel);
-    loginLayout->addWidget(pleaseLogInStatement);
-    loginLayout->addWidget(userDropdown);
-    loginLayout->addWidget(noAccLabel);
-    loginLayout->addWidget(createProfButton);
-
-
-    QWidget *loginPage = new QWidget(this);
-    loginPage->setLayout(loginLayout);
-
-
-    // Add the login page to stacked widget
-    stackedWidget->addWidget(loginPage);
-
-
-    // Populate the dropdown with existing profiles
-    populateUserDropdown();
-}
-
-void MainWindow::populateUserDropdown()
-{
-    userDropdown->clear();
-    userDropdown->addItem("Select User");
-
-    if (model.getProfileNames().isEmpty()) {
-        QMessageBox::information(this, "No Profiles", "No profiles available. Please create a new profile.");
-        return;
-    }
-
-    for (const QString &user : model.getProfileNames()) {
-        userDropdown->addItem(user);
-    }
-}
-
-
-void MainWindow::setupCreateProfilePage()
-{
-    // Initialize the create profile page widgets
-    createProfLabel = new QLabel("Create Your Profile", this);
-    fNameLabel = new QLabel("First Name:", this);
-    lNameLabel = new QLabel("Last Name:", this);
-    weightLabel = new QLabel("Weight (kg):", this);
-    heightLabel = new QLabel("Height (cm):", this);
-    dobLabel = new QLabel("Date of Birth:", this);
-    countryLabel = new QLabel("Country:", this);
-    fNameInput = new QLineEdit(this);
-    lNameInput = new QLineEdit(this);
-    weightInput = new QLineEdit(this);
-    heightInput = new QLineEdit(this);
-    dobInput = new QLineEdit(this);
-    countryInput = new QLineEdit(this);
-    saveProfButton = new QPushButton("Save Profile", this);
-    connect(saveProfButton, &QPushButton::clicked, this, &MainWindow::onSaveProfButtonClicked);
-
-
-    QFont labelFont2("Arial", 16, QFont::Bold);
-
-    // Apply the font to the labels
-    fNameLabel->setFont(labelFont2);
-    lNameLabel->setFont(labelFont2);
-    weightLabel->setFont(labelFont2);
-    heightLabel->setFont(labelFont2);
-    dobLabel->setFont(labelFont2);
-    countryLabel->setFont(labelFont2);
-
-
-    // Create layout for create profile page
-    QVBoxLayout *createProfLayout = new QVBoxLayout;
-    createProfLayout->addWidget(createProfLabel);
-    createProfLayout->addWidget(fNameLabel);
-    createProfLayout->addWidget(fNameInput);
-    createProfLayout->addWidget(lNameLabel);
-    createProfLayout->addWidget(lNameInput);
-    createProfLayout->addWidget(weightLabel);
-    createProfLayout->addWidget(weightInput);
-    createProfLayout->addWidget(heightLabel);
-    createProfLayout->addWidget(heightInput);
-    createProfLayout->addWidget(dobLabel);
-    createProfLayout->addWidget(dobInput);
-    createProfLayout->addWidget(saveProfButton);
-
-
-    QWidget *createProfPage = new QWidget(this);
-    createProfPage->setLayout(createProfLayout);
-
-    // Add the create profile page to stacked widget
-    stackedWidget->addWidget(createProfPage);
-}
-
 
 void MainWindow::setupMenuPage()
 {
@@ -218,7 +96,185 @@ void MainWindow::setupMenuPage()
     // Set the layout for the menu page
     menuPage->setLayout(verticalLayout_3);
     stackedWidget->addWidget(menuPage);
+}
 
+void MainWindow::setupProfilesPage()
+{
+    if (profilesPage == nullptr) {
+        profilesPage = new QWidget(this);
+        QVBoxLayout *profilesLayout = new QVBoxLayout;
+
+        QLabel *profilesLabel = new QLabel("Manage Profiles", this);
+        QFont labelFont("Arial", 16, QFont::Bold);
+        profilesLabel->setFont(labelFont);
+        profilesLayout->addWidget(profilesLabel);
+
+        // Table to display profiles
+        profilesTable = new QTableWidget(this);
+        profilesTable->setColumnCount(2); // Columns: First Name, Last Name
+        profilesTable->setHorizontalHeaderLabels({"First Name", "Last Name"});
+        
+        //profilesTable->clearContents(); //clears existing data
+        //profilesTable->setRowCount(0); display curr user
+
+        QVector<Profile*> profiles = model.getAllProfiles();
+        profilesTable->clearContents();
+
+        // Populate profilesTable with profiles
+        profilesTable->setRowCount(profiles.length());
+        qInfo() << profiles.length();
+        for(int i = 0; i < profiles.length(); i++){
+            profilesTable->setItem(i, 0, new QTableWidgetItem(profiles.at(i)->getFname()));
+            profilesTable->setItem(i, 1, new QTableWidgetItem(profiles.at(i)->getLname()));
+        }
+
+        // Set table properties
+        profilesTable->setEditTriggers(QAbstractItemView::NoEditTriggers); // Disable editing
+        profilesTable->setSelectionBehavior(QAbstractItemView::SelectRows); // Entire row selection
+        profilesTable->setSelectionMode(QAbstractItemView::SingleSelection);
+
+        //create, edit & delete buttons
+        QPushButton *createProfButton = new QPushButton("Create New Profile", this);
+        QPushButton *editProfileButton = new QPushButton("Edit", this);
+        QPushButton *deleteProfileButton = new QPushButton("Delete", this);
+
+        // Back Button
+        QPushButton *profilesBackButton = new QPushButton("Back");
+        connect(profilesBackButton, &QPushButton::clicked, [this]() {
+            stackedWidget->setCurrentIndex(0); // Go back to Menu page
+        });
+        
+        profilesLayout->addWidget(profilesTable);
+        profilesLayout->addWidget(createProfButton);
+        profilesLayout->addWidget(editProfileButton);
+        profilesLayout->addWidget(deleteProfileButton);
+        profilesLayout->addWidget(profilesBackButton);
+
+        profilesPage->setLayout(profilesLayout);
+        stackedWidget->addWidget(profilesPage);
+
+        connect(createProfButton, &QPushButton::clicked, this, &MainWindow::onCreateProfButtonClicked);
+        // Connect the row click signal to the slot
+        connect(profilesTable, &QTableWidget::cellClicked, this, &MainWindow::onProfileRowClicked);
+        connect(editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
+        connect(deleteProfileButton, &QPushButton::clicked, this, &MainWindow::onDeleteProfileClicked);
+    }
+    else {
+        //profilesTable->clearContents(); //clears existing data
+        //profilesTable->setRowCount(0); display curr user
+        profilesTable->clearContents();
+        QVector<Profile*> profiles = model.getAllProfiles();
+        // Populate profilesTable with profiles
+        profilesTable->setRowCount(profiles.length());
+        qInfo() << profiles.length();
+        for(int i = 0; i < profiles.length(); i++){
+            profilesTable->setItem(i, 0, new QTableWidgetItem(profiles.at(i)->getFname()));
+            profilesTable->setItem(i, 1, new QTableWidgetItem(profiles.at(i)->getLname()));
+        }
+        stackedWidget->setCurrentIndex(1);
+    }
+}
+
+// Modify to work as the page selecting user before scan. 
+// Similar to Profiles page where we select profiles by index.
+void MainWindow::setupLoginPage()
+{
+    // Initialize the login page widgets
+    welcomeLabel = new QLabel("Welcome to the App", this);
+    pleaseLogInStatement = new QLabel("Please log in to continue", this);
+
+    userDropdown = new QComboBox(this);
+    userDropdown->setEditable(false); // Prevent manual entry
+    userDropdown->addItem("Select User"); // Default placeholder
+    //Connect the dropdown's signal to the login slot
+    connect(userDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) { if (index > 0) { onLoginButtonClicked(); } });
+
+
+    noAccLabel = new QLabel("Don't have an account?", this);
+    createProfButton = new QPushButton("Create New Profile", this);
+
+
+    // Create a QFont for customizing the font
+    QFont labelFont("Arial", 16, QFont::Bold);
+
+    // Apply the font to the labels
+    welcomeLabel->setFont(labelFont);
+    pleaseLogInStatement->setFont(labelFont);
+    noAccLabel->setFont(labelFont);
+
+
+    // Create layout for login page
+    QVBoxLayout *loginLayout = new QVBoxLayout;
+    loginLayout->addWidget(welcomeLabel);
+    loginLayout->addWidget(pleaseLogInStatement);
+    loginLayout->addWidget(userDropdown);
+    loginLayout->addWidget(noAccLabel);
+    loginLayout->addWidget(createProfButton);
+
+    QWidget *loginPage = new QWidget(this);
+    loginPage->setLayout(loginLayout);
+
+    // Add the login page to stacked widget
+    stackedWidget->addWidget(loginPage);
+
+    // Populate the dropdown with existing profiles
+    // populateUserDropdown(); // Removed
+}
+
+
+void MainWindow::setupCreateProfilePage()
+{
+    // Initialize the create profile page widgets
+    createProfLabel = new QLabel("Create Your Profile", this);
+    fNameLabel = new QLabel("First Name:", this);
+    lNameLabel = new QLabel("Last Name:", this);
+    weightLabel = new QLabel("Weight (kg):", this);
+    heightLabel = new QLabel("Height (cm):", this);
+    dobLabel = new QLabel("Date of Birth:", this);
+    fNameInput = new QLineEdit(this);
+    lNameInput = new QLineEdit(this);
+    weightInput = new QLineEdit(this);
+    heightInput = new QLineEdit(this);
+    dobInput = new QLineEdit(this);
+    saveProfButton = new QPushButton("Save Profile", this);
+    connect(saveProfButton, &QPushButton::clicked, this, &MainWindow::onSaveProfButtonClicked);
+    // Create a "Back" button
+    QPushButton *saveProfBackButton = new QPushButton("Back", this);
+    connect(saveProfBackButton, &QPushButton::clicked, [this]() {
+        stackedWidget->setCurrentIndex(1); // Go back to Profile page
+    });
+
+    QFont labelFont2("Arial", 16, QFont::Bold);
+
+    // Apply the font to the labels
+    fNameLabel->setFont(labelFont2);
+    lNameLabel->setFont(labelFont2);
+    weightLabel->setFont(labelFont2);
+    heightLabel->setFont(labelFont2);
+    dobLabel->setFont(labelFont2);
+
+
+    // Create layout for create profile page
+    QVBoxLayout *createProfLayout = new QVBoxLayout;
+    createProfLayout->addWidget(createProfLabel);
+    createProfLayout->addWidget(fNameLabel);
+    createProfLayout->addWidget(fNameInput);
+    createProfLayout->addWidget(lNameLabel);
+    createProfLayout->addWidget(lNameInput);
+    createProfLayout->addWidget(weightLabel);
+    createProfLayout->addWidget(weightInput);
+    createProfLayout->addWidget(heightLabel);
+    createProfLayout->addWidget(heightInput);
+    createProfLayout->addWidget(dobLabel);
+    createProfLayout->addWidget(dobInput);
+    createProfLayout->addWidget(saveProfButton);
+    createProfLayout->addWidget(saveProfBackButton);
+
+    QWidget *createProfPage = new QWidget(this);
+    createProfPage->setLayout(createProfLayout);
+
+    // Add the create profile page to stacked widget
+    stackedWidget->addWidget(createProfPage);
 }
 
 
@@ -250,25 +306,6 @@ void MainWindow::setupMeasurePage()
    connect(startMeasureButton, &QPushButton::clicked, this, &MainWindow::startMeasurement);
    measureLayout->addWidget(startMeasureButton);
 
-   QPushButton *rightHandButton = new QPushButton("Measure Right Hand", this);
-   connect(rightHandButton, &QPushButton::clicked, this, [this]() { measureHands("Right"); });
-   measureLayout->addWidget(rightHandButton);
-
-
-   QPushButton *leftHandButton = new QPushButton("Measure Left Hand", this);
-   connect(leftHandButton, &QPushButton::clicked, this, [this]() { measureHands("Left"); });
-   measureLayout->addWidget(leftHandButton);
-
-
-   QPushButton *rightFootButton = new QPushButton("Measure Right Foot", this);
-   connect(rightFootButton, &QPushButton::clicked, this, [this]() { measureFeet("Right"); });
-   measureLayout->addWidget(rightFootButton);
-
-
-   QPushButton *leftFootButton = new QPushButton("Measure Left Foot", this);
-   connect(leftFootButton, &QPushButton::clicked, this, [this]() { measureFeet("Left"); });
-   measureLayout->addWidget(leftFootButton);
-
 
    // Finish Button to go back to History or Menu page
    QPushButton* finishButton = new QPushButton("Finish Measurement", this);
@@ -278,7 +315,7 @@ void MainWindow::setupMeasurePage()
    // Create a "Back" button
    QPushButton *measureBackButton = new QPushButton("Back", this);
    connect(measureBackButton, &QPushButton::clicked, [this]() {
-       stackedWidget->setCurrentIndex(2); // Go back to Menu page
+       stackedWidget->setCurrentIndex(0); // Go back to Menu page
    });
 
    // Add Back button to layout
@@ -348,16 +385,16 @@ void MainWindow::setupBattery()
 
 void MainWindow::startMeasurement()
 {
-   if (!batteryDepletionTimer || !batteryLabel) {
-       qDebug() << "Battery components are not initialized!";
-       return;
-   }
+    if (!batteryDepletionTimer || !batteryLabel) {
+        qDebug() << "Battery components are not initialized!";
+        return;
+    }
 
 
-   if (!batteryDepletionTimer->isActive()) {
-       batteryDepletionTimer->start(2400);
-       qDebug() << "Battery depletion timer started.";
-   }
+    if (!batteryDepletionTimer->isActive()) {
+        batteryDepletionTimer->start(2400);
+        qDebug() << "Battery depletion timer started.";
+    }
 }
 
 
@@ -376,29 +413,29 @@ void MainWindow::depleteBattery()
    }
 }
 
-
+// Change to be used by SnapshotDetails page into "SaveSnapshot"
 void MainWindow::finishMeasurement()
 {
-   if (batteryDepletionTimer && batteryDepletionTimer->isActive()) {
-       batteryDepletionTimer->stop();
-   }
+    if (batteryDepletionTimer && batteryDepletionTimer->isActive()) {
+        batteryDepletionTimer->stop();
+    }
 
+    //!!USER INPUTS POST MEASUREMENT GO HERE -- To remove after
+    scanner->registerWeight(0.0f);
+    scanner->registerBlood('L', 0,0);
+    scanner->registerBlood('R',0,0);
+    scanner->registerBodyTemp(0.0);
+    scanner->registerHeartRate(0);
+    scanner->registerSleepTime(0,0);
+    scanner->registerTime(0,0); //might want to get current from system
+    scanner->registerDate(0,0,0); //might want to geet current from system
+    scanner->registerNotes("Normal scan"); // let user write these
+    // -----
 
-   //!!USER INPUTS POST MEASUREMENT GO HERE
-   scanner->registerWeight(0.0f);
-   scanner->registerBlood('L', 0,0);
-   scanner->registerBlood('R',0,0);
-   scanner->registerBodyTemp(0.0);
-   scanner->registerHeartRate(0);
-   scanner->registerSleepTime(0,0);
-   scanner->registerTime(0,0); //might want to get current from system
-   scanner->registerDate(0,0,0); //might want to geet current from system
-   scanner->registerNotes("Normal scan"); // let user write these
-
-   if(!scanner->finishScan()){
-       QMessageBox::warning(this, "Scan Incomplete", "Scan parameters incomplete");
-       return;
-   }
+    if(!scanner->finishScan()) {
+        QMessageBox::warning(this, "Scan Incomplete", "Scan parameters incomplete");
+        return;
+    }
 
    //clean up scan.
    delete scanner;
@@ -455,7 +492,7 @@ void MainWindow::setupHistoryPage()
     // Create a "Back" button
     QPushButton *historyBackButton = new QPushButton("Back", this);
     connect(historyBackButton, &QPushButton::clicked, [this]() {
-        stackedWidget->setCurrentIndex(2); // Go back to Menu page
+        stackedWidget->setCurrentIndex(0); // Go back to Home page
     });
 
 
@@ -474,71 +511,7 @@ void MainWindow::setupHistoryPage()
 
 }
 
-void MainWindow::setupProfilesPage()
-{
-    if (profilesPage != nullptr) {
-        stackedWidget->setCurrentWidget(profilesPage);
-        return; // If already set up, skip reinitialization
-    }
 
-    profilesPage = new QWidget(this);
-    QVBoxLayout *profilesLayout = new QVBoxLayout;
-
-
-    QLabel *profilesLabel = new QLabel("Manage Profiles", this);
-    QFont labelFont("Arial", 16, QFont::Bold);
-    profilesLabel->setFont(labelFont);
-    profilesLayout->addWidget(profilesLabel);
-
-
-    // Table to display profiles
-    profilesTable = new QTableWidget(this);
-    profilesTable->setColumnCount(4); // Columns: First Name, Last Name, Weight, Height
-    profilesTable->setHorizontalHeaderLabels({"First Name", "Last Name", "Weight", "Height"});
-    profilesLayout->addWidget(profilesTable);
-
-    //edit & delete buttons
-    QPushButton *editProfileButton = new QPushButton("Edit", this);
-    QPushButton *deleteProfileButton = new QPushButton("Delete", this);
-
-    // Back Button
-    QPushButton *profilesBackButton = new QPushButton("Back");
-    connect(profilesBackButton, &QPushButton::clicked, [this]() {
-        stackedWidget->setCurrentIndex(2); // Go back to Menu page
-    });
-
-    profilesLayout->addWidget(editProfileButton);
-    profilesLayout->addWidget(deleteProfileButton);
-    profilesLayout->addWidget(profilesBackButton);
-
-
-    profilesPage->setLayout(profilesLayout);
-    stackedWidget->addWidget(profilesPage);
-
-    populateProfilesTable();
-
-    connect(editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
-    connect(deleteProfileButton, &QPushButton::clicked, this, &MainWindow::onDeleteProfileClicked);
-}
-
-
-void MainWindow::populateProfilesTable()
-{
-    if (!profilesTable) return;
-
-    qDebug() << "Updating profile table for user: " << model.getCurProfile()->getFullName();
-
-
-    profilesTable->clearContents(); // Clear existing data
-    profilesTable->setRowCount(1); // Display only the current user
-
-    profilesTable->setItem(0, 0, new QTableWidgetItem(model.getCurProfile()->getFname()));
-    profilesTable->setItem(0, 1, new QTableWidgetItem(model.getCurProfile()->getLname()));
-    profilesTable->setItem(0, 2, new QTableWidgetItem(QString::number(model.getCurProfile()->getWeight())));
-    profilesTable->setItem(0, 3, new QTableWidgetItem(QString::number(model.getCurProfile()->getHeight())));
-
-    profilesTable->setEditTriggers(QAbstractItemView::NoEditTriggers); // Prevent direct editing
-}
 
 
 void MainWindow::setupBodyScreen()
@@ -834,8 +807,8 @@ void MainWindow::onLoginButtonClicked()
 // Slot for handling create profile button click
 void MainWindow::onCreateProfButtonClicked()
 {
-    // Switch to the create profile page (index 1)
-    stackedWidget->setCurrentIndex(1);
+    // Switch to the create profile page
+    stackedWidget->setCurrentIndex(2);
 }
 
 
@@ -860,32 +833,22 @@ void MainWindow::onSaveProfButtonClicked()
     bool isValid;
     weight = weightString.toFloat(&isValid);
 
-    if(!isValid){
+    if (!isValid){
         QMessageBox::warning(this, "Validation Error", "Weight must be a number");
         return;
     }
 
     height = heightString.toFloat(&isValid);
-    if(!isValid){
+    if (!isValid){
         QMessageBox::warning(this, "Validation Error", "Height must be a number");
         return;
     }
 
-
-    isValid = model.createProfile(fname, lname, weight, height, dob);
-
-    if(!isValid){
+    if (! model.createProfile(fname, lname, weight, height, dob)) {
         QMessageBox::warning(this, "Validation Error", "Something went wrong creatting this profile in the database");
         return;
     }
-
-
-
-    // Combine fname and lname to create a full name
-    QString fullName = fname + " " + lname;
-
-    userProfiles.append(fullName);  // Add the new user to the list
-    populateUserDropdown();         // Update the dropdown in the Welcome page
+    
     QMessageBox::information(this, "Success", "Profile created successfully!");
 
     // Clear input fields after saving
@@ -894,11 +857,9 @@ void MainWindow::onSaveProfButtonClicked()
     weightInput->clear();
     heightInput->clear();
     dobInput->clear();
-    countryInput->clear();
 
-    // Navigate back to the Welcome page
-    stackedWidget->setCurrentIndex(0);
-
+    // Reload the Profile page
+    setupProfilesPage();
 }
 
 
@@ -913,7 +874,7 @@ void MainWindow::addMeasurementToHistory(const QString &result) {
     setupHistoryPage();
 }
 
-void MainWindow::onHistoryRowClicked(int row, int column){
+void MainWindow::onHistoryRowClicked(int row, int column) {
 
     if(row == 0){return;}
 
@@ -926,28 +887,37 @@ void MainWindow::onHistoryRowClicked(int row, int column){
 
     // Example: Navigate to the Body Screen and display detailed info
     setupBodyScreen(); // Ensure this method sets up the Body Screen if not already done
+    // TBD
     stackedWidget->setCurrentIndex(6); // Assuming the Body Screen index is 5
+}
+
+void MainWindow::onProfileRowClicked(int row, int col) {
+    // Access the QTableWidget (history table)
+    QTableWidget *profilesTable = qobject_cast<QTableWidget *>(sender());
+    if (!profilesTable) return; // Safety check
+    // Selects current profile to enable Update/Delete
+    model.selectProfile(row);
 }
 
 void MainWindow::onEditProfileClicked()
 {
     // Ensure the profile has been selected
     if (model.getCurProfile()  == nullptr) {
-        QMessageBox::warning(this, "Edit Error", "No profile selected. Please log in first.");
+        QMessageBox::warning(this, "EDIT_ERR", "No profile selected. Please select a profile first.");
         return;
     }
 
     // Create a dialog or input fields to edit the profile
     bool ok;
 
-   QString newFname = QInputDialog::getText(this, "Edit First Name", "Enter new weight first name:", QLineEdit::Normal, model.getCurProfile()->getFname(), &ok);
+    QString newFname = QInputDialog::getText(this, "Edit First Name", "Enter new weight first name:", QLineEdit::Normal, model.getCurProfile()->getFname(), &ok);
     if (!ok) {
         newFname = model.getCurProfile()->getFname();
     }
     QString newLname = QInputDialog::getText(this, "Edit First Name", "Enter new weight first name:", QLineEdit::Normal, model.getCurProfile()->getLname(), &ok);
-     if (!ok) {
-         newLname = model.getCurProfile()->getLname();
-     }
+    if (!ok) {
+        newLname = model.getCurProfile()->getLname();
+    }
 
     float newWeight = QInputDialog::getDouble(this, "Edit Weight", "Enter new weight (kg):", model.getCurProfile()->getWeight(), 0.0, 200.0, 2, &ok);
     if (!ok) {
@@ -962,20 +932,21 @@ void MainWindow::onEditProfileClicked()
     QString empty = "";
     model.editCurProfile(newFname, newLname, newWeight, newHeight, empty);
 
-
-
-    // Update the profile table
-    populateProfilesTable();
-
     // Inform the user of the successful update
     QMessageBox::information(this, "Profile Updated", "The profile has been successfully updated.");
 
     // Optionally, update other areas of the app, such as the dropdown
-    populateUserDropdown(); // Ensure the dropdown reflects the updated data
+    // populateUserDropdown(); // Ensure the dropdown reflects the updated data
 }
 
 void MainWindow::onDeleteProfileClicked()
 {
+    // Ensure the profile has been selected
+    if (model.getCurProfile()  == nullptr) {
+        QMessageBox::warning(this, "EDIT_ERR", "No profile selected. Please select a profile first.");
+        return;
+    }
+
     // Confirm the deletion
     int result = QMessageBox::question(this, "Delete Profile",
         "Are you sure you want to delete this profile?",
@@ -984,23 +955,19 @@ void MainWindow::onDeleteProfileClicked()
     if (result == QMessageBox::No) {
         return; // Exit if the user cancels
     }
-
-
-    model.deleteCurrentProfile();
-
+    
+    if (!model.deleteCurrentProfile()) {
+        // Show success message
+        QMessageBox::information(this, "Error", "Profile could not be deleted.");
+    }
+    QMessageBox::information(this, "Profile Deleted", "The profile has been deleted.");
     // Clear current user data
     currentFirstName.clear();
     currentLastName.clear();
     currentWeight = 0.0;
     currentHeight = 0.0;
 
-    // Update the dropdown on the Welcome Page
-    populateUserDropdown();
-
-    // Show success message
-    QMessageBox::information(this, "Profile Deleted", "The profile has been deleted.");
-
-    // Navigate back to the Welcome Page
-    stackedWidget->setCurrentIndex(0);
+    // Reload the Profiles Page
+    setupProfilesPage();
 }
 

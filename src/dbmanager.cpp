@@ -128,10 +128,10 @@ Profile* DBManager::createProfile(const QString& fname, const QString& lname,
 
     if (!query.exec()) {
         qWarning() << "Error creating profile: " << query.lastError().text();
-        return NULL;
+        return nullptr;
     }
     int lastId = getLastInsertId(query);
-    return new Profile(lastId, fname, lname, weight, height, bday, this);
+    return new Profile(lastId, fname, lname, weight, height, bday, nullptr);
 }
 
 bool DBManager::deleteProfile(int id)

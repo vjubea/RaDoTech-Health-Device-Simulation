@@ -20,6 +20,7 @@ class Model
         Scanner* startScan();
 
         bool selectProfile(int index);
+        QVector<Profile*> getAllProfiles();
         bool createProfile(QString& fname, QString& lname, float weight, float height, QString& bday);
         bool editCurProfile(QString& fname, QString& lname, float weight, float height, QString& bday);
         bool deleteCurrentProfile();
