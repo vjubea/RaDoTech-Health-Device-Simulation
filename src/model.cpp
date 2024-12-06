@@ -13,6 +13,7 @@ Model::Model() {
     QString lname = "GO";
     QString bday = "yyyy/MM/dd";
     createProfile(name, lname, 70, 150, bday); // returns Profile Object only if succeeds being added to DB.
+    getAllProfiles();
     selectProfile(0);
     deleteCurrentProfile();
     createProfile(name, lname, 70, 150, bday);
@@ -23,11 +24,13 @@ Model::Model() {
     name = "Road";
     createProfile(name, lname, 70, 150, bday);
     name = "Toad";
+    getAllProfiles();
+    // Properly updates the profiles QVector, and DB
     dbManager->updateProfile(profiles.at(3), name, lname, 90, 150, bday);
     selectProfile(3);
 
     Scanner* scanner = startScan();
-    for (int i=0; i<6; ++i) {
+    for (int i=0; i<6; ++i) { // i from 1-12 is H, i from 13-24 is F. Odd i = L, Even i = R
         scanner->registerReading('L','H',10);
         scanner->registerReading('R','H',10);
         scanner->registerReading('L','F',10);
@@ -38,7 +41,7 @@ Model::Model() {
     scanner->registerBodyTemp(36);
     scanner->registerDate(10, 4, 2024);
     scanner->registerTime(23, 59);
-    scanner->finishScan();
+    scanner->finishScan(); // Saves snapshot to DB with all its required fields
     QVector<Snapshot*> snaps;
     dbManager->getAllSnapshots(snaps);
     qWarning() << (snaps.size());
@@ -76,13 +79,16 @@ bool Model::selectProfile(int index) {
     return true;
 }
 
+QVector<Profile*> Model::getAllProfiles() {
+    dbManager->getAllProfiles(profiles);
+    return profiles;
+}
+
 bool Model::createProfile(QString& fname, QString& lname, float weight, float height, QString& birthday) {
     // attempts to create profile. If no room for another, false. If creation fails, false. etc...
     if (profiles.size() < 5){
         Profile* newProf = dbManager->createProfile(fname, lname, weight, height, birthday);
-        if (newProf != NULL) {
-            // Pushes new profile to the profiles list
-            profiles.push_back(newProf);
+        if (newProf != nullptr) {
             return true;
         }
         qWarning() <<"ERR: Could not Create Profile. Database entry error.";

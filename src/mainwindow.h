@@ -51,10 +51,11 @@ private slots:
   void onLoginButtonClicked(); // Slot for login button
   void onLogoutButtonClicked(); // Slot for logout button
   void onCreateProfButtonClicked(); // Slot for create profile button
+  void onProfileRowClicked(int row, int col); // Slot for selecting profile
   void onSaveProfButtonClicked(); // Slot for save profile button
   void onDeleteProfileClicked(); // Slot for delete profile button
   void onEditProfileClicked(); // Slot for edit profile button
-  void onHistoryRowClicked(int row, int column); // Slot for history row click
+  void onHistoryRowClicked(int row, int col); // Slot for history row click
   void addMeasurementToHistory(const QString& result);
   void startMeasurement(); // Start the measurement
   void finishMeasurement(); // Slot for finishing measurement
@@ -75,7 +76,6 @@ private:
   QLabel *pleaseLogInStatement;
   QLabel *noAccLabel;
   QPushButton *createProfButton;
-  QVector<QString> userProfiles; // List of "First Last" user names
   QComboBox *userDropdown;
 
 
@@ -117,7 +117,7 @@ private:
 
   //GUI elements for Profiles Page
   QLabel *profilesLabel;
-  QWidget *profilesPage = nullptr;
+  QWidget *profilesPage;
   QTableWidget *profilesTable;    // Table for displaying profiles
   QPushButton *profilesBackButton;       // Back button on Profiles page
   QPushButton *editProfileButton; // Edit profile button
@@ -126,7 +126,7 @@ private:
   // GUI elements for Measure Page
   // Battery variables
   QLabel *batteryLabel;
-  int batteryLevel = 100; // Start at 100% battery
+  int batteryLevel; // Battery level
   QTimer *batteryDepletionTimer; // Timer to simulate battery depletion
   QVBoxLayout *measureLayout;
 
@@ -177,7 +177,6 @@ private:
   void showRecommendationsPage(); // Show the recommendations page
   void showHistoryPage(); // Show the history page
   void setupProfilesPage(); // Set up the Profiles page
-  void populateProfilesTable(); // Populate the profiles table
   void setupChartPage(); // Set up the Chart page
   void setupIndicatorsPage(); // Set up the Indicators page
   void setupRecommendationsPage(); // Set up the Recommendations page
