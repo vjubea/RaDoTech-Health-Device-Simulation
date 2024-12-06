@@ -984,14 +984,8 @@ void MainWindow::onDeleteProfileClicked()
         return; // Exit if the user cancels
     }
 
-    // Find the full name of the current user
-    QString fullName = currentFirstName + " " + currentLastName;
 
-    // Remove the user from the QVector
-    int userIndex = userProfiles.indexOf(fullName);
-    if (userIndex != -1) {
-        userProfiles.removeAt(userIndex);
-    }
+    model.deleteCurrentProfile();
 
     // Clear current user data
     currentFirstName.clear();
