@@ -298,42 +298,36 @@ void MainWindow::setupMeasurePage()
 
 void MainWindow::measureHands(const QString &side) {
    // Simulate data for measurement
-   int reading = QRandomGenerator::global()->bounded(50, 150); // Generate a random reading
+   qDebug() << "Measuring" << side << "Hand";
 
 
-   qDebug() << "Measuring" << side << "Hand with reading:" << reading;
+   for(int i = 0; i < 6; i++){
+       int reading = QRandomGenerator::global()->bounded(HandGoodReadStart[i] - 7, HandGoodReadEnd[i] +7); // Generate a random reading in range
+       if (scanner) {
+          char sideChar = (side == "Left") ? 'L' : 'R';
+          scanner->registerReading(sideChar, 'H', reading); // H for Hand
+       } else {
+           qWarning() << "Scanner not initialized.";
+       }
+   }
 
-
-   // Assuming Scanner is initialized as a member variable
-//   if (scanner) {
-//       char sideChar = (side == "Left") ? 'L' : 'R';
-//       scanner->registerReading(sideChar, 'H', reading); // H for Hand
-//   } else {
-//       qWarning() << "Scanner not initialized.";
-//   }
-
-
-   // TODO: Update UI or indicate that the hand measurement was successful
    QMessageBox::information(this, "Measurement Complete", side + " Hand measurement recorded.");
 }
 
 
 void MainWindow::measureFeet(const QString &side) {
    // Simulate data for measurement
-   int reading = QRandomGenerator::global()->bounded(50, 150); // Generate a random reading
+    qDebug() << "Measuring" << side << "Foot";
 
-
-   qDebug() << "Measuring" << side << "Foot with reading:" << reading;
-
-
-   // Assuming Scanner is initialized as a member variable
-//   if (scanner) {
-//       char sideChar = (side == "Left") ? 'L' : 'R';
-//       scanner->registerReading(sideChar, 'F', reading); // F for Foot
-//   } else {
-//       qWarning() << "Scanner not initialized.";
-//   }
-
+   for(int i = 0; i < 6; i++){
+       int reading = QRandomGenerator::global()->bounded(FootGoodReadStart[i] - 7, FootGoodReadEnd[i] +7); // Generate a random reading in range
+       if (scanner) {
+          char sideChar = (side == "Left") ? 'L' : 'R';
+          scanner->registerReading(sideChar, 'F', reading); // F for Foot
+       } else {
+           qWarning() << "Scanner not initialized.";
+       }
+   }
 
    //Update UI or indicate that the foot measurement was successful
    QMessageBox::information(this, "Measurement Complete", side + " Foot measurement recorded.");
@@ -391,9 +385,11 @@ void MainWindow::finishMeasurement()
 
 
    //!!USER INPUTS POST MEASUREMENT GO HERE
+   scanner->registerWeight(0.0f);
    scanner->registerBlood('L', 0,0);
    scanner->registerBlood('R',0,0);
    scanner->registerBodyTemp(0.0);
+   scanner->registerHeartRate(0);
    scanner->registerSleepTime(0,0);
    scanner->registerTime(0,0); //might want to get current from system
    scanner->registerDate(0,0,0); //might want to geet current from system
@@ -407,7 +403,7 @@ void MainWindow::finishMeasurement()
    //clean up scan.
    delete scanner;
    scanner = nullptr;
-   curSnap = model.getCurSnapshots()[model.getCurSnapshots().length()-1];
+
 
 
    QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");

@@ -20,6 +20,15 @@
 #define H6_GoodReadSTART 61
 #define H6_GoodReadEND 89
 
+const int HandGoodReadStart[] = {
+    H1_GoodReadSTART, H2_GoodReadSTART, H3_GoodReadSTART,
+    H4_GoodReadSTART, H5_GoodReadSTART, H6_GoodReadSTART
+};
+const int HandGoodReadEnd[] = {
+    H1_GoodReadEND, H2_GoodReadEND, H3_GoodReadEND,
+    H4_GoodReadEND, H5_GoodReadEND, H6_GoodReadEND
+};
+
 // Feet (R/L) Reading Good Ranges
 #define F1_GoodReadSTART 48
 #define F1_GoodReadEND 71
@@ -39,5 +48,14 @@
 #define F6_GoodReadSTART 43
 #define F6_GoodReadEND 64
 
+const int FootGoodReadStart[] = {
+    F1_GoodReadSTART, F2_GoodReadSTART, F3_GoodReadSTART,
+    F4_GoodReadSTART, F5_GoodReadSTART, F6_GoodReadSTART
+};
+
+const int FootGoodReadEnd[] = {
+    F1_GoodReadEND, F2_GoodReadEND, F3_GoodReadEND,
+    F4_GoodReadEND, F5_GoodReadEND, F6_GoodReadEND
+};
 
 #endif // DEFS_H

@@ -30,7 +30,7 @@
 #include "scanner.h"
 #include "profile.h"
 #include "snapshot.h"
-#include "dbmanager.h"
+#include "defs.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
