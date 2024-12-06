@@ -26,6 +26,7 @@ class Model
 
         QVector<Snapshot*> getCurSnapshots();
         Profile* getCurProfile();
+        QVector<QString> getProfileNames();
 };
 
 #endif // MODEL_H

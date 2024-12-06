@@ -131,3 +131,12 @@ QVector<Snapshot*> Model::getCurSnapshots(){
 Profile* Model::getCurProfile(){
     return currentProfile;
 }
+
+QVector<QString> Model::getProfileNames(){
+    QVector<QString> names;
+    for (int i = 0;  i < profiles.size(); i++) {
+        names.append(profiles[i]->getFullName());
+    }
+    return names;
+
+}

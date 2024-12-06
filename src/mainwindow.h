@@ -30,6 +30,7 @@
 #include "scanner.h"
 #include "profile.h"
 #include "snapshot.h"
+#include "dbmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -66,6 +67,7 @@ private:
   Model model;
   Scanner* scanner;
   Snapshot* curSnap;
+  DBManager dbm;
 
 
   // GUI elements for Login Page

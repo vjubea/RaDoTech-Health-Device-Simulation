@@ -114,16 +114,15 @@ void MainWindow::populateUserDropdown()
     userDropdown->clear();
     userDropdown->addItem("Select User");
 
-    if (userProfiles.isEmpty()) {
+    if (model.getProfileNames().isEmpty()) {
         QMessageBox::information(this, "No Profiles", "No profiles available. Please create a new profile.");
         return;
     }
 
-    for (const QString &user : userProfiles) {
+    for (const QString &user : model.getProfileNames()) {
         userDropdown->addItem(user);
     }
 }
-
 
 
 void MainWindow::setupCreateProfilePage()
@@ -183,8 +182,6 @@ void MainWindow::setupCreateProfilePage()
 }
 
 
-
-
 void MainWindow::setupMenuPage()
 {
 
@@ -225,7 +222,6 @@ void MainWindow::setupMenuPage()
     stackedWidget->addWidget(menuPage);
 
 }
-
 
 
 void MainWindow::setupMeasurePage()
@@ -344,7 +340,6 @@ void MainWindow::measureFeet(const QString &side) {
 }
 
 
-
 void MainWindow::setupBattery()
 {
    batteryLevel = 100;
@@ -396,8 +391,6 @@ void MainWindow::finishMeasurement()
    QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
 }
 
-
-
 void MainWindow::setupHistoryPage()
 {
     // Create the history page
@@ -415,7 +408,7 @@ void MainWindow::setupHistoryPage()
     // Create a table widget for displaying history data
     QTableWidget *historyTable = new QTableWidget(this);
     historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
-    historyTable->setColumnCount(3); // Example: Date & Time, Profile, Notes
+    historyTable->setColumnCount(3); // Date & Time, Profile, Notes
 
     QVector<Snapshot*> snaps = model.getCurSnapshots();
     historyTable->setRowCount(snaps.length());
@@ -481,7 +474,7 @@ void MainWindow::setupProfilesPage()
 
     // Table to display profiles
     profilesTable = new QTableWidget(this);
-    profilesTable->setColumnCount(4); // Example columns: First Name, Last Name, Weight, Height
+    profilesTable->setColumnCount(4); // Columns: First Name, Last Name, Weight, Height
     profilesTable->setHorizontalHeaderLabels({"First Name", "Last Name", "Weight", "Height"});
     profilesLayout->addWidget(profilesTable);
 
@@ -650,7 +643,6 @@ void MainWindow::setupBodyScreen()
 }
 
 
-
 void MainWindow::setupChartPage()
 {
    QWidget *chartWidget = new QWidget(this);
@@ -697,7 +689,6 @@ void MainWindow::setupChartPage()
    chartWidget->setLayout(chartLayout);
    stackedWidget->addWidget(chartWidget);
 }
-
 
 
 void MainWindow::setupIndicatorsPage()
@@ -833,29 +824,48 @@ void MainWindow::onSaveProfButtonClicked()
     // Fetch input values
     QString fname = fNameInput->text().trimmed();
     QString lname = lNameInput->text().trimmed();
-    QString weight = weightInput->text().trimmed();
-    QString height = heightInput->text().trimmed();
+    QString weightString = weightInput->text().trimmed();
+    float weight;
+    QString heightString = heightInput->text().trimmed();
+    float height;
     QString dob = dobInput->text().trimmed();
-    QString country = countryInput->text().trimmed();
 
     // Validate inputs
-    if (fname.isEmpty() || lname.isEmpty() || weight.isEmpty() || height.isEmpty() || dob.isEmpty() || country.isEmpty()) {
+    if (fname.isEmpty() || lname.isEmpty() || weightString.isEmpty() || heightString.isEmpty() || dob.isEmpty()) {
         QMessageBox::warning(this, "Validation Error", "All fields are required!");
         return;
     }
 
+    bool isValid;
+    weight = weightString.toFloat(&isValid);
+
+    if(!isValid){
+        QMessageBox::warning(this, "Validation Error", "Weight must be a number");
+        return;
+    }
+
+    height = heightString.toFloat(&isValid);
+    if(!isValid){
+        QMessageBox::warning(this, "Validation Error", "Height must be a number");
+        return;
+    }
+
+
+    isValid = model.createProfile(fname, lname, weight, height, dob);
+
+    if(!isValid){
+        QMessageBox::warning(this, "Validation Error", "Something went wrong creatting this profile in the database");
+        return;
+    }
+
+
+
     // Combine fname and lname to create a full name
     QString fullName = fname + " " + lname;
 
-    // Check for duplicate profiles
-    if (!userProfiles.contains(fullName)) {
-        userProfiles.append(fullName);  // Add the new user to the list
-        populateUserDropdown();         // Update the dropdown in the Welcome page
-        QMessageBox::information(this, "Success", "Profile created successfully!");
-    } else {
-        QMessageBox::warning(this, "Duplicate Entry", "A profile with this name already exists!");
-        return;
-    }
+    userProfiles.append(fullName);  // Add the new user to the list
+    populateUserDropdown();         // Update the dropdown in the Welcome page
+    QMessageBox::information(this, "Success", "Profile created successfully!");
 
     // Clear input fields after saving
     fNameInput->clear();
@@ -890,8 +900,6 @@ void MainWindow::addMeasurementToHistory(const QString &result) {
     // historyTable->setItem(row, 0, new QTableWidgetItem(QDate::currentDate().toString()));  // Date
     // historyTable->setItem(row, 1, new QTableWidgetItem(result));  // Measurement result
 }
-
-
 
 void MainWindow::onHistoryRowClicked(int row, int column)
 {
