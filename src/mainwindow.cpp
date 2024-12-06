@@ -224,6 +224,8 @@ void MainWindow::setupMenuPage()
 
 void MainWindow::setupMeasurePage()
 {
+    scanner = model.startScan();
+
    // Create the measure page
    QWidget *measurePage = new QWidget(this);
 
@@ -386,7 +388,30 @@ void MainWindow::finishMeasurement()
    if (batteryDepletionTimer && batteryDepletionTimer->isActive()) {
        batteryDepletionTimer->stop();
    }
+
+
+   //!!USER INPUTS POST MEASUREMENT GO HERE
+   scanner->registerBlood('L', 0,0);
+   scanner->registerBlood('R',0,0);
+   scanner->registerBodyTemp(0.0);
+   scanner->registerSleepTime(0,0);
+   scanner->registerTime(0,0); //might want to get current from system
+   scanner->registerDate(0,0,0); //might want to geet current from system
+   scanner->registerNotes("Normal scan"); // let user write these
+
+   if(!scanner->finishScan()){
+       QMessageBox::warning(this, "Scan Incomplete", "Scan parameters incomplete");
+       return;
+   }
+
+   //clean up scan.
+   delete scanner;
+   scanner = nullptr;
+   curSnap = model.getCurSnapshots()[model.getCurSnapshots().length()-1];
+
+
    QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
+
 }
 
 void MainWindow::setupHistoryPage()
@@ -889,42 +914,23 @@ void MainWindow::updateGreeting(const QString &firstName, const QString &lastNam
 
 
 void MainWindow::addMeasurementToHistory(const QString &result) {
-    // // Assuming you have a QTableWidget for the history page
-    // QTableWidget *historyTable = historyPage->findChild<QTableWidget *>("historyTable");
-
-    // // Add a new row to the table with the result
-    // int row = historyTable->rowCount();
-    // historyTable->insertRow(row);
-
-    // // Add data to the new row
-    // historyTable->setItem(row, 0, new QTableWidgetItem(QDate::currentDate().toString()));  // Date
-    // historyTable->setItem(row, 1, new QTableWidgetItem(result));  // Measurement result
+    setupHistoryPage();
 }
 
-void MainWindow::onHistoryRowClicked(int row, int column)
-{
+void MainWindow::onHistoryRowClicked(int row, int column){
+
+    if(row == 0){return;}
+
     // Access the QTableWidget (history table)
     QTableWidget *historyTable = qobject_cast<QTableWidget *>(sender());
     if (!historyTable) return; // Safety check
 
-
-    // Retrieve data from the clicked row (for example, the first column)
-    QString date = historyTable->item(row, 0)->text();
-    QString time = historyTable->item(row, 1)->text();
-    QString summary = historyTable->item(row, 2)->text();
-
-
-    // Debug: Print the row data to confirm functionality !!!
-    qDebug() << "Row clicked:" << row << ", Column:" << column;
-    qDebug() << "Date:" << date << ", Time:" << time << ", Summary:" << summary;
-
+    //This sets current snapshot to be displayed as the profile's snap at associated index.
+    curSnap = model.getCurProfile()->getSnapshots()[row];
 
     // Example: Navigate to the Body Screen and display detailed info
     setupBodyScreen(); // Ensure this method sets up the Body Screen if not already done
     stackedWidget->setCurrentIndex(6); // Assuming the Body Screen index is 5
-
-
-    // Optionally, pass the clicked data to the Body Screen (e.g., via labels or widgets)
 }
 
 void MainWindow::onEditProfileClicked()
@@ -971,7 +977,6 @@ void MainWindow::onEditProfileClicked()
     // Optionally, update other areas of the app, such as the dropdown
     populateUserDropdown(); // Ensure the dropdown reflects the updated data
 }
-
 
 void MainWindow::onDeleteProfileClicked()
 {
