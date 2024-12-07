@@ -58,7 +58,6 @@ private slots:
   void onEditProfileClicked(); // Slot for edit profile button
   void onSaveSnapshotClicked();
   void onHistoryRowClicked(int row, int col); // Slot for history row click
-  void addMeasurementToHistory(const QString& result);
   void startMeasurement(); // Start the measurement
   void finishMeasurement(); // Slot for finishing measurement
 
@@ -175,29 +174,54 @@ private:
 
 
   // Functions
-  void setupLoginPage(); // Function to initialize Login Page
-  void setupCreateProfilePage(); // Function to initialize Create Profile Page
+  //Page Setups
+  void setupLoginPage();
+  void setupCreateProfilePage();
+  void setupMenuPage();
+  void setupMeasurePage();
+  void setupBattery();
+  void setupProfilesPage();
+  void setupChartPage();
+  void setupIndicatorsPage();
+  void setupRecommendationsPage();
+  void setupSnapshotDetailsPage();
+  void setupHistoryPage();
+  void setupBodyScreen();
+
+
+  // Page Switches
+  void showLoginPage();
+  void showCreateProfilePage();
+  void showMenuPage();
+  void showMeasurePage();
+  void showBattery();
+  void showProfilesPage();
+  void showChartPage();
+  void showIndicatorsPage();
+  void showRecommendationsPage();
+  void showSnapshotDetailsPage();
+  void showHistoryPage();
+  void showBodyScreen();
+
+
+  //Misc
   void populateUserDropdown(); // Populate the user dropdown
-  void setupMenuPage();  // Function to initialize Menu Page
+
   void updateGreeting(const QString &firstName, const QString &lastName);  // Update greeting labels
-  void setupMeasurePage(); // Set up the Measure page
+
   void measureHands(const QString &side);
   void measureFeet(const QString &side);
-  void setupBattery();
+
   void depleteBattery(); // Deplete the battery
   void setupScanningPage(); // Set up the Scanning page
   void startScanningProcess();
-  void setupSnapshotDetailsPage();
-  void setupHistoryPage();// Set up the History page
-  void setupBodyScreen(); // Show the body screen
-  void showChartPage(); // Show the chart page
-  void showIndicatorsPage(); // Show the indicators page
-  void showRecommendationsPage(); // Show the recommendations page
-  void showHistoryPage(); // Show the history page
-  void setupProfilesPage(); // Set up the Profiles page
-  void setupChartPage(); // Set up the Chart page
-  void setupIndicatorsPage(); // Set up the Indicators page
-  void setupRecommendationsPage(); // Set up the Recommendations page
+
+
+
+
+
+
+
 
 
 };

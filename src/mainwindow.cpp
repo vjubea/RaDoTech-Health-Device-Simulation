@@ -60,6 +60,9 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+//GUI SETUP/REFRESH FUNCTIONS
+
 void MainWindow::setupMenuPage()
 {
 
@@ -175,8 +178,6 @@ void MainWindow::setupProfilesPage()
     }
 }
 
-// Modify to work as the page selecting user before scan.
-// Similar to Profiles page where we select profiles by index.
 void MainWindow::setupLoginPage()
 {
     // Initialize the login page widgets
@@ -221,18 +222,6 @@ void MainWindow::setupLoginPage()
 
     qDebug() << "Log in page index: " << stackedWidget->indexOf(loginPage);
 }
-
-
-void MainWindow::populateUserDropdown() {
-    userDropdown->clear();
-    userDropdown->addItem("Select User");
-
-    QVector<QString> profileNames = model.getProfileNames();
-    for (const QString &name : profileNames) {
-        userDropdown->addItem(name);
-    }
-}
-
 
 void MainWindow::setupCreateProfilePage()
 {
@@ -292,7 +281,6 @@ void MainWindow::setupCreateProfilePage()
     stackedWidget->addWidget(createProfPage);
 }
 
-
 void MainWindow::setupMeasurePage()
 {
     if (!model.getCurProfile()) {
@@ -339,7 +327,7 @@ void MainWindow::setupMeasurePage()
    // Create a "Back" button
    QPushButton *measureBackButton = new QPushButton("Back", this);
    connect(measureBackButton, &QPushButton::clicked, [this]() {
-       stackedWidget->setCurrentIndex(0); // Go back to Menu page
+       showMenuPage();
    });
 
    // Add Back button to layout
@@ -356,45 +344,6 @@ void MainWindow::setupMeasurePage()
 
 }
 
-
-void MainWindow::measureHands(const QString &side) {
-   // Simulate data for measurement
-   qDebug() << "Measuring" << side << "Hand";
-
-
-   for(int i = 0; i < 6; i++){
-       int reading = QRandomGenerator::global()->bounded(HandGoodReadStart[i] - 7, HandGoodReadEnd[i] +7); // Generate a random reading in range
-       if (scanner) {
-          char sideChar = (side == "Left") ? 'L' : 'R';
-          scanner->registerReading(sideChar, 'H', reading); // H for Hand
-       } else {
-           qWarning() << "Scanner not initialized.";
-       }
-   }
-
-   QMessageBox::information(this, "Measurement Complete", side + " Hand measurement recorded.");
-}
-
-
-void MainWindow::measureFeet(const QString &side) {
-   // Simulate data for measurement
-    qDebug() << "Measuring" << side << "Foot";
-
-   for(int i = 0; i < 6; i++){
-       int reading = QRandomGenerator::global()->bounded(FootGoodReadStart[i] - 7, FootGoodReadEnd[i] +7); // Generate a random reading in range
-       if (scanner) {
-          char sideChar = (side == "Left") ? 'L' : 'R';
-          scanner->registerReading(sideChar, 'F', reading); // F for Foot
-       } else {
-           qWarning() << "Scanner not initialized.";
-       }
-   }
-
-   //Update UI or indicate that the foot measurement was successful
-   QMessageBox::information(this, "Measurement Complete", side + " Foot measurement recorded.");
-}
-
-
 void MainWindow::setupBattery()
 {
    batteryLevel = 100;
@@ -405,96 +354,6 @@ void MainWindow::setupBattery()
        qDebug() << "Battery timer initialized.";
    }
 }
-
-
-//void MainWindow::startMeasurement() {
-//    if (!batteryDepletionTimer || !batteryLabel) {
-//        qDebug() << "Battery components are not initialized!";
-//        return;
-//    }
-//    if (!batteryDepletionTimer->isActive()) {
-//        batteryDepletionTimer->start(2400);
-//        qDebug() << "Battery depletion timer started.";
-//    }
-//    // Switch to the Scanning page
-//    stackedWidget->setCurrentIndex(5);
-//}
-
-void MainWindow::startMeasurement() {
-    if (!scanner) {
-        QMessageBox::warning(this, "Error", "Scanner not initialized. Please try again.");
-        return;
-    }
-
-    if (!batteryDepletionTimer || !batteryLabel) {
-        qDebug() << "Battery components are not initialized!";
-        return;
-    }
-
-    if (!batteryDepletionTimer->isActive()) {
-        batteryDepletionTimer->start(2400);
-        qDebug() << "Battery depletion timer started.";
-    }
-
-    stackedWidget->setCurrentIndex(5); // Switch to the Scanning page
-}
-
-
-void MainWindow::depleteBattery()
-{
-   if (batteryLevel > 0) {
-       batteryLevel--;
-       if (batteryLabel) {
-           batteryLabel->setText("Battery: " + QString::number(batteryLevel) + "%");
-       } else {
-           qDebug() << "Error: Battery label not initialized!";
-       }
-   } else {
-       batteryDepletionTimer->stop();
-       QMessageBox::warning(this, "Battery Low", "Battery is completely drained!");
-   }
-}
-
-// Change to be used by SnapshotDetails page into "SaveSnapshot"
-void MainWindow::finishMeasurement()
-{
-    if (!scanner) {
-        QMessageBox::warning(this, "Error", "No active scan in progress.");
-        return;
-    }
-
-    if (batteryDepletionTimer && batteryDepletionTimer->isActive()) {
-        batteryDepletionTimer->stop();
-    }
-
-    //!!USER INPUTS POST MEASUREMENT GO HERE -- To remove after
-    if (scanner) {
-        scanner->registerWeight(0.0f);
-        scanner->registerBlood('L', 0,0);
-        scanner->registerBlood('R',0,0);
-        scanner->registerBodyTemp(0.0);
-        scanner->registerHeartRate(0);
-        scanner->registerSleepTime(0,0);
-        scanner->registerTime(0,0); //might want to get current from system
-        scanner->registerDate(0,0,0); //might want to geet current from system
-        scanner->registerNotes("Normal scan"); // let user write these
-        // -----
-
-        if(!scanner->finishScan()) {
-            QMessageBox::warning(this, "Scan Incomplete", "Scan parameters incomplete");
-            return;
-        }
-
-       //clean up scan.
-       delete scanner;
-       scanner = nullptr;
-    } else {
-        QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
-    }
-
-}
-
-
 
 void MainWindow::setupScanningPage() {
     QWidget *scanningPage = new QWidget(this);
@@ -511,56 +370,12 @@ void MainWindow::setupScanningPage() {
     scanningLayout->addWidget(scanningInstructionLabel);
 
     contactWithSkinButton = new QPushButton("Contact with Skin", this);
-    connect(contactWithSkinButton, &QPushButton::clicked, this, &MainWindow::startScanningProcess);
+    //connect(contactWithSkinButton, &QPushButton::clicked, this, &MainWindow::startScanningProcess);
     scanningLayout->addWidget(contactWithSkinButton);
 
     scanningPage->setLayout(scanningLayout);
     stackedWidget->addWidget(scanningPage);
 }
-
-void MainWindow::startScanningProcess() {
-    const int totalPoints = 24;
-    for (int i = 0; i < totalPoints; ++i) {
-        scanningInstructionLabel->setText("Scanning...");
-        QApplication::processEvents();
-        QThread::msleep(500);
-
-        scanningInstructionLabel->setText("Fetching results...");
-        QApplication::processEvents();
-        QThread::msleep(500);
-
-        QString pointType = (i < 12) ? "Hand" : "Foot";
-        QString side = (i % 2 == 0) ? "Right" : "Left";
-        int pointNumber = (i % 12) / 2 + 1;
-
-        QMessageBox msg;
-        msg.setText("Go to next point");
-        msg.setInformativeText("Current point: " + side + " " + pointType + " " + QString::number(pointNumber));
-        msg.setStandardButtons(QMessageBox::NoButton);
-        msg.show();
-
-        QTimer::singleShot(2000, &msg, &QMessageBox::close);
-        QApplication::processEvents();
-        QThread::msleep(2000);
-
-        scanningInstructionLabel->setText("Place the device on your skin and press the button below:");
-        QApplication::processEvents();
-        QThread::msleep(500);
-
-        // Here you would call the appropriate method from the Scanner class
-        // For example:
-        if (scanner) {
-            char sideChar = (side == "Left") ? 'L' : 'R';
-            char limbChar = (pointType == "Hand") ? 'H' : 'F';
-            int reading = QRandomGenerator::global()->bounded(0, 100); // Replace with actual reading
-            scanner->registerReading(sideChar, limbChar, reading);
-        }
-    }
-
-    // After 24 points, go to snapshot page
-    stackedWidget->setCurrentIndex(6); // Assuming snapshot page index is 6
-}
-
 
 void MainWindow::setupSnapshotDetailsPage() {
 
@@ -641,20 +456,6 @@ void MainWindow::setupSnapshotDetailsPage() {
     stackedWidget->addWidget(snapshotDetailsPage);
 }
 
-void MainWindow::onSaveSnapshotClicked() {
-    // Check if all fields are filled
-    if (weightInput->text().isEmpty() || heartRateInput->text().isEmpty() ||
-        bodyTempInput->text().isEmpty() || sleepHoursInput->text().isEmpty() ||
-        sleepMinutesInput->text().isEmpty() || notesInput->toPlainText().isEmpty()) {
-        QMessageBox::warning(this, "Incomplete Data", "Please fill all the input fields.");
-    } else {
-        QMessageBox::information(this, "Snapshot Saved", "Snapshot details have been successfully saved.");
-        stackedWidget->setCurrentIndex(0);
-    }
-}
-
-
-
 void MainWindow::setupHistoryPage()
 {
     // Create the history page
@@ -718,9 +519,6 @@ void MainWindow::setupHistoryPage()
     qDebug() << "History page index: " << stackedWidget->indexOf(historyPage);
 
 }
-
-
-
 
 void MainWindow::setupBodyScreen()
 {
@@ -842,7 +640,6 @@ void MainWindow::setupBodyScreen()
    stackedWidget->addWidget(bodyWidget);
 }
 
-
 void MainWindow::setupChartPage()
 {
    QWidget *chartWidget = new QWidget(this);
@@ -890,6 +687,31 @@ void MainWindow::setupChartPage()
    stackedWidget->addWidget(chartWidget);
 }
 
+void MainWindow::setupRecommendationsPage()
+{
+    QWidget *recommendationsWidget = new QWidget(this);
+    QVBoxLayout *recommendationsLayout = new QVBoxLayout(recommendationsWidget);
+
+
+    QFont labelFont5("Arial", 16, QFont::Bold);
+
+
+    QLabel *recommendationsLabel = new QLabel("Recommendations Page");
+    recommendationsLabel->setFont(labelFont5);
+    recommendationsLabel->setAlignment(Qt::AlignCenter);
+    recommendationsLayout->addWidget(recommendationsLabel);
+
+
+    QPushButton *recBackButton = new QPushButton("Back");
+    connect(recBackButton, &QPushButton::clicked, this, [this]() {
+        stackedWidget->setCurrentIndex(6);
+    });
+    recommendationsLayout->addWidget(recBackButton);
+
+
+    recommendationsWidget->setLayout(recommendationsLayout);
+    stackedWidget->addWidget(recommendationsWidget);
+}
 
 void MainWindow::setupIndicatorsPage()
 {
@@ -918,88 +740,243 @@ void MainWindow::setupIndicatorsPage()
 }
 
 
-void MainWindow::setupRecommendationsPage()
+//GUI SHOW FUNCTIONS
+void MainWindow::showLoginPage()
 {
-    QWidget *recommendationsWidget = new QWidget(this);
-    QVBoxLayout *recommendationsLayout = new QVBoxLayout(recommendationsWidget);
-
-
-    QFont labelFont5("Arial", 16, QFont::Bold);
-
-
-    QLabel *recommendationsLabel = new QLabel("Recommendations Page");
-    recommendationsLabel->setFont(labelFont5);
-    recommendationsLabel->setAlignment(Qt::AlignCenter);
-    recommendationsLayout->addWidget(recommendationsLabel);
-
-
-    QPushButton *recBackButton = new QPushButton("Back");
-    connect(recBackButton, &QPushButton::clicked, this, [this]() {
-        stackedWidget->setCurrentIndex(6);
-    });
-    recommendationsLayout->addWidget(recBackButton);
-
-
-    recommendationsWidget->setLayout(recommendationsLayout);
-    stackedWidget->addWidget(recommendationsWidget);
+    stackedWidget->setCurrentIndex(1);
 }
 
+void MainWindow::showCreateProfilePage()
+{
+    stackedWidget->setCurrentIndex(2);
+}
+
+void MainWindow::showMenuPage()
+{
+    stackedWidget->setCurrentIndex(0);
+}
+
+void MainWindow::showMeasurePage()
+{
+    stackedWidget->setCurrentIndex(5);
+}
+
+void MainWindow::showBattery()
+{
+    stackedWidget->setCurrentIndex(1);
+}
+
+void MainWindow::showProfilesPage()
+{
+    stackedWidget->setCurrentIndex(1);
+}
 
 void MainWindow::showChartPage()
 {
-    // Placeholder for chart page
     stackedWidget->setCurrentIndex(7);
 }
 
-
 void MainWindow::showIndicatorsPage()
 {
-    // Placeholder for indicators page
     stackedWidget->setCurrentIndex(8);
 }
 
-
 void MainWindow::showRecommendationsPage()
 {
-    // Placeholder for recommendations page
     stackedWidget->setCurrentIndex(9);
 }
 
+void MainWindow::showSnapshotDetailsPage()
+{
+    stackedWidget->setCurrentIndex(1);
+}
 
 void MainWindow::showHistoryPage()
 {
-    // Navigate back to the History Page
     stackedWidget->setCurrentIndex(3);
 }
 
-
-//void MainWindow::onLoginButtonClicked()
-//{
-//    model.selectProfile(userDropdown->currentIndex()-1);
-
-//    QString selectedUser = model.getCurProfile()->getFullName();
-
-//    if (selectedUser == "Select User") {
-//        QMessageBox::warning(this, "Login Error", "Please select a user!");
-//        return;
-//    }
-
-//    // Split the name to update the Menu page greeting:
-//    QStringList nameParts = selectedUser.split(' ');
-//    if (nameParts.size() == 2) {
-//        currentFirstName = nameParts[0];
-//        currentLastName = nameParts[1];
-//    }
-
-//    // Debugging output
-//    qDebug() << "Logged in user: " << model.getCurProfile()->getFullName();
-//    qDebug() << "Weight: " << model.getCurProfile()->getWeight() << "Height: " << model.getCurProfile()->getHeight();
+void MainWindow::showBodyScreen()
+{
+    stackedWidget->setCurrentIndex(6);
+}
 
 
-//    // Proceed to the Menu Page
-//    stackedWidget->setCurrentIndex(2);
-//    userNameLabel->setText("Hello, " + selectedUser);
-//}
+
+
+
+//MISC/HELPER FUNCTIONS
+
+void MainWindow::populateUserDropdown() {
+    userDropdown->clear();
+    userDropdown->addItem("Select User");
+
+    QVector<QString> profileNames = model.getProfileNames();
+    for (const QString &name : profileNames) {
+        userDropdown->addItem(name);
+    }
+}
+
+void MainWindow::measureHands(const QString &side) {
+   // Simulate data for measurement
+   qDebug() << "Measuring" << side << "Hand";
+
+
+   for(int i = 0; i < 6; i++){
+       int reading = QRandomGenerator::global()->bounded(HandGoodReadStart[i] - 7, HandGoodReadEnd[i] +7); // Generate a random reading in range
+       if (scanner) {
+          char sideChar = (side == "Left") ? 'L' : 'R';
+          scanner->registerReading(sideChar, 'H', reading); // H for Hand
+       } else {
+           qWarning() << "Scanner not initialized.";
+       }
+   }
+
+   QMessageBox::information(this, "Measurement Complete", side + " Hand measurement recorded.");
+}
+
+
+void MainWindow::measureFeet(const QString &side) {
+   // Simulate data for measurement
+    qDebug() << "Measuring" << side << "Foot";
+
+   for(int i = 0; i < 6; i++){
+       int reading = QRandomGenerator::global()->bounded(FootGoodReadStart[i] - 7, FootGoodReadEnd[i] +7); // Generate a random reading in range
+       if (scanner) {
+          char sideChar = (side == "Left") ? 'L' : 'R';
+          scanner->registerReading(sideChar, 'F', reading); // F for Foot
+       } else {
+           qWarning() << "Scanner not initialized.";
+       }
+   }
+
+   //Update UI or indicate that the foot measurement was successful
+   QMessageBox::information(this, "Measurement Complete", side + " Foot measurement recorded.");
+}
+
+void MainWindow::startMeasurement() {
+    if (!scanner) {
+        QMessageBox::warning(this, "Error", "Scanner not initialized. Please try again.");
+        return;
+    }
+
+    if (!batteryDepletionTimer || !batteryLabel) {
+        qDebug() << "Battery components are not initialized!";
+        return;
+    }
+
+    if (!batteryDepletionTimer->isActive()) {
+        batteryDepletionTimer->start(2400);
+        qDebug() << "Battery depletion timer started.";
+    }
+
+    showMeasurePage();
+    startScanningProcess();
+}
+
+void MainWindow::depleteBattery()
+{
+   if (batteryLevel > 0) {
+       batteryLevel--;
+       if (batteryLabel) {
+           batteryLabel->setText("Battery: " + QString::number(batteryLevel) + "%");
+       } else {
+           qDebug() << "Error: Battery label not initialized!";
+       }
+   } else {
+       batteryDepletionTimer->stop();
+       QMessageBox::warning(this, "Battery Low", "Battery is completely drained!");
+   }
+}
+
+// Change to be used by SnapshotDetails page into "SaveSnapshot"
+void MainWindow::finishMeasurement()
+{
+    if (!scanner) {
+        QMessageBox::warning(this, "Error", "No active scan in progress.");
+        return;
+    }
+
+    if (batteryDepletionTimer && batteryDepletionTimer->isActive()) {
+        batteryDepletionTimer->stop();
+    }
+
+    //!!USER INPUTS POST MEASUREMENT GO HERE -- To remove after
+    if (scanner) {
+        scanner->registerWeight(0.0f);
+        scanner->registerBlood('L', 0,0);
+        scanner->registerBlood('R',0,0);
+        scanner->registerBodyTemp(0.0);
+        scanner->registerHeartRate(0);
+        scanner->registerSleepTime(0,0);
+        scanner->registerTime(0,0); //might want to get current from system
+        scanner->registerDate(0,0,0); //might want to geet current from system
+        scanner->registerNotes("Normal scan"); // let user write these
+        // -----
+
+        if(!scanner->finishScan()) {
+            QMessageBox::warning(this, "Scan Incomplete", "Scan parameters incomplete");
+            return;
+        }
+
+       //clean up scan.
+       delete scanner;
+       scanner = nullptr;
+    } else {
+        QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
+    }
+
+}
+
+void MainWindow::startScanningProcess() {
+    const int totalPoints = 24;
+    for (int i = 0; i < totalPoints; i++) {
+        qDebug() <<"scan step " << i;
+
+        QString pointType = (i < 12) ? "Hand" : "Foot";
+        QString side = (i%12 < 6) ? "Right" : "Left";
+        int pointNumber = (i % 6) + 1;
+
+        scanningInstructionLabel->setText("Press Device to " + side + " " + pointType + " point " + QString::number(pointNumber));
+        while(!contactWithSkinButton->isDown()){
+                QApplication::processEvents();
+        }
+
+        if(contactWithSkinButton->isDown()){
+            scanningInstructionLabel->setText("Scanning...");
+            QApplication::processEvents();
+            QThread::msleep(600);
+        }
+
+        scanningInstructionLabel->setText("Remove Device From Skin");
+        while(contactWithSkinButton->isDown()){
+            QApplication::processEvents();
+        }
+
+        if (scanner) {
+            char sideChar = (side == "Left") ? 'L' : 'R';
+            char limbChar = (pointType == "Hand") ? 'H' : 'F';
+            int reading = QRandomGenerator::global()->bounded(0, 100); // Replace with actual reading
+            scanner->registerReading(sideChar, limbChar, reading);
+        }
+    }
+
+    // After 24 points, go to snapshot page
+    setupBodyScreen();
+    showBodyScreen();
+}
+
+void MainWindow::onSaveSnapshotClicked() {
+    // Check if all fields are filled
+    if (weightInput->text().isEmpty() || heartRateInput->text().isEmpty() ||
+        bodyTempInput->text().isEmpty() || sleepHoursInput->text().isEmpty() ||
+        sleepMinutesInput->text().isEmpty() || notesInput->toPlainText().isEmpty()) {
+        QMessageBox::warning(this, "Incomplete Data", "Please fill all the input fields.");
+    } else {
+        QMessageBox::information(this, "Snapshot Saved", "Snapshot details have been successfully saved.");
+        stackedWidget->setCurrentIndex(0);
+    }
+}
 
 void MainWindow::onLoginButtonClicked() {
     int selectedIndex = userDropdown->currentIndex() - 1;
@@ -1010,14 +987,11 @@ void MainWindow::onLoginButtonClicked() {
     }
 }
 
-
 // Slot for handling create profile button click
 void MainWindow::onCreateProfButtonClicked()
 {
-    // Switch to the create profile page
-    stackedWidget->setCurrentIndex(2);
+    showCreateProfilePage();
 }
-
 
 // Slot for handling save profile button click
 void MainWindow::onSaveProfButtonClicked()
@@ -1069,21 +1043,13 @@ void MainWindow::onSaveProfButtonClicked()
     setupProfilesPage();
 }
 
-
 void MainWindow::updateGreeting(const QString &firstName, const QString &lastName)
 {
     userGreetingLabel->setText("Hello, ");
     userNameLabel->setText(firstName + " " + lastName); // Display full name
 }
 
-
-void MainWindow::addMeasurementToHistory(const QString &result) {
-    setupHistoryPage();
-}
-
 void MainWindow::onHistoryRowClicked(int row, int column) {
-
-    if(row == 0){return;}
 
     // Access the QTableWidget (history table)
     QTableWidget *historyTable = qobject_cast<QTableWidget *>(sender());
@@ -1142,8 +1108,7 @@ void MainWindow::onEditProfileClicked()
     // Inform the user of the successful update
     QMessageBox::information(this, "Profile Updated", "The profile has been successfully updated.");
 
-    // Optionally, update other areas of the app, such as the dropdown
-    // populateUserDropdown(); // Ensure the dropdown reflects the updated data
+    setupProfilesPage();
 }
 
 void MainWindow::onDeleteProfileClicked()
