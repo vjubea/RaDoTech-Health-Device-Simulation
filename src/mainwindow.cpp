@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // Connect buttons to respective slots   
-    connect(measureNowButton, &QPushButton::clicked, [this] () { startMeasurement();});
+    connect(measureNowButton, &QPushButton::clicked, [this] () { showLoginPage();});
     connect(profilesButton, &QPushButton::clicked, [this]() {
         setupProfilesPage();    // Ensure the Profiles Page is initialized
         showProfilesPage(); // Go to the Profiles Page
@@ -99,6 +99,8 @@ void MainWindow::setupMenuPage()
     // Set the layout for the menu page
     menuPage->setLayout(verticalLayout_3);
     stackedWidget->addWidget(menuPage);
+
+    qDebug() << "Menu page index: " << stackedWidget->indexOf(menuPage);
 }
 
 void MainWindow::setupProfilesPage()
@@ -144,7 +146,7 @@ void MainWindow::setupProfilesPage()
         // Back Button
         QPushButton *profilesBackButton = new QPushButton("Back");
         connect(profilesBackButton, &QPushButton::clicked, [this]() {
-            stackedWidget->setCurrentIndex(0); // Go back to Menu page
+            showMenuPage();
         });
 
         profilesLayout->addWidget(profilesTable);
@@ -161,6 +163,8 @@ void MainWindow::setupProfilesPage()
         connect(profilesTable, &QTableWidget::cellClicked, this, &MainWindow::onProfileRowClicked);
         connect(editProfileButton, &QPushButton::clicked, this, &MainWindow::onEditProfileClicked);
         connect(deleteProfileButton, &QPushButton::clicked, this, &MainWindow::onDeleteProfileClicked);
+
+        qDebug() << "Profiles page index: " << stackedWidget->indexOf(profilesPage);
     }
     else {
         //profilesTable->clearContents(); //clears existing data
@@ -174,7 +178,6 @@ void MainWindow::setupProfilesPage()
             profilesTable->setItem(i, 0, new QTableWidgetItem(profiles.at(i)->getFname()));
             profilesTable->setItem(i, 1, new QTableWidgetItem(profiles.at(i)->getLname()));
         }
-        stackedWidget->setCurrentIndex(1);
     }
 }
 
@@ -279,13 +282,15 @@ void MainWindow::setupCreateProfilePage()
 
     // Add the create profile page to stacked widget
     stackedWidget->addWidget(createProfPage);
+
+    qDebug() << "Create Profiles page index: " << stackedWidget->indexOf(createProfPage);
 }
 
 void MainWindow::setupMeasurePage()
 {
     if (!model.getCurProfile()) {
         QMessageBox::warning(this, "Error", "No profile selected. Please log in first.");
-        stackedWidget->setCurrentIndex(3); // Go back to login page
+        showLoginPage();
         return;
     }
 
@@ -340,7 +345,7 @@ void MainWindow::setupMeasurePage()
    // Add the history page to stacked widget
    stackedWidget->addWidget(measurePage);
 
-   //qDebug() << "Measure Now page index: " << stackedWidget->indexOf(measurePage);
+   qDebug() << "Measure Now page index: " << stackedWidget->indexOf(measurePage);
 
 }
 
@@ -375,6 +380,8 @@ void MainWindow::setupScanningPage() {
 
     scanningPage->setLayout(scanningLayout);
     stackedWidget->addWidget(scanningPage);
+
+    qDebug() << "scannings page index: " << stackedWidget->indexOf(scanningPage);
 }
 
 void MainWindow::setupSnapshotDetailsPage() {
@@ -449,11 +456,13 @@ void MainWindow::setupSnapshotDetailsPage() {
 
     connect(saveSnapshotButton, &QPushButton::clicked, this, &MainWindow::onSaveSnapshotClicked);
     connect(backToMeasureButton, &QPushButton::clicked, [this]() {
-        stackedWidget->setCurrentIndex(4); // Assuming measure page index is 4
+        showMeasurePage();
     });
 
     snapshotDetailsPage->setLayout(snapshotLayout);
     stackedWidget->addWidget(snapshotDetailsPage);
+
+    qDebug() << "Snapshot details page index: " << stackedWidget->indexOf(snapshotDetailsPage);
 }
 
 void MainWindow::setupHistoryPage()
@@ -501,7 +510,7 @@ void MainWindow::setupHistoryPage()
     // Create a "Back" button
     QPushButton *historyBackButton = new QPushButton("Back", this);
     connect(historyBackButton, &QPushButton::clicked, [this]() {
-        stackedWidget->setCurrentIndex(0); // Go back to Home page
+        showMenuPage();
     });
 
 
@@ -632,12 +641,14 @@ void MainWindow::setupBodyScreen()
    connect(indicatorsButton, &QPushButton::clicked, this, &MainWindow::showIndicatorsPage);
    connect(recommendationsButton, &QPushButton::clicked, this, &MainWindow::showRecommendationsPage);
    connect(backBodyButton, &QPushButton::clicked, this, [this]() {
-       stackedWidget->setCurrentIndex(5); // Navigate back to the History Page
+       showHistoryPage();
    });
 
 
    bodyWidget->setLayout(bodyLayout);
    stackedWidget->addWidget(bodyWidget);
+
+    qDebug() << "Body page index: " << stackedWidget->indexOf(bodyWidget);
 }
 
 void MainWindow::setupChartPage()
@@ -677,7 +688,7 @@ void MainWindow::setupChartPage()
    // Add the Back button
    QPushButton *chartBackButton = new QPushButton("Back");
    connect(chartBackButton, &QPushButton::clicked, this, [this]() {
-       stackedWidget->setCurrentIndex(6); // Navigate back to the Body Screen page
+       showBodyScreen();
    });
    chartLayout->addWidget(chartBackButton);
 
@@ -685,6 +696,8 @@ void MainWindow::setupChartPage()
    // Set the layout and add to the stacked widget
    chartWidget->setLayout(chartLayout);
    stackedWidget->addWidget(chartWidget);
+
+    qDebug() << "Chart page index: " << stackedWidget->indexOf(chartWidget);
 }
 
 void MainWindow::setupRecommendationsPage()
@@ -704,13 +717,15 @@ void MainWindow::setupRecommendationsPage()
 
     QPushButton *recBackButton = new QPushButton("Back");
     connect(recBackButton, &QPushButton::clicked, this, [this]() {
-        stackedWidget->setCurrentIndex(6);
+        showBodyScreen();
     });
     recommendationsLayout->addWidget(recBackButton);
 
 
     recommendationsWidget->setLayout(recommendationsLayout);
     stackedWidget->addWidget(recommendationsWidget);
+
+    qDebug() << "Recommendations page index: " << stackedWidget->indexOf(recommendationsWidget);
 }
 
 void MainWindow::setupIndicatorsPage()
@@ -737,13 +752,15 @@ void MainWindow::setupIndicatorsPage()
 
     indicatorsWidget->setLayout(indicatorsLayout);
     stackedWidget->addWidget(indicatorsWidget);
+
+    qDebug() << "Indicators page index: " << stackedWidget->indexOf(indicatorsWidget);
 }
 
 
 //GUI SHOW FUNCTIONS
 void MainWindow::showLoginPage()
 {
-    stackedWidget->setCurrentIndex(1);
+    stackedWidget->setCurrentIndex(3);
 }
 
 void MainWindow::showCreateProfilePage()
@@ -761,11 +778,6 @@ void MainWindow::showMeasurePage()
     stackedWidget->setCurrentIndex(5);
 }
 
-void MainWindow::showBattery()
-{
-    stackedWidget->setCurrentIndex(1);
-}
-
 void MainWindow::showProfilesPage()
 {
     stackedWidget->setCurrentIndex(1);
@@ -773,22 +785,22 @@ void MainWindow::showProfilesPage()
 
 void MainWindow::showChartPage()
 {
-    stackedWidget->setCurrentIndex(7);
+    stackedWidget->setCurrentIndex(9);
 }
 
 void MainWindow::showIndicatorsPage()
 {
-    stackedWidget->setCurrentIndex(8);
+    stackedWidget->setCurrentIndex(10);
 }
 
 void MainWindow::showRecommendationsPage()
 {
-    stackedWidget->setCurrentIndex(9);
+    stackedWidget->setCurrentIndex(11);
 }
 
 void MainWindow::showSnapshotDetailsPage()
 {
-    stackedWidget->setCurrentIndex(1);
+    stackedWidget->setCurrentIndex(6);
 }
 
 void MainWindow::showHistoryPage()
@@ -798,7 +810,7 @@ void MainWindow::showHistoryPage()
 
 void MainWindow::showBodyScreen()
 {
-    stackedWidget->setCurrentIndex(6);
+    stackedWidget->setCurrentIndex(8);
 }
 
 
@@ -919,7 +931,7 @@ void MainWindow::finishMeasurement()
             return;
         }
 
-       //clean up scan.
+       curSnap = scanner->getFinishedSnap();
        delete scanner;
        scanner = nullptr;
     } else {
@@ -974,14 +986,15 @@ void MainWindow::onSaveSnapshotClicked() {
         QMessageBox::warning(this, "Incomplete Data", "Please fill all the input fields.");
     } else {
         QMessageBox::information(this, "Snapshot Saved", "Snapshot details have been successfully saved.");
-        stackedWidget->setCurrentIndex(0);
+        showBodyScreen();
     }
 }
 
 void MainWindow::onLoginButtonClicked() {
     int selectedIndex = userDropdown->currentIndex() - 1;
     if (selectedIndex >= 0 && model.selectProfile(selectedIndex)) {
-        stackedWidget->setCurrentIndex(4); // Go to Measure page
+        showMeasurePage();
+        startMeasurement();
     } else {
         QMessageBox::warning(this, "Login Error", "Please select a valid user");
     }
@@ -1055,13 +1068,13 @@ void MainWindow::onHistoryRowClicked(int row, int column) {
     QTableWidget *historyTable = qobject_cast<QTableWidget *>(sender());
     if (!historyTable) return; // Safety check
 
-    //This sets current snapshot to be displayed as the profile's snap at associated index.
-    curSnap = model.getCurProfile()->getSnapshots()[row];
+    //This sets current snapshot to be displayed as the profile's snap at associated index
+    curSnap = nullptr;
 
     // Example: Navigate to the Body Screen and display detailed info
     setupBodyScreen(); // Ensure this method sets up the Body Screen if not already done
     // TBD
-    stackedWidget->setCurrentIndex(6); // Assuming the Body Screen index is 5
+    showBodyScreen();
 }
 
 void MainWindow::onProfileRowClicked(int row, int col) {

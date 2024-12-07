@@ -194,7 +194,6 @@ private:
   void showCreateProfilePage();
   void showMenuPage();
   void showMeasurePage();
-  void showBattery();
   void showProfilesPage();
   void showChartPage();
   void showIndicatorsPage();
