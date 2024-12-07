@@ -96,6 +96,7 @@ private:
 
 
   // GUI elements for Menu Page
+  QWidget *menuPage;
   QLabel *userGreetingLabel;
   QLabel *userNameLabel;
   QString currentFirstName;
@@ -107,6 +108,20 @@ private:
   QPushButton *historyButton;
 
 
+  //Page Widgets
+  QWidget *loginPage;
+  QWidget *profilesPage;
+  QWidget *createProfPage;
+  QWidget *measurePage;
+  QWidget *scanningPage;
+  QWidget *snapshotDetailsPage;
+  QWidget *historyPage;
+  QWidget *bodyWidget;
+  QWidget *chartWidget;
+  QWidget *recommendationsWidget;
+  QWidget *indicatorsWidget;
+
+
   // GUI elements for History Page
   QLabel *historyLabel;
   QTableWidget *historyTable;    // Table for displaying history
@@ -115,7 +130,6 @@ private:
 
   //GUI elements for Profiles Page
   QLabel *profilesLabel;
-  QWidget *profilesPage;
   QTableWidget *profilesTable;    // Table for displaying profiles
   QPushButton *profilesBackButton;       // Back button on Profiles page
   QPushButton *editProfileButton; // Edit profile button

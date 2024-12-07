@@ -65,9 +65,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupMenuPage()
 {
+   if(menuPage == nullptr){
 
     // Create a layout for the Menu Page
-    QWidget *menuPage = new QWidget();
+    menuPage = new QWidget();
     QVBoxLayout *verticalLayout_3 = new QVBoxLayout(menuPage);
 
 
@@ -101,6 +102,10 @@ void MainWindow::setupMenuPage()
     stackedWidget->addWidget(menuPage);
 
     qDebug() << "Menu page index: " << stackedWidget->indexOf(menuPage);
+   }
+   else{
+       // should be emptyy
+   }
 }
 
 void MainWindow::setupProfilesPage()
@@ -183,6 +188,8 @@ void MainWindow::setupProfilesPage()
 
 void MainWindow::setupLoginPage()
 {
+    if(loginPage == nullptr){
+
     // Initialize the login page widgets
     welcomeLabel = new QLabel("Select User", this);
     pleaseLogInStatement = new QLabel("Please Select User", this);
@@ -214,7 +221,7 @@ void MainWindow::setupLoginPage()
     loginLayout->addWidget(pleaseLogInStatement);
     loginLayout->addWidget(userDropdown);
 
-    QWidget *loginPage = new QWidget(this);
+    loginPage = new QWidget(this);
     loginPage->setLayout(loginLayout);
 
     // Add the login page to stacked widget
@@ -224,10 +231,18 @@ void MainWindow::setupLoginPage()
     populateUserDropdown();
 
     qDebug() << "Log in page index: " << stackedWidget->indexOf(loginPage);
+    }
+
+    else{
+        //can be empty
+    }
+
 }
 
 void MainWindow::setupCreateProfilePage()
 {
+    if(createProfPage == nullptr){
+
     // Initialize the create profile page widgets
     createProfLabel = new QLabel("Create Your Profile", this);
     QFont labelFont9("Arial", 16, QFont::Bold);
@@ -277,31 +292,28 @@ void MainWindow::setupCreateProfilePage()
     createProfLayout->addWidget(saveProfButton);
     createProfLayout->addWidget(saveProfBackButton);
 
-    QWidget *createProfPage = new QWidget(this);
+    createProfPage = new QWidget(this);
     createProfPage->setLayout(createProfLayout);
 
     // Add the create profile page to stacked widget
     stackedWidget->addWidget(createProfPage);
 
     qDebug() << "Create Profiles page index: " << stackedWidget->indexOf(createProfPage);
+    }
+
+    else{
+        //CLEAR INPUT ROWS
+    }
 }
 
 void MainWindow::setupMeasurePage()
 {
-    if (!model.getCurProfile()) {
-        QMessageBox::warning(this, "Error", "No profile selected. Please log in first.");
-        showLoginPage();
-        return;
-    }
 
-    scanner = model.startScan();
-    if (!scanner) {
-        qWarning() << "Failed to initialize scanner. No profile selected?";
-        // Disable measurement buttons or show an error message
-    }
+   if(measurePage == nullptr){
+
 
    // Create the measure page
-   QWidget *measurePage = new QWidget(this);
+   measurePage = new QWidget(this);
 
    // Create layout
    QVBoxLayout *measureLayout = new QVBoxLayout;
@@ -346,6 +358,18 @@ void MainWindow::setupMeasurePage()
    stackedWidget->addWidget(measurePage);
 
    qDebug() << "Measure Now page index: " << stackedWidget->indexOf(measurePage);
+   }
+
+   else{
+
+       if (!model.getCurProfile()) {
+           QMessageBox::warning(this, "Error", "No profile selected. Please log in first.");
+           showLoginPage();
+           return;
+       }
+
+
+    }
 
 }
 
@@ -361,7 +385,9 @@ void MainWindow::setupBattery()
 }
 
 void MainWindow::setupScanningPage() {
-    QWidget *scanningPage = new QWidget(this);
+
+    if(scanningPage == nullptr){
+    scanningPage = new QWidget(this);
     QVBoxLayout *scanningLayout = new QVBoxLayout;
 
     QLabel *scanHeaderLabel = new QLabel("Scanning Page", this);
@@ -382,11 +408,17 @@ void MainWindow::setupScanningPage() {
     stackedWidget->addWidget(scanningPage);
 
     qDebug() << "scannings page index: " << stackedWidget->indexOf(scanningPage);
+    }
+
+    else{
+        //probably won't need this else
+    }
 }
 
 void MainWindow::setupSnapshotDetailsPage() {
 
-    QWidget *snapshotDetailsPage = new QWidget(this);
+    if(snapshotDetailsPage ==  nullptr){
+    snapshotDetailsPage = new QWidget(this);
     QVBoxLayout *snapshotLayout = new QVBoxLayout;
 
     QLabel *snapshotTitle = new QLabel("Snapshot Details", this);
@@ -463,12 +495,23 @@ void MainWindow::setupSnapshotDetailsPage() {
     stackedWidget->addWidget(snapshotDetailsPage);
 
     qDebug() << "Snapshot details page index: " << stackedWidget->indexOf(snapshotDetailsPage);
+    }
+
+    else {
+        weightInput->clear();
+        bodyTempInput->clear();
+        heartRateInput->clear();
+        notesInput->clear();
+        sleepHoursInput->clear();
+        sleepMinutesInput->clear();
+    }
 }
 
-void MainWindow::setupHistoryPage()
-{
+void MainWindow::setupHistoryPage(){
+    if(historyPage == nullptr){
+
     // Create the history page
-    QWidget *historyPage = new QWidget(this);
+    historyPage = new QWidget(this);
 
     // Create layout
     QVBoxLayout *historyLayout = new QVBoxLayout;
@@ -527,11 +570,17 @@ void MainWindow::setupHistoryPage()
 
     qDebug() << "History page index: " << stackedWidget->indexOf(historyPage);
 
+    }
+
+    else{
+    //POPULATE HISTORY PAGE HERE
+    }
 }
 
 void MainWindow::setupBodyScreen()
 {
-   QWidget *bodyWidget = new QWidget(this);
+   if(bodyWidget == nullptr){
+   bodyWidget = new QWidget(this);
    QVBoxLayout *bodyLayout = new QVBoxLayout;
 
 
@@ -649,11 +698,20 @@ void MainWindow::setupBodyScreen()
    stackedWidget->addWidget(bodyWidget);
 
     qDebug() << "Body page index: " << stackedWidget->indexOf(bodyWidget);
+
+   }
+
+   else{
+       //POPULATE BODY CHART HERE
+
+   }
+
 }
 
 void MainWindow::setupChartPage()
 {
-   QWidget *chartWidget = new QWidget(this);
+   if(chartWidget == nullptr){
+   chartWidget = new QWidget(this);
    QVBoxLayout *chartLayout = new QVBoxLayout(chartWidget);
 
 
@@ -698,11 +756,21 @@ void MainWindow::setupChartPage()
    stackedWidget->addWidget(chartWidget);
 
     qDebug() << "Chart page index: " << stackedWidget->indexOf(chartWidget);
+   }
+
+   else{
+       //POPULAATE BAR CHART HERE
+
+
+   }
+
 }
 
 void MainWindow::setupRecommendationsPage()
 {
-    QWidget *recommendationsWidget = new QWidget(this);
+    if(recommendationsWidget == nullptr){
+
+    recommendationsWidget = new QWidget(this);
     QVBoxLayout *recommendationsLayout = new QVBoxLayout(recommendationsWidget);
 
 
@@ -726,11 +794,20 @@ void MainWindow::setupRecommendationsPage()
     stackedWidget->addWidget(recommendationsWidget);
 
     qDebug() << "Recommendations page index: " << stackedWidget->indexOf(recommendationsWidget);
+    }
+
+    else{
+        //POPULATE  RECOMMENDATIONS HERE
+
+
+    }
+
 }
 
 void MainWindow::setupIndicatorsPage()
 {
-    QWidget *indicatorsWidget = new QWidget(this);
+    if(indicatorsWidget == nullptr){
+    indicatorsWidget = new QWidget(this);
     QVBoxLayout *indicatorsLayout = new QVBoxLayout(indicatorsWidget);
 
 
@@ -754,6 +831,16 @@ void MainWindow::setupIndicatorsPage()
     stackedWidget->addWidget(indicatorsWidget);
 
     qDebug() << "Indicators page index: " << stackedWidget->indexOf(indicatorsWidget);
+    }
+
+    else{
+        //POPULATE INDICATORS PAGE WITH DATA HERE
+
+
+
+    }
+
+
 }
 
 
@@ -867,7 +954,8 @@ void MainWindow::measureFeet(const QString &side) {
 }
 
 void MainWindow::startMeasurement() {
-    if (!scanner) {
+    scanner = model.startScan();
+    if (scanner == nullptr) {
         QMessageBox::warning(this, "Error", "Scanner not initialized. Please try again.");
         return;
     }
