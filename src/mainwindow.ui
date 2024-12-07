@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>9</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="loginPage">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -278,7 +278,7 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="">
          <property name="spacing">
           <number>10</number>
          </property>
@@ -294,13 +294,6 @@
          <property name="bottomMargin">
           <number>40</number>
          </property>
-         <item>
-          <widget class="QLabel" name="userNameLabel">
-           <property name="text">
-            <string>userNameLabel</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
@@ -321,13 +314,6 @@
         <widget class="QPushButton" name="historyButton">
          <property name="text">
           <string>History</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="logoutButton">
-         <property name="text">
-          <string>Log Out</string>
          </property>
         </widget>
        </item>
@@ -696,34 +682,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="rightHandButton">
-          <property name="text">
-           <string>Right Hand</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="leftHandButton">
-          <property name="text">
-           <string>Left Hand</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="rightFootButton">
-          <property name="text">
-           <string>RIght Foot</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="leftFootButton">
-          <property name="text">
-           <string>Left Foot</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="finishButton">
           <property name="text">
            <string>Finish</string>
@@ -739,6 +697,69 @@
         </item>
        </layout>
       </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="scanningPage">
+     <widget class="QWidget" name="verticalLayoutWidget_11">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>1271</width>
+        <height>531</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="scanningLayout">
+       <item>
+        <widget class="QLabel" name="scanHeaderLabel">
+         <property name="text">
+          <string>Scanning Page</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="scanningInstructionLabel">
+         <property name="text">
+          <string>Scanning Instructions</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="contactWithSkinButton">
+         <property name="text">
+          <string>Contact With Skin</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="stopButton">
+         <property name="text">
+          <string>Stop Scan</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="snapshotDetailsPage">
+     <widget class="QWidget" name="verticalLayoutWidget_12">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>10</y>
+        <width>1261</width>
+        <height>541</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="snapshotLayout">
+       <item>
+        <widget class="QPushButton" name="saveSnapShotButton">
+         <property name="text">
+          <string>Save</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </widget>

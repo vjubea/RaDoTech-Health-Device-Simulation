@@ -17,7 +17,9 @@
 #include <QComboBox>
 #include <QInputDialog>
 #include <QTimer>
+#include <QTextEdit>
 #include <QRandomGenerator>
+#include <QThread>
 // #include <QSqlQuery>
 // #include <QSqlDatabase>
 // #include <QSqlError>
@@ -49,12 +51,12 @@ public:
 
 private slots:
   void onLoginButtonClicked(); // Slot for login button
-  void onLogoutButtonClicked(); // Slot for logout button
   void onCreateProfButtonClicked(); // Slot for create profile button
   void onProfileRowClicked(int row, int col); // Slot for selecting profile
   void onSaveProfButtonClicked(); // Slot for save profile button
   void onDeleteProfileClicked(); // Slot for delete profile button
   void onEditProfileClicked(); // Slot for edit profile button
+  void onSaveSnapshotClicked();
   void onHistoryRowClicked(int row, int col); // Slot for history row click
   void addMeasurementToHistory(const QString& result);
   void startMeasurement(); // Start the measurement
@@ -74,8 +76,6 @@ private:
   // GUI elements for Login Page
   QLabel *welcomeLabel;
   QLabel *pleaseLogInStatement;
-  QLabel *noAccLabel;
-  QPushButton *createProfButton;
   QComboBox *userDropdown;
 
 
@@ -106,7 +106,6 @@ private:
   QPushButton *measureNowButton;
   QPushButton *profilesButton;
   QPushButton *historyButton;
-  QPushButton *logoutButton;
 
 
   // GUI elements for History Page
@@ -129,6 +128,22 @@ private:
   int batteryLevel; // Battery level
   QTimer *batteryDepletionTimer; // Timer to simulate battery depletion
   QVBoxLayout *measureLayout;
+
+  // GUI elements for Scanning Page
+  QLabel scanHeaderLabel;
+  QLabel *scanningInstructionLabel;
+  QPushButton *contactWithSkinButton; // Contact with skin button
+
+  // GUI elements for Snapshots Page
+  QLineEdit *weightInputSnap;
+  QLineEdit *heartRateInput;
+  QLineEdit *bodyTempInput;
+  QLineEdit *sleepHoursInput;
+  QLineEdit *sleepMinutesInput;
+  QTextEdit *notesInput;
+  QPushButton *saveSnapshotButton;
+  QPushButton *backToMeasureButton;
+
 
 
   // GUI elements for Body Screen
@@ -170,6 +185,9 @@ private:
   void measureFeet(const QString &side);
   void setupBattery();
   void depleteBattery(); // Deplete the battery
+  void setupScanningPage(); // Set up the Scanning page
+  void startScanningProcess();
+  void setupSnapshotDetailsPage();
   void setupHistoryPage();// Set up the History page
   void setupBodyScreen(); // Show the body screen
   void showChartPage(); // Show the chart page

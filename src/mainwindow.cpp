@@ -30,6 +30,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupBattery();
 
+    setupScanningPage();
+
+    setupSnapshotDetailsPage();
+
     setupHistoryPage();
 
     setupBodyScreen();
@@ -39,16 +43,14 @@ MainWindow::MainWindow(QWidget *parent)
     setupRecommendationsPage();
 
 
-    // Connect buttons to respective slots
-    connect(logoutButton, &QPushButton::clicked, this, &MainWindow::onLogoutButtonClicked);
-    
-    connect(measureNowButton, &QPushButton::clicked, [this] () { stackedWidget->setCurrentIndex(4);});
+    // Connect buttons to respective slots   
+    connect(measureNowButton, &QPushButton::clicked, [this] () { stackedWidget->setCurrentIndex(5);});
     connect(profilesButton, &QPushButton::clicked, [this]() {
         setupProfilesPage();    // Ensure the Profiles Page is initialized
         stackedWidget->setCurrentIndex(1); // Go to the Profiles Page
     });
     connect(historyButton, &QPushButton::clicked, [this]() {
-        stackedWidget->setCurrentIndex(5);
+        stackedWidget->setCurrentIndex(7);
     });
 }
 
@@ -84,13 +86,11 @@ void MainWindow::setupMenuPage()
     measureNowButton = new QPushButton("Measure Now");
     profilesButton = new QPushButton("Profiles");
     historyButton = new QPushButton("History");
-    logoutButton = new QPushButton("Log Out");
 
 
     verticalLayout_3->addWidget(measureNowButton);
     verticalLayout_3->addWidget(profilesButton);
     verticalLayout_3->addWidget(historyButton);
-    verticalLayout_3->addWidget(logoutButton);
 
 
     // Set the layout for the menu page
@@ -113,7 +113,7 @@ void MainWindow::setupProfilesPage()
         profilesTable = new QTableWidget(this);
         profilesTable->setColumnCount(2); // Columns: First Name, Last Name
         profilesTable->setHorizontalHeaderLabels({"First Name", "Last Name"});
-        
+
         //profilesTable->clearContents(); //clears existing data
         //profilesTable->setRowCount(0); display curr user
 
@@ -143,7 +143,7 @@ void MainWindow::setupProfilesPage()
         connect(profilesBackButton, &QPushButton::clicked, [this]() {
             stackedWidget->setCurrentIndex(0); // Go back to Menu page
         });
-        
+
         profilesLayout->addWidget(profilesTable);
         profilesLayout->addWidget(createProfButton);
         profilesLayout->addWidget(editProfileButton);
@@ -175,23 +175,24 @@ void MainWindow::setupProfilesPage()
     }
 }
 
-// Modify to work as the page selecting user before scan. 
+// Modify to work as the page selecting user before scan.
 // Similar to Profiles page where we select profiles by index.
 void MainWindow::setupLoginPage()
 {
     // Initialize the login page widgets
-    welcomeLabel = new QLabel("Welcome to the App", this);
-    pleaseLogInStatement = new QLabel("Please log in to continue", this);
+    welcomeLabel = new QLabel("Select User", this);
+    pleaseLogInStatement = new QLabel("Please Select User", this);
 
     userDropdown = new QComboBox(this);
     userDropdown->setEditable(false); // Prevent manual entry
     userDropdown->addItem("Select User"); // Default placeholder
     //Connect the dropdown's signal to the login slot
-    connect(userDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) { if (index > 0) { onLoginButtonClicked(); } });
-
-
-    noAccLabel = new QLabel("Don't have an account?", this);
-    createProfButton = new QPushButton("Create New Profile", this);
+    //connect(userDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) { if (index > 0) { onLoginButtonClicked(); } });
+    connect(userDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+        if (index > 0) {
+            onLoginButtonClicked();
+        }
+    });
 
 
     // Create a QFont for customizing the font
@@ -200,7 +201,7 @@ void MainWindow::setupLoginPage()
     // Apply the font to the labels
     welcomeLabel->setFont(labelFont);
     pleaseLogInStatement->setFont(labelFont);
-    noAccLabel->setFont(labelFont);
+
 
 
     // Create layout for login page
@@ -208,8 +209,6 @@ void MainWindow::setupLoginPage()
     loginLayout->addWidget(welcomeLabel);
     loginLayout->addWidget(pleaseLogInStatement);
     loginLayout->addWidget(userDropdown);
-    loginLayout->addWidget(noAccLabel);
-    loginLayout->addWidget(createProfButton);
 
     QWidget *loginPage = new QWidget(this);
     loginPage->setLayout(loginLayout);
@@ -218,7 +217,20 @@ void MainWindow::setupLoginPage()
     stackedWidget->addWidget(loginPage);
 
     // Populate the dropdown with existing profiles
-    // populateUserDropdown(); // Removed
+    populateUserDropdown();
+
+    qDebug() << "Log in page index: " << stackedWidget->indexOf(loginPage);
+}
+
+
+void MainWindow::populateUserDropdown() {
+    userDropdown->clear();
+    userDropdown->addItem("Select User");
+
+    QVector<QString> profileNames = model.getProfileNames();
+    for (const QString &name : profileNames) {
+        userDropdown->addItem(name);
+    }
 }
 
 
@@ -226,6 +238,9 @@ void MainWindow::setupCreateProfilePage()
 {
     // Initialize the create profile page widgets
     createProfLabel = new QLabel("Create Your Profile", this);
+    QFont labelFont9("Arial", 16, QFont::Bold);
+    createProfLabel->setFont(labelFont9);
+
     fNameLabel = new QLabel("First Name:", this);
     lNameLabel = new QLabel("Last Name:", this);
     weightLabel = new QLabel("Weight (kg):", this);
@@ -280,14 +295,23 @@ void MainWindow::setupCreateProfilePage()
 
 void MainWindow::setupMeasurePage()
 {
+    if (!model.getCurProfile()) {
+        QMessageBox::warning(this, "Error", "No profile selected. Please log in first.");
+        stackedWidget->setCurrentIndex(3); // Go back to login page
+        return;
+    }
+
     scanner = model.startScan();
+    if (!scanner) {
+        qWarning() << "Failed to initialize scanner. No profile selected?";
+        // Disable measurement buttons or show an error message
+    }
 
    // Create the measure page
    QWidget *measurePage = new QWidget(this);
 
    // Create layout
    QVBoxLayout *measureLayout = new QVBoxLayout;
-
 
    // Add the battery label
    batteryLabel = new QLabel("Battery: 100%", this);
@@ -383,18 +407,36 @@ void MainWindow::setupBattery()
 }
 
 
-void MainWindow::startMeasurement()
-{
+//void MainWindow::startMeasurement() {
+//    if (!batteryDepletionTimer || !batteryLabel) {
+//        qDebug() << "Battery components are not initialized!";
+//        return;
+//    }
+//    if (!batteryDepletionTimer->isActive()) {
+//        batteryDepletionTimer->start(2400);
+//        qDebug() << "Battery depletion timer started.";
+//    }
+//    // Switch to the Scanning page
+//    stackedWidget->setCurrentIndex(5);
+//}
+
+void MainWindow::startMeasurement() {
+    if (!scanner) {
+        QMessageBox::warning(this, "Error", "Scanner not initialized. Please try again.");
+        return;
+    }
+
     if (!batteryDepletionTimer || !batteryLabel) {
         qDebug() << "Battery components are not initialized!";
         return;
     }
 
-
     if (!batteryDepletionTimer->isActive()) {
         batteryDepletionTimer->start(2400);
         qDebug() << "Battery depletion timer started.";
     }
+
+    stackedWidget->setCurrentIndex(5); // Switch to the Scanning page
 }
 
 
@@ -416,36 +458,202 @@ void MainWindow::depleteBattery()
 // Change to be used by SnapshotDetails page into "SaveSnapshot"
 void MainWindow::finishMeasurement()
 {
+    if (!scanner) {
+        QMessageBox::warning(this, "Error", "No active scan in progress.");
+        return;
+    }
+
     if (batteryDepletionTimer && batteryDepletionTimer->isActive()) {
         batteryDepletionTimer->stop();
     }
 
     //!!USER INPUTS POST MEASUREMENT GO HERE -- To remove after
-    scanner->registerWeight(0.0f);
-    scanner->registerBlood('L', 0,0);
-    scanner->registerBlood('R',0,0);
-    scanner->registerBodyTemp(0.0);
-    scanner->registerHeartRate(0);
-    scanner->registerSleepTime(0,0);
-    scanner->registerTime(0,0); //might want to get current from system
-    scanner->registerDate(0,0,0); //might want to geet current from system
-    scanner->registerNotes("Normal scan"); // let user write these
-    // -----
+    if (scanner) {
+        scanner->registerWeight(0.0f);
+        scanner->registerBlood('L', 0,0);
+        scanner->registerBlood('R',0,0);
+        scanner->registerBodyTemp(0.0);
+        scanner->registerHeartRate(0);
+        scanner->registerSleepTime(0,0);
+        scanner->registerTime(0,0); //might want to get current from system
+        scanner->registerDate(0,0,0); //might want to geet current from system
+        scanner->registerNotes("Normal scan"); // let user write these
+        // -----
 
-    if(!scanner->finishScan()) {
-        QMessageBox::warning(this, "Scan Incomplete", "Scan parameters incomplete");
-        return;
+        if(!scanner->finishScan()) {
+            QMessageBox::warning(this, "Scan Incomplete", "Scan parameters incomplete");
+            return;
+        }
+
+       //clean up scan.
+       delete scanner;
+       scanner = nullptr;
+    } else {
+        QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
     }
 
-   //clean up scan.
-   delete scanner;
-   scanner = nullptr;
-
-
-
-   QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
-
 }
+
+
+
+void MainWindow::setupScanningPage() {
+    QWidget *scanningPage = new QWidget(this);
+    QVBoxLayout *scanningLayout = new QVBoxLayout;
+
+    QLabel *scanHeaderLabel = new QLabel("Scanning Page", this);
+    QFont labelFont8("Arial", 16, QFont::Bold);
+    scanHeaderLabel->setFont(labelFont8);
+    scanningLayout->addWidget(scanHeaderLabel);
+
+    scanningInstructionLabel = new QLabel("Place the device on your skin and press the button below:", this);
+    QFont labelFont7("Arial", 14, QFont::Bold);
+    scanningInstructionLabel->setFont(labelFont7);
+    scanningLayout->addWidget(scanningInstructionLabel);
+
+    contactWithSkinButton = new QPushButton("Contact with Skin", this);
+    connect(contactWithSkinButton, &QPushButton::clicked, this, &MainWindow::startScanningProcess);
+    scanningLayout->addWidget(contactWithSkinButton);
+
+    scanningPage->setLayout(scanningLayout);
+    stackedWidget->addWidget(scanningPage);
+}
+
+void MainWindow::startScanningProcess() {
+    const int totalPoints = 24;
+    for (int i = 0; i < totalPoints; ++i) {
+        scanningInstructionLabel->setText("Scanning...");
+        QApplication::processEvents();
+        QThread::msleep(500);
+
+        scanningInstructionLabel->setText("Fetching results...");
+        QApplication::processEvents();
+        QThread::msleep(500);
+
+        QString pointType = (i < 12) ? "Hand" : "Foot";
+        QString side = (i % 2 == 0) ? "Right" : "Left";
+        int pointNumber = (i % 12) / 2 + 1;
+
+        QMessageBox msg;
+        msg.setText("Go to next point");
+        msg.setInformativeText("Current point: " + side + " " + pointType + " " + QString::number(pointNumber));
+        msg.setStandardButtons(QMessageBox::NoButton);
+        msg.show();
+
+        QTimer::singleShot(2000, &msg, &QMessageBox::close);
+        QApplication::processEvents();
+        QThread::msleep(2000);
+
+        scanningInstructionLabel->setText("Place the device on your skin and press the button below:");
+        QApplication::processEvents();
+        QThread::msleep(500);
+
+        // Here you would call the appropriate method from the Scanner class
+        // For example:
+        if (scanner) {
+            char sideChar = (side == "Left") ? 'L' : 'R';
+            char limbChar = (pointType == "Hand") ? 'H' : 'F';
+            int reading = QRandomGenerator::global()->bounded(0, 100); // Replace with actual reading
+            scanner->registerReading(sideChar, limbChar, reading);
+        }
+    }
+
+    // After 24 points, go to snapshot page
+    stackedWidget->setCurrentIndex(6); // Assuming snapshot page index is 6
+}
+
+
+void MainWindow::setupSnapshotDetailsPage() {
+
+    QWidget *snapshotDetailsPage = new QWidget(this);
+    QVBoxLayout *snapshotLayout = new QVBoxLayout;
+
+    QLabel *snapshotTitle = new QLabel("Snapshot Details", this);
+    QFont titleFont("Arial", 18, QFont::Bold);
+    snapshotTitle->setFont(titleFont);
+    snapshotLayout->addWidget(snapshotTitle);
+
+    QFont labelFont("Arial", 14, QFont::Bold);
+
+    // Blood Pressure
+    for (const auto& hand : {"Left Hand", "Right Hand"}) {
+        QLabel *pressureLabel = new QLabel(QString("%1 Pressure:").arg(hand), this);
+        pressureLabel->setFont(labelFont);
+        snapshotLayout->addWidget(pressureLabel);
+
+        QHBoxLayout *pressureLayout = new QHBoxLayout;
+        QLineEdit *systolicInput = new QLineEdit(this);
+        systolicInput->setPlaceholderText("Systolic");
+        QLineEdit *diastolicInput = new QLineEdit(this);
+        diastolicInput->setPlaceholderText("Diastolic");
+        pressureLayout->addWidget(systolicInput);
+        pressureLayout->addWidget(diastolicInput);
+        snapshotLayout->addLayout(pressureLayout);
+    }
+
+    // Other measurements
+    QLabel *weightLabel = new QLabel("Weight (kg):", this);
+    weightLabel->setFont(labelFont);
+    weightInput = new QLineEdit(this);
+    snapshotLayout->addWidget(weightLabel);
+    snapshotLayout->addWidget(weightInput);
+
+    QLabel *heartRateLabel = new QLabel("Heart Rate:", this);
+    heartRateLabel->setFont(labelFont);
+    heartRateInput = new QLineEdit(this);
+    snapshotLayout->addWidget(heartRateLabel);
+    snapshotLayout->addWidget(heartRateInput);
+
+    QLabel *bodyTempLabel = new QLabel("Body Temperature (°C):", this);
+    bodyTempLabel->setFont(labelFont);
+    bodyTempInput = new QLineEdit(this);
+    snapshotLayout->addWidget(bodyTempLabel);
+    snapshotLayout->addWidget(bodyTempInput);
+
+    QLabel *sleepTimeLabel = new QLabel("Sleep Time (hh:mm):", this);
+    sleepTimeLabel->setFont(labelFont);
+    snapshotLayout->addWidget(sleepTimeLabel);
+    QHBoxLayout *sleepTimeLayout = new QHBoxLayout;
+    sleepHoursInput = new QLineEdit(this);
+    sleepHoursInput->setPlaceholderText("Hours");
+    sleepMinutesInput = new QLineEdit(this);
+    sleepMinutesInput->setPlaceholderText("Minutes");
+    sleepTimeLayout->addWidget(sleepHoursInput);
+    sleepTimeLayout->addWidget(sleepMinutesInput);
+    snapshotLayout->addLayout(sleepTimeLayout);
+
+    QLabel *notesLabel = new QLabel("Notes:", this);
+    notesLabel->setFont(labelFont);
+    notesInput = new QTextEdit(this);
+    snapshotLayout->addWidget(notesLabel);
+    snapshotLayout->addWidget(notesInput);
+
+    saveSnapshotButton = new QPushButton("Save Snapshot", this);
+    backToMeasureButton = new QPushButton("Back", this);
+    snapshotLayout->addWidget(saveSnapshotButton);
+    snapshotLayout->addWidget(backToMeasureButton);
+
+    connect(saveSnapshotButton, &QPushButton::clicked, this, &MainWindow::onSaveSnapshotClicked);
+    connect(backToMeasureButton, &QPushButton::clicked, [this]() {
+        stackedWidget->setCurrentIndex(4); // Assuming measure page index is 4
+    });
+
+    snapshotDetailsPage->setLayout(snapshotLayout);
+    stackedWidget->addWidget(snapshotDetailsPage);
+}
+
+void MainWindow::onSaveSnapshotClicked() {
+    // Check if all fields are filled
+    if (weightInput->text().isEmpty() || heartRateInput->text().isEmpty() ||
+        bodyTempInput->text().isEmpty() || sleepHoursInput->text().isEmpty() ||
+        sleepMinutesInput->text().isEmpty() || notesInput->toPlainText().isEmpty()) {
+        QMessageBox::warning(this, "Incomplete Data", "Please fill all the input fields.");
+    } else {
+        QMessageBox::information(this, "Snapshot Saved", "Snapshot details have been successfully saved.");
+        stackedWidget->setCurrentIndex(0);
+    }
+}
+
+
 
 void MainWindow::setupHistoryPage()
 {
@@ -507,7 +715,7 @@ void MainWindow::setupHistoryPage()
     // Add the history page to stacked widget
     stackedWidget->addWidget(historyPage);
 
-    //qDebug() << "History page index: " << stackedWidget->indexOf(historyPage);
+    qDebug() << "History page index: " << stackedWidget->indexOf(historyPage);
 
 }
 
@@ -765,42 +973,41 @@ void MainWindow::showHistoryPage()
 }
 
 
-void MainWindow::onLogoutButtonClicked()
-{
-    // Clear session-specific data
-    userNameLabel->clear();
+//void MainWindow::onLoginButtonClicked()
+//{
+//    model.selectProfile(userDropdown->currentIndex()-1);
 
-    // Navigate to the Login Page
-    stackedWidget->setCurrentIndex(0);
-}
+//    QString selectedUser = model.getCurProfile()->getFullName();
+
+//    if (selectedUser == "Select User") {
+//        QMessageBox::warning(this, "Login Error", "Please select a user!");
+//        return;
+//    }
+
+//    // Split the name to update the Menu page greeting:
+//    QStringList nameParts = selectedUser.split(' ');
+//    if (nameParts.size() == 2) {
+//        currentFirstName = nameParts[0];
+//        currentLastName = nameParts[1];
+//    }
+
+//    // Debugging output
+//    qDebug() << "Logged in user: " << model.getCurProfile()->getFullName();
+//    qDebug() << "Weight: " << model.getCurProfile()->getWeight() << "Height: " << model.getCurProfile()->getHeight();
 
 
-void MainWindow::onLoginButtonClicked()
-{
-    model.selectProfile(userDropdown->currentIndex()-1);
+//    // Proceed to the Menu Page
+//    stackedWidget->setCurrentIndex(2);
+//    userNameLabel->setText("Hello, " + selectedUser);
+//}
 
-    QString selectedUser = model.getCurProfile()->getFullName();
-
-    if (selectedUser == "Select User") {
-        QMessageBox::warning(this, "Login Error", "Please select a user!");
-        return;
+void MainWindow::onLoginButtonClicked() {
+    int selectedIndex = userDropdown->currentIndex() - 1;
+    if (selectedIndex >= 0 && model.selectProfile(selectedIndex)) {
+        stackedWidget->setCurrentIndex(4); // Go to Measure page
+    } else {
+        QMessageBox::warning(this, "Login Error", "Please select a valid user");
     }
-
-    // Split the name to update the Menu page greeting:
-    QStringList nameParts = selectedUser.split(' ');
-    if (nameParts.size() == 2) {
-        currentFirstName = nameParts[0];
-        currentLastName = nameParts[1];
-    }
-
-    // Debugging output
-    qDebug() << "Logged in user: " << model.getCurProfile()->getFullName();
-    qDebug() << "Weight: " << model.getCurProfile()->getWeight() << "Height: " << model.getCurProfile()->getHeight();
-
-
-    // Proceed to the Menu Page
-    stackedWidget->setCurrentIndex(2);
-    userNameLabel->setText("Hello, " + selectedUser);
 }
 
 
@@ -848,7 +1055,7 @@ void MainWindow::onSaveProfButtonClicked()
         QMessageBox::warning(this, "Validation Error", "Something went wrong creatting this profile in the database");
         return;
     }
-    
+
     QMessageBox::information(this, "Success", "Profile created successfully!");
 
     // Clear input fields after saving
@@ -955,7 +1162,7 @@ void MainWindow::onDeleteProfileClicked()
     if (result == QMessageBox::No) {
         return; // Exit if the user cancels
     }
-    
+
     if (!model.deleteCurrentProfile()) {
         // Show success message
         QMessageBox::information(this, "Error", "Profile could not be deleted.");
@@ -970,4 +1177,3 @@ void MainWindow::onDeleteProfileClicked()
     // Reload the Profiles Page
     setupProfilesPage();
 }
-
