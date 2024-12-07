@@ -1,0 +1,59 @@
+title Success 2: User Views Old Scan
+
+participant "User" as usr
+participant "mw: MainWindow" as mw
+participant "model: Model" as model
+participant "profileA: Profile" as prof
+participant "snap: Snapshot" as snap
+
+usr->mw: ViewHistoryPressed()
+activate mw
+mw->mw: SetupHistoryPage()
+activate mw
+mw->model: getCurHistory()
+activate model
+model->prof: getSnapshots()
+prof-->model: Vector: snaps
+model-->mw: snaps
+deactivate model
+deactivate mw
+mw->>mw:ShowHistoryPage()
+note over mw: MainWindow displays list\nof snapshots and their\nassociated dates.
+deactivate mw
+
+usr->mw: ViewHistoryRowClicked(9)
+activate mw
+mw->mw: curSnap = snap9*
+mw->mw: setupChartPage()
+activate mw
+mw->snap: curSnap.getData()
+snap-->mw: data
+deactivate mw
+mw->mw: displayChartPage()
+deactivate mw
+
+usr->mw: NextClicked()
+activate mw
+mw->mw: setupIndicatorsPage()
+activate mw
+mw->snap: curSnap.getIndicators()
+snap-->mw: indicators
+deactivate mw
+mw->mw: displayIndicatorsPage()
+deactivate mw
+
+usr->mw: NextClicked()
+activate mw
+mw->mw: setupRecomendationsPage()
+activate mw
+mw->snap: curSnap.getRecomendations()
+snap-->mw: "placeholder"
+deactivate mw
+mw->mw: displayRecomendationsPage()
+deactivate mw
+
+usr->mw: NextClicked()
+activate mw
+mw->mw: setupMenuPage()
+mw->mw: showMenuPage()
+deactivate mw

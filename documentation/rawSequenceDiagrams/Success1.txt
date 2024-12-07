@@ -1,0 +1,64 @@
+title Success 1: User Performs Scan
+
+participant "User" as usr
+participant "mw: MainWindow" as mw
+participant "model: Model" as model
+participant "profileA: Profile" as prof
+participant "scanner: Scanner" as scanner
+participant "snap: Snapshot" as snap
+participant "dbm: DBManager" as dbm
+
+usr->mw: ScanButtonPress()
+activate mw
+mw->model: StartScan()
+activate model
+model->scanner: new Scanner(ProfileA*)
+scanner-->model: scanner*
+model-->mw: scanner*
+deactivate model
+
+usr->mw:ScanHandPress()
+mw->scanner: genHandScan()
+usr->mw:ScanFootPress()
+mw->scanner: genFootScan()
+
+loop
+usr->mw: FillField("value")
+mw->scanner: registerValue("value")
+note over mw: user fills out various text\nboxes with information\nabout the scan
+end
+
+usr->mw: FinishScanPress()
+mw->scanner: FinishScan()
+activate scanner
+alt some incorrect or incomplete information
+scanner-->mw: nullptr
+note over mw: Main window knows\nthis means there isn't\ngood info, doesn't end\nscan
+
+else user information filled correctly
+scanner->dbm: createHandReadings([...])
+dbm-->scanner: hrID
+scanner->dbm: createLegReadings([...])
+dbm-->scanner: lrID
+scanner->snap: new Snapshot()
+loop 
+scanner->snap:setVal(val)
+note over snap: scanner sets all params
+end
+scanner->dbm: addSnapshotToHistory(snap)
+dbm-->scanner: true
+scanner->prof:addSnapshot(snap*)
+scanner-->mw: snap*
+deactivate scanner
+mw->scanner: delete scanner
+mw->mw:displaySnapshot(snap*)
+deactivate mw
+
+
+
+
+end
+
+
+
+

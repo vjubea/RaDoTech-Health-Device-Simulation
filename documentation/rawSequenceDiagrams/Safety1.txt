@@ -1,0 +1,34 @@
+title Safety 1: Battery Depletion
+
+participant "User" as usr
+participant "mw: MainWindow" as mw
+participant "scanner: Scanner" as scanner
+
+note over usr: User is mid-scan
+mw->mw: batteryTimerExpire()
+activate mw
+
+mw->mw: showPopup("Battery\ndepleted, finishing \nscan")
+activate mw
+usr->mw: closePopup()
+deactivate mw
+
+mw->scanner: finishScan()
+activate scanner
+
+alt 
+scanner-->mw:false
+deactivate scanner
+mw->mw:showMenuScreen()
+note over mw: scan fails to complete\nand the user returns\nto the main menu
+
+else 
+activate scanner
+scanner-->mw: true
+deactivate scanner
+mw->mw:setupBodyScreen()
+mw->mw: showBodyScreen()
+note over mw: Proceeds like the\nend of a normal\nscan
+end
+
+deactivate mw
