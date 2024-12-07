@@ -9,7 +9,7 @@ Nigel Wanga - GUI Interface (majority of code in mainwindow; all code designing 
 
 Thomas Roche - design + implementation for model, scanner, and about half of the design + implementation for profile and snapshot. Most documentation
 
-Vlad Jubea - Use cases, database design + implementation, half the work on profile and snapshot, much of the work integrating model etc. with mainwindow.
+Vlad Jubea - Use cases, database design + implementation, half the work on profile and snapshot, integrating DBManager with the model, and much of the work integrating model etc. with mainwindow.
 
 # Codebase & Executables:
 /src contains all .cpp and .h files. It can be built using the VM's QTcreator or run like any other program. 
@@ -21,7 +21,6 @@ profile.[h/cpp]
 scanner.[h/cpp]
 snapshot.[h/cpp]
 dbmanager.[h/cpp]
-
 
 # Use Cases, Textual Explanation of Design Decisions, Requirements Traceability Matrix
 /documentation has all documentation. See DOCS_README.txt for more info
