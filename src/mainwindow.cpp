@@ -44,13 +44,13 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // Connect buttons to respective slots   
-    connect(measureNowButton, &QPushButton::clicked, [this] () { stackedWidget->setCurrentIndex(5);});
+    connect(measureNowButton, &QPushButton::clicked, [this] () { startMeasurement();});
     connect(profilesButton, &QPushButton::clicked, [this]() {
         setupProfilesPage();    // Ensure the Profiles Page is initialized
-        stackedWidget->setCurrentIndex(1); // Go to the Profiles Page
+        showProfilesPage(); // Go to the Profiles Page
     });
     connect(historyButton, &QPushButton::clicked, [this]() {
-        stackedWidget->setCurrentIndex(7);
+        showHistoryPage();
     });
 }
 
@@ -793,7 +793,7 @@ void MainWindow::showSnapshotDetailsPage()
 
 void MainWindow::showHistoryPage()
 {
-    stackedWidget->setCurrentIndex(3);
+    stackedWidget->setCurrentIndex(7);
 }
 
 void MainWindow::showBodyScreen()
