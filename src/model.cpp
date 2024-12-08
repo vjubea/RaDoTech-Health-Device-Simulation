@@ -59,10 +59,10 @@ Model::Model() {
     qWarning() << (snaps.size());
     Snapshot* snap = snaps.at(0);
     qWarning() << "Here are the readings for ProfileID:" << snap->getProfileID();
-    qWarning() << "LegReadID and HandReadID: " << snap->getFootReadingID() << snap->getHandReadingID();
+    qWarning() << "LegReadID and HandReadID: " << snap->getFootReadingsID() << snap->getHandReadingsID();
 
-    QVector<int> readings = dbManager->getFootReadingsById(snap->getFootReadingID());
-    QVector<int> hreadings = dbManager->getHandReadingsById(snap->getHandReadingID());
+    QVector<int> readings = dbManager->getFootReadingsById(snap->getFootReadingsID());
+    QVector<int> hreadings = dbManager->getHandReadingsById(snap->getHandReadingsID());
     for (int i=0; i<6; ++i) {
         qWarning() <<"Foot Reading at ("<<i<<") is: "<<readings.at(i);
         //qWarning() <<"Hand Reading at ("<<i<<") is: "<<hreadings.at(i);
@@ -88,12 +88,20 @@ bool Model::selectProfile(int index) {
 }
 
 QVector<Profile*> Model::getAllProfiles() {
-    for(int i = 0; i< profiles.length(); i++){
+    for(int i = 0; i < profiles.length(); i++) {
         delete profiles[i];
     }
     profiles.clear();
     dbManager->getAllProfiles(profiles);
     return profiles;
+}
+
+Profile* Model::getProfileByID(int profileID) {
+    return dbManager->getProfileByID(profileID);
+}
+
+bool Model::getAllSnapshots(QVector<Snapshot*> &snaps) {
+    return dbManager->getAllSnapshots(snaps);
 }
 
 bool Model::createProfile(QString& fname, QString& lname, float weight, float height, QString& birthday) {
@@ -140,11 +148,6 @@ bool Model::deleteCurrentProfile() {
     return wasDeleted;
 }
 
-
-QVector<Snapshot*> Model::getCurSnapshots(){
-    if(currentProfile == nullptr) return QVector<Snapshot*> {};
-    return currentProfile->getSnapshots();
-}
 
 Profile* Model::getCurProfile(){
     return currentProfile;

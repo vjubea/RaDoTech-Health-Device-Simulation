@@ -210,7 +210,7 @@ bool DBManager::createHandReadings(int& lastId, const QVector<int>& readings)
     lastId = getLastInsertId(query);
     return true;
 }
-// Create FootReadings
+
 bool DBManager::createFootReadings(int& lastId, const QVector<int>& readings)
 {
     if (readings.size() != 12) {
@@ -254,9 +254,9 @@ bool DBManager::getAllProfiles(QVector<Profile*>& profiles)
         qWarning() << "ERR: Could not fetch profiles: " << query.lastError().text();
         return false;
     }
-    // Iterate through the query result and populate the `snaps` vector
+    // Iterate through the query result and populate the `profiles` QVector reference
     while (query.next()) {
-        // Create a new Snapshot object
+        // Create a new Profile object
         Profile* prof = new Profile();
 
         // Populate the Profile object with data from the query
@@ -267,10 +267,41 @@ bool DBManager::getAllProfiles(QVector<Profile*>& profiles)
         prof->setHeight(query.value("height").toFloat());
         prof->setBday(query.value("birthDay").toString());
 
-        // Add the Snapshot object to the vector
+        // Add the Profile object to the vector reference
         profiles.append(prof);
     }
     return true;
+}
+
+Profile* DBManager::getProfileByID(int id)
+{
+    // Create a query to retrieve Profile by id
+    QSqlQuery query;
+    query.prepare("SELECT * FROM Profiles WHERE id = :id;");
+    query.bindValue(":id", id);
+
+    // Execute the query
+    if (!query.exec()) {
+        qWarning() << "ERR: Could not fetch profileID:" << id << " from Profiles table. " << query.lastError().text();
+        return nullptr;
+    }
+    
+    while (query.next()) {
+        // Create a Profile object
+        Profile* prof = new Profile();
+
+        // Populate the Profile object with data from the query
+        prof->setId(query.value("id").toInt());
+        prof->setFname(query.value("fname").toString());
+        prof->setLname(query.value("lname").toString());
+        prof->setWeight(query.value("weight").toFloat());
+        prof->setHeight(query.value("height").toFloat());
+        prof->setBday(query.value("birthDay").toString());
+
+        // Return the Profile object
+        return prof;
+    }
+    return nullptr;
 }
 
 bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps)
@@ -300,8 +331,8 @@ bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps)
         snap->setSleepMins(query.value("sleepMins").toInt());
         snap->setCurrWeight(query.value("currWeight").toFloat());
         snap->setNotes(query.value("notes").toString());
-        snap->setHandReadingID(query.value("handReadingsID").toInt());
-        snap->setFootReadingID(query.value("footReadingsID").toInt());
+        snap->setHandReadingsID(query.value("handReadingsID").toInt());
+        snap->setFootReadingsID(query.value("footReadingsID").toInt());
         snap->setDBM(this);
 
         // Add the Snapshot object to the vector
@@ -314,8 +345,7 @@ bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps)
 bool DBManager::getAllSnapshotsOfUser(QVector<Snapshot*>& snaps, int userID)
 {
     // Create a query to retrieve all snapshots from the database
-    QSqlQuery query("SELECT * FROM Snapshots"
-                    "WHERE profileID = :profileID;");
+    QSqlQuery query("SELECT * FROM Snapshots WHERE profileID = :profileID;");
 
     query.bindValue(":profileID", userID);
 
@@ -341,8 +371,8 @@ bool DBManager::getAllSnapshotsOfUser(QVector<Snapshot*>& snaps, int userID)
         snap->setSleepMins(query.value("sleepMins").toInt());
         snap->setCurrWeight(query.value("currWeight").toFloat());
         snap->setNotes(query.value("notes").toString());
-        snap->setHandReadingID(query.value("handReadingsID").toInt());
-        snap->setFootReadingID(query.value("footReadingsID").toInt());
+        snap->setHandReadingsID(query.value("handReadingsID").toInt());
+        snap->setFootReadingsID(query.value("footReadingsID").toInt());
 
         // Add the Snapshot object to the vector
         snaps.append(snap);
@@ -381,10 +411,10 @@ bool DBManager::getSnapshotByUserAndTime(Snapshot& snap, int userID, const QStri
         snap.setNotes(query.value("notes").toString());
 
         // Set the Hand and Leg readings
-        snap.setHandReadingID(
+        snap.setHandReadingsID(
             query.value("handReadingsID").isNull() ? -1 : query.value("handReadingsID").toInt()
             );
-        snap.setFootReadingID(
+        snap.setFootReadingsID(
             query.value("footReadingsID").isNull() ? -1 : query.value("footReadingsID").toInt()
             );
         return true;
@@ -392,14 +422,14 @@ bool DBManager::getSnapshotByUserAndTime(Snapshot& snap, int userID, const QStri
     return false;
 }
 
-QVector<int> DBManager::getHandReadingsById(int handReadingID)
+QVector<int> DBManager::getHandReadingsById(int handReadingsID)
 {
     QVector<int> readings;
 
     // Prepare the query to fetch hand readings by handReadingsID
     QSqlQuery query;
     query.prepare("SELECT * FROM HandReadings WHERE id = :handReadingsID;");
-    query.bindValue(":handReadingID", handReadingID);
+    query.bindValue(":handReadingsID", handReadingsID);
 
     if (!query.exec()) {
         qWarning() << "Error fetching hand readings: " << query.lastError().text();
@@ -479,14 +509,15 @@ bool DBManager::addSnapshotToHistory(const Snapshot& snapshot)
     query.bindValue(":sleepMins", snapshot.getSleepMins());
     query.bindValue(":currWeight", snapshot.getCurrWeight());
     query.bindValue(":notes", snapshot.getNotes());
-    query.bindValue(":handReadingsID", snapshot.getHandReadingID());
-    query.bindValue(":footReadingsID", snapshot.getFootReadingID());
+    query.bindValue(":handReadingsID", snapshot.getHandReadingsID());
+    query.bindValue(":footReadingsID", snapshot.getFootReadingsID());
 
     // Execute the query and check if it was successful
     if (!query.exec()) {
         qWarning() << "Failed to add new Snapshot: " << query.lastError().text();
         return false;  // Return false if there was an error
     }
+    qInfo() << "Saved new Snapshot to the DB.";
     // Successfully inserted the snapshot
     return true;
 }
