@@ -727,22 +727,6 @@ void MainWindow::setupChartPage()
    // Create a horizontal layout for the bar graph
    barLayout = new QHBoxLayout();
 
-
-   // Example data
-   QVector<int> data = {15, 30, 45, 60, 75};
-
-
-   // Create bars as QLabels with QPixmap
-   for (int value : data) {
-       QLabel *barLabel = new QLabel();
-       QPixmap pixmap(50, value);  // Set width to 50, height based on value
-       pixmap.fill(Qt::blue);  // Fill the pixmap with a color (e.g., blue)
-       barLabel->setPixmap(pixmap);
-       barLabel->setAlignment(Qt::AlignBottom);  // Align to bottom of the bar
-       barLayout->addWidget(barLabel);
-   }
-
-
    chartLayout->addLayout(barLayout);
 
 
@@ -769,12 +753,23 @@ void MainWindow::setupChartPage()
        // Example data
        QVector<int> data = curSnap->getRawReadings();
 
-       while (QLayoutItem *item = barLayout->takeAt(0)) {
-           if (QWidget *widget = item->widget()) {
-               widget->deleteLater(); // Schedule widget for deletion
+       while (barLayout->count()) {
+               QLayoutItem *item = barLayout->takeAt(0);  // Take out each child layout
+
+               if (item->layout()) {  // If it's a QVBoxLayout
+                   QVBoxLayout *subLayout = qobject_cast<QVBoxLayout *>(item->layout());
+
+                   while (subLayout->count()) {
+                       QLayoutItem *childItem = subLayout->takeAt(0);
+
+                       if (childItem->widget()) {
+                           delete childItem->widget();  // Delete the QLabel (barLabel or valueLabel)
+                       }
+                   }
+
+                   delete subLayout;  // Delete the QVBoxLayout itself
+               }
            }
-           delete item; // Delete the layout item
-       }
 
        // Create bars as QLabels with QPixmap
        for (int value : data) {
@@ -795,9 +790,7 @@ void MainWindow::setupChartPage()
 
            barLayout->addLayout(barWithLabelLayout);
 
-       }
-
-
+      }
 
    }
 
@@ -1038,6 +1031,12 @@ void MainWindow::depleteBattery()
    } else {
        batteryDepletionTimer->stop();
        QMessageBox::warning(this, "Battery Low", "Battery is completely drained!");
+       if(scanner){
+           delete scanner;
+       }
+
+       batteryLevel = 100;
+       showMenuPage();
    }
 }
 
@@ -1091,8 +1090,7 @@ void MainWindow::finishMeasurement()
        scanner = nullptr;
 
 
-       QMessageBox::information(this, "Measurement Complete", "The measurement is complete." +
-                                QString::number(curSnap->getBodyTemp()));
+       QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
        setupBodyScreen();
        showBodyScreen();
 
