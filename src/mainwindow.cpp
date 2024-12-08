@@ -757,7 +757,7 @@ void MainWindow::setupChartPage()
    }
 
    else{
-       //POPULAATE BAR CHART HERE
+       //POPULATE BAR CHART HERE
        if(curSnap  == nullptr) return;
 
 
@@ -798,11 +798,19 @@ void MainWindow::setupRecommendationsPage()
     QFont labelFont5("Arial", 16, QFont::Bold);
 
 
+
+
     QLabel *recommendationsLabel = new QLabel("Recommendations Page");
     recommendationsLabel->setFont(labelFont5);
     recommendationsLabel->setAlignment(Qt::AlignCenter);
     recommendationsLayout->addWidget(recommendationsLabel);
 
+
+    recBox = new QTextEdit();
+    recBox->setText("");
+    recBox->setWordWrapMode(QTextOption::WordWrap); // Ensure wrapping
+    recBox->setReadOnly(true);
+    recommendationsLayout->addWidget(recBox);
 
     QPushButton *recBackButton = new QPushButton("Back");
     connect(recBackButton, &QPushButton::clicked, this, [this]() {
@@ -819,7 +827,9 @@ void MainWindow::setupRecommendationsPage()
 
     else{
         //POPULATE  RECOMMENDATIONS HERE
+        if(curSnap == nullptr) return;
 
+        recBox->setText(curSnap->getRecommendations());
 
     }
 
@@ -1190,6 +1200,7 @@ void MainWindow::onHistoryRowClicked(int row, int column) {
     // Example: Navigate to the Body Screen and display detailed info
     setupBodyScreen(); // Ensure this method sets up the Body Screen if not already done
     setupChartPage();
+    setupRecommendationsPage();
     // TBD
     showBodyScreen();
 }

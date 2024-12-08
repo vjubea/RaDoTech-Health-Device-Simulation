@@ -56,6 +56,7 @@ public:
 
     QVector<QString> getOrganValues();
     QVector<int> getRawReadings();
+    QString getRecommendations();
 
 private:
     int profileID;  // Foreign key linking to Profile

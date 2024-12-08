@@ -182,6 +182,7 @@ private:
 
   // GUI elements for Recommendations Page
   QLabel *recommendationsLabel;
+  QTextEdit *recBox;
   QPushButton *recommendationsBackButton;// Back button on Recommendations page
 
 

@@ -99,3 +99,6 @@ QVector<int> Snapshot::getRawReadings(){
     return feet + feet;
 }
 
+QString Snapshot::getRecommendations(){
+    return "This is a placeholder for a professional recommendation. It will tell you do do xyz and buy these supplements";
+}
