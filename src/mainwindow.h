@@ -166,6 +166,7 @@ private:
   QPushButton *indicatorsButton; // Indicators button
   QPushButton *recommendationsButton; // Recommendations button
   QPushButton *chartButton; // Chart button
+  QTableWidget *organTable;
 
 
   // GUI elements for Chart Page

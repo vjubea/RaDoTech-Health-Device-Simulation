@@ -617,7 +617,7 @@ void MainWindow::setupBodyScreen()
 
 
    // Create table for organ readings
-   QTableWidget *organTable = new QTableWidget(this);
+   organTable = new QTableWidget(this);
    organTable->setRowCount(12); // 12 organs to display (6 from H1-H6 and 6 from F1-F6)
    organTable->setColumnCount(2); // Column 1: Organ, Column 2: Status
 
@@ -625,45 +625,22 @@ void MainWindow::setupBodyScreen()
    // Set table headers
    QStringList headers = {"Organ", "Status"};
    organTable->setHorizontalHeaderLabels(headers);
-
+   organTable->setColumnWidth(0, 200);
+   organTable->setColumnWidth(1,200);
 
    // Define font for organ rows
    QFont labelFont5("Arial", 14, QFont::Bold);
 
 
    // Define organ readings and ranges (from defs.h)
-   /*
+
 
    // Loop through the organs and set their color based on the reading
-   for (int i = 0; i < organs.size(); ++i) {
-       QTableWidgetItem *organItem = new QTableWidgetItem(organs[i].name);
+   for (int i = 0; i < 12; ++i) {
+       QTableWidgetItem *organItem = new QTableWidgetItem(organs[i]);
        organItem->setFont(labelFont5);
        organTable->setItem(i, 0, organItem);
-
-
-       // Determine the status color based on the reading
-       QString status;
-       QColor color;
-
-
-       if (organs[i].reading < organs[i].goodStart) {
-           status = "Below Normal";
-           color = Qt::red;
-       } else if (organs[i].reading > organs[i].goodEnd) {
-           status = "Above Normal";
-           color = Qt::purple;
-       } else {
-           status = "Normal";
-           color = Qt::green;
-       }
-
-
-       QTableWidgetItem *statusItem = new QTableWidgetItem(status);
-       statusItem->setBackgroundColor(color);
-       statusItem->setFont(labelFont5);
-       organTable->setItem(i, 1, statusItem);
-   }
-   */
+    }
 
    // Add the table to the layout
    bodyLayout->addWidget(organTable);
@@ -700,9 +677,28 @@ void MainWindow::setupBodyScreen()
    }
 
    else{
-       if(curSnap == nullptr){return;}
+      if(curSnap == nullptr){return;}
 
-       //POPULATE BODY CHART HERE
+      //POPULATE BODY CHART HERE
+      QVector<QString> organVals = curSnap->getOrganValues();
+      QFont labelFont5("Arial", 16, QFont::Bold);
+
+
+      for(int i = 0; i < organVals.length(); i++){
+
+          QColor color;
+          if (organVals[i] == "Below Normal") {color = Qt::red;
+          } else if (organVals[i] == "Above Normal") {color = Qt::blue;
+          } else {color = Qt::green;
+          }
+
+          QTableWidgetItem *statusItem = new QTableWidgetItem(organVals[i]);
+          statusItem->setBackground(color);
+          statusItem->setFont(labelFont5);
+          organTable->setItem(i, 1, statusItem);
+
+      }
+
 
 
 

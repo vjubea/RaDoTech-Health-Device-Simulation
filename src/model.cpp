@@ -50,8 +50,10 @@ Model::Model() {
     qWarning() << "LegReadID and HandReadID: " << snap->getFootReadingID() << snap->getHandReadingID();
 
     QVector<int> readings = dbManager->getFootReadingsById(snap->getFootReadingID());
+    QVector<int> hreadings = dbManager->getHandReadingsById(snap->getHandReadingID());
     for (int i=0; i<6; ++i) {
         qWarning() <<"Foot Reading at ("<<i<<") is: "<<readings.at(i);
+        //qWarning() <<"Hand Reading at ("<<i<<") is: "<<hreadings.at(i);
     }
 
     /*
