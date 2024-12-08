@@ -1,0 +1,79 @@
+title Success Scenario 3: User Logs In and Modifies Profile
+
+participant "User" as usr
+participant "mw: MainWindow" as mw
+participant "model: Model" as model
+participant "profile: Profile" as prof
+participant "dbm: DBManager" as dbm
+
+mw->mw: init()
+activate mw
+mw->model: new model()
+activate model
+model->dbm: getAllProfiles()
+loop from 0 to n (max 5)
+dbm->prof: newProfile([...])
+end
+dbm-->model:Vector:profiles*
+deactivate model
+deactivate mw
+
+usr->mw: selectProfile(i)
+activate mw
+mw->model: setCurProfile(i)
+activate model
+alt index invalid
+model-->mw: false
+deactivate model
+note over mw: mw knows that \nthis is not a valid\nprofile; does \nnothing.
+deactivate mw
+
+else valid index
+activate model
+activate mw
+model->model: curProf = profiles[i]
+model-->mw: true
+deactivate model
+mw->mw: setupMenuPage()
+mw->mw:showMenuPage()
+deactivate mw
+
+end
+
+
+usr->mw: ProfilesClicked()
+activate mw
+mw->mw: SetupProfilesPage()
+activate mw
+loop from 0 to n
+mw->model:getProfile(i)
+model-->mw: profilei*
+end
+deactivate mw
+mw->mw:ShowProfilesPage()
+deactivate mw
+
+usr->mw: modProfAtt(att,val)
+note over mw: user is filling some\ntext boxes to change\nprofile values \n(hasn't yet saved)
+
+usr->mw: SaveProfClicked()
+activate mw
+mw->model: editCurProfile([...])
+activate model
+model->dbm: updateProfile(curProf, [...])
+activate dbm
+loop
+dbm->prof: setParam(val)
+end
+dbm-->model: true
+deactivate dbm
+model-->mw: true
+deactivate model
+mw->mw: SetupProfilesPage()
+mw->mw: ShowProfilesPage()
+note over mw: profiles display refreshes\nto reflect changes.
+deactivate mw
+
+
+
+
