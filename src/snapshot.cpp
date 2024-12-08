@@ -8,7 +8,7 @@ Snapshot::Snapshot()
     profileID(0), bodyTemp(0.0f), 
     leftHandPressReadId(0), rightHandPressReadId(0),
     heartRate(0), sleepHrs(0), sleepMins(0),
-    currWeight(0.0f), handReadingID(0), footReadingID(0)
+    currWeight(0.0f), handReadingsID(0), footReadingsID(0)
     {}
 
 Snapshot::Snapshot(
@@ -16,13 +16,13 @@ Snapshot::Snapshot(
     int leftHandPressReadId, int rightHandPressReadId,
     int heartRate, int sleepHrs, int sleepMins, 
     float currWeight, const QString& notes,
-    int handReadingID, int footReadingID)
+    int handReadingsID, int footReadingsID)
     : 
     profileID(profileID), timestamp(timestamp), bodyTemp(bodyTemp),
     leftHandPressReadId(leftHandPressReadId), rightHandPressReadId(rightHandPressReadId), 
     heartRate(heartRate), sleepHrs(sleepHrs), sleepMins(sleepMins), 
     currWeight(currWeight), notes(notes),
-    handReadingID(handReadingID), footReadingID(footReadingID)
+    handReadingsID(handReadingsID), footReadingsID(footReadingsID)
     {}
 
 
@@ -63,11 +63,11 @@ void Snapshot::setCurrWeight(float currWeight) { this->currWeight = currWeight; 
 QString Snapshot::getNotes() const { return notes; }
 void Snapshot::setNotes(const QString& notes) { this->notes = notes; }
 
-int Snapshot::getHandReadingID() const { return handReadingID; }
-void Snapshot::setHandReadingID(int handReadingID) { this->handReadingID = handReadingID; }
+int Snapshot::getHandReadingsID() const { return handReadingsID; }
+void Snapshot::setHandReadingsID(int handReadingsID) { this->handReadingsID = handReadingsID; }
 
-int Snapshot::getFootReadingID() const { return footReadingID; }
-void Snapshot::setFootReadingID(int footReadingID) { this->footReadingID = footReadingID; }
+int Snapshot::getFootReadingsID() const { return footReadingsID; }
+void Snapshot::setFootReadingsID(int footReadingsID) { this->footReadingsID = footReadingsID; }
 
 void Snapshot::setDBM(DBManager* d){dbm = d;}
 
@@ -92,11 +92,11 @@ QVector<QString> Snapshot::getOrganValues(){
 }
 
 QVector<int> Snapshot::getRawReadings(){
-    QVector<int> hands =  dbm->getHandReadingsById(handReadingID);
-    QVector<int> feet = dbm->getFootReadingsById(footReadingID);
+    QVector<int> hands =  dbm->getHandReadingsById(handReadingsID);
+    QVector<int> feet = dbm->getFootReadingsById(footReadingsID);
 
     //hands.append(feet);
-    return feet + feet;
+    return hands + feet;
 }
 
 QString Snapshot::getRecommendations(){

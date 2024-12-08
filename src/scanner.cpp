@@ -49,13 +49,13 @@ void Scanner::registerReading(char side, char limb, int reading){
         qWarning() << "Scanner l/r Hand/Foot Read array is at max capacity (6).";
 }
 
-void Scanner::registerBlood(char side, int dyst, int syst){
+void Scanner::registerBlood(char side, int dyst, int syst)
+{
     int* arr;
     if(side == 'L'){arr = lHandBlood;}
     else {arr = rHandBlood;}
     arr[0] = dyst;
     arr[1] = syst;
-
 }
 
 void Scanner::registerWeight(float w){
@@ -114,7 +114,7 @@ bool Scanner::finishScan(){
     QVector<int> hands;
     QVector<int> feet;
     // Add hand and feet readings
-    for(int i = 0; i < 6; i++){
+    for(int i = 0; i < 6; i++) {
         hands.append(lHandRead->at(i));
         hands.append(rHandRead->at(i));
         feet.append(lFootRead->at(i));
@@ -126,8 +126,8 @@ bool Scanner::finishScan(){
 
     //create Snapshot object
     newSnap = new Snapshot();
-    newSnap->setHandReadingID(hrID);
-    newSnap->setFootReadingID(lrID);
+    newSnap->setHandReadingsID(hrID);
+    newSnap->setFootReadingsID(lrID);
 
     QString formattedTimeStamp = QString::asprintf("%04d-%02d-%02d %02d:%02d",
                                                   date[2], date[0], date[1],
@@ -145,10 +145,9 @@ bool Scanner::finishScan(){
     newSnap->setCurrWeight(weight);
     newSnap->setNotes(notes);
 
-    // Attempts adding snapshot to DB
+    qInfo() << "Attempting to Save Snapshot to the DB";
     if(dbm->addSnapshotToHistory(*newSnap)) {
-        qInfo() << "Saving Snapshot to the DB";
-        profile->addSnap(newSnap);
+        qInfo() << "ProfileID of new Snapshot:" << newSnap->getProfileID();
         return true;
     }
     else {
@@ -172,18 +171,17 @@ void Scanner::genRandomSnap(){
         registerReading('R','F',genScanVal('F',i));
     }
 
-    registerWeight(0.0f);
+    registerWeight(10.0f);
     registerBlood('L', 0,0);
     registerBlood('R',0,0);
-    registerBodyTemp(0.0);
-    registerHeartRate(0);
-    registerSleepTime(0,0);
+    registerBodyTemp(10.0);
+    registerHeartRate(10);
+    registerSleepTime(10,10);
     registerTime(QRandomGenerator::global()->bounded(1,24),QRandomGenerator::global()->bounded(0,59));
     registerDate(QRandomGenerator::global()->bounded(1,12),QRandomGenerator::global()->bounded(1,30),QRandomGenerator::global()->bounded(2000,2024));
     registerNotes("Normal scan");
 
     finishScan();
-
 }
 
 int Scanner::genScanVal(char limb, int index){

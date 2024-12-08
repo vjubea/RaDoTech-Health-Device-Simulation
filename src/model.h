@@ -21,11 +21,12 @@ class Model
 
         bool selectProfile(int index);
         QVector<Profile*> getAllProfiles();
+        Profile* getProfileByID(int profileID);
         bool createProfile(QString& fname, QString& lname, float weight, float height, QString& bday);
         bool editCurProfile(QString& fname, QString& lname, float weight, float height, QString& bday);
         bool deleteCurrentProfile();
 
-        QVector<Snapshot*> getCurSnapshots();
+        bool getAllSnapshots(QVector<Snapshot*> &snaps);
         Profile* getCurProfile();
         QVector<QString> getProfileNames();
         DBManager* getDBM();

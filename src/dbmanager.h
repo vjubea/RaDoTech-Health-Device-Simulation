@@ -37,7 +37,7 @@
 
 class DBManager {
 public:
-    const QString DATE_FORMAT = "yyyy-MM-dd hh:mm"; // not used yet
+    const QString DATE_FORMAT = "yyyy-MM-dd hh:mm";
     static const QString DATABASE_PATH;
 
     DBManager();
@@ -47,9 +47,10 @@ public:
 
     // Profile-related functions
     Profile* createProfile(const QString& fname, const QString& lname, float weight, float height, const QString& bday);
+    bool updateProfile(Profile* prof, const QString& newFname, const QString& newLname, float newWeight, float newHeight, const QString& newBday);
     bool deleteProfile(int id);
     bool getAllProfiles(QVector<Profile*>& profiles);
-    bool updateProfile(Profile* prof, const QString& newFname, const QString& newLname, float newWeight, float newHeight, const QString& newBday);
+    Profile* getProfileByID(int profileID);
 
     // Snapshot-related functions
     bool addSnapshotToHistory(const Snapshot& snapshot); // Create snapshot object, then pass as parameter
