@@ -866,6 +866,13 @@ void MainWindow::setupIndicatorsPage()
     indicatorsLabel->setAlignment(Qt::AlignCenter);
     indicatorsLayout->addWidget(indicatorsLabel);
 
+    indBox = new QTextEdit();
+    indBox->setText("");
+    indBox->setWordWrapMode(QTextOption::WordWrap); // Ensure wrapping
+    indBox->setReadOnly(true);
+    indBox->setText("This is text which stands as a placeholder for the indicators. Some specific  data aboout energy levels tc. goes here.");
+    indicatorsLayout->addWidget(indBox);
+
 
     QPushButton *indBackButton = new QPushButton("Back");
     connect(indBackButton, &QPushButton::clicked, this, [this]() {
@@ -882,6 +889,44 @@ void MainWindow::setupIndicatorsPage()
 
     else{
         //POPULATE INDICATORS PAGE WITH DATA HERE
+
+        if(curSnap == nullptr) return;
+        QVector<int> raw  = curSnap->getRawReadings();
+
+        float energy =( raw[0] + raw[1] + raw[2] + raw[3]) / 78.0;
+        QString enLevel = (energy < 2.2) ? "Below Normal" : (energy < 3.4) ? "Normal" : "Above Normal";
+        float immune =( raw[5] + raw[6] + raw[7] + raw[9]) / 62.0;
+        QString imnLevel = (immune < 2.5) ? "Below Normal" : (immune < 2.9) ? "Normal" : "Above Normal";
+        float meta =( raw[11] + raw[12] + raw[16]) / 51.0;
+        QString metLevel = (meta < 1.1) ? "Below Normal" : (meta < 3.4) ? "Normal" : "Above Normal";
+        float emo =( raw[9] + raw[14] + raw[13] + raw[21]) / 110.0;
+        QString emLevel = (emo < 0.3) ? "Below Normal" : (emo < 1.2) ? "Normal" : "Above Normal";
+        float mus =( raw[22] + raw[8] + raw[13] + raw[23]) / 41.0;
+        QString musLevel = (mus < 3.5) ? "Below Normal" : (mus < 5.6) ? "Normal" : "Above Normal";
+
+
+
+        QString preppedText = QString(R"(Your scan results show the following to be true:
+                Energy Level: %1  %2
+                Immune System: %3  %4
+                Metabolism:  %5  %6
+                Psycho-emotional State: %7  %8
+                Musculoskeletal System: %9  %10
+
+                This tells us specifically that [...])")
+                .arg(QString::number(energy, 'f', 2))    // Format as 2 decimal places
+                .arg(enLevel)
+                .arg(QString::number(immune, 'f', 2))
+                .arg(imnLevel)
+                .arg(QString::number(meta, 'f', 2))
+                .arg(metLevel)
+                .arg(QString::number(emo, 'f', 2))
+                .arg(emLevel)
+                .arg(QString::number(mus, 'f', 2))
+                .arg(musLevel);
+
+
+        indBox->setText(preppedText);
 
 
 

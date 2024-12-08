@@ -177,6 +177,7 @@ private:
 
   // GUI elements for Indicators Page
   QLabel *indicatorsLabel;
+  QTextEdit *indBox;
   QPushButton *indicatorsBackButton;// Back button on Indicators page
 
 
