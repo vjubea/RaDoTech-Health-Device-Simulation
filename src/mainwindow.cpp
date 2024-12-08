@@ -10,7 +10,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     batteryLevel = 100;
+    menuPage = nullptr;
+    loginPage = nullptr;
     profilesPage = nullptr;
+    createProfPage = nullptr;
+    measurePage = nullptr;
+    scanningPage = nullptr;
+    snapshotDetailsPage = nullptr;
+    historyPage = nullptr;
+    bodyWidget = nullptr;
+    chartWidget = nullptr;
+    recommendationsWidget = nullptr;
+    indicatorsWidget = nullptr;
+
 
     // Set up the stacked widget
     stackedWidget = new QStackedWidget(this);
