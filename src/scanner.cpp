@@ -188,8 +188,8 @@ void Scanner::genRandomSnap(){
 
 int Scanner::genScanVal(char limb, int index){
     int reading;
-    if(limb == 'H') reading = QRandomGenerator::global()->bounded(HandGoodReadStart[index] - 5, HandGoodReadEnd[index] +5); // Generate a random reading in range
-    else reading = reading = QRandomGenerator::global()->bounded(FootGoodReadStart[index] - 5, FootGoodReadEnd[index] +5);
+    if(limb == 'H') reading = QRandomGenerator::global()->bounded(HandGoodReadStart[index] - 3, HandGoodReadEnd[index] +3); // Generate a random reading in range
+    else reading = reading = QRandomGenerator::global()->bounded(FootGoodReadStart[index] - 3, FootGoodReadEnd[index] +3);
     return reading;
 }
 

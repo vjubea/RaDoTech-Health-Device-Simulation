@@ -336,11 +336,6 @@ void MainWindow::setupMeasurePage()
    // Create layout
    QVBoxLayout *measureLayout = new QVBoxLayout;
 
-   // Add the battery label
-   batteryLabel = new QLabel("Battery: 100%", this);
-   batteryLabel->setAlignment(Qt::AlignCenter);
-   measureLayout->addWidget(batteryLabel);
-
 
    // Instruction Label
    QLabel *instructionLabel = new QLabel("Follow the instructions to measure your body parts:", this);
@@ -412,6 +407,12 @@ void MainWindow::setupScanningPage() {
     QFont labelFont8("Arial", 16, QFont::Bold);
     scanHeaderLabel->setFont(labelFont8);
     scanningLayout->addWidget(scanHeaderLabel);
+
+    // Add the battery label
+    batteryLabel = new QLabel("Battery: 100%", this);
+    batteryLabel->setAlignment(Qt::AlignCenter);
+    scanningLayout->addWidget(batteryLabel);
+
 
     scanningInstructionLabel = new QLabel("Place the device on your skin and press the button below:", this);
     QFont labelFont7("Arial", 14, QFont::Bold);
@@ -546,6 +547,11 @@ void MainWindow::setupHistoryPage(){
     historyTable = new QTableWidget(this);
     historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
     historyTable->setColumnCount(3); // Date & Time, Profile, Notes
+    for(int i = 0; i<3; i++){
+        historyTable->setColumnWidth(i,200);
+    }
+    historyTable->setColumnWidth(2,400);
+
 
     if(snaps.length() == 0) {dbm->getAllSnapshots(snaps);}
     historyTable->setRowCount(snaps.length());
@@ -600,7 +606,7 @@ void MainWindow::setupHistoryPage(){
 
         for(int i = 0; i< snaps.length(); i++){
             historyTable->setItem(i, 0, new QTableWidgetItem(snaps[i]->getTimestamp()));
-            historyTable->setItem(i, 1, new QTableWidgetItem(snaps[i]->getProfileID()));
+            historyTable->setItem(i, 1, new QTableWidgetItem(model.getAllProfiles()[snaps[i]->getProfileID()-1]->getFullName()));
             historyTable->setItem(i, 2, new QTableWidgetItem(snaps[i]->getNotes()));
         }
     }
