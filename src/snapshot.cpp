@@ -1,4 +1,7 @@
 #include "snapshot.h"
+#include "defs.h"
+
+#include"dbmanager.h"
 
 Snapshot::Snapshot() 
     : 
@@ -65,3 +68,37 @@ void Snapshot::setHandReadingID(int handReadingID) { this->handReadingID = handR
 
 int Snapshot::getFootReadingID() const { return footReadingID; }
 void Snapshot::setFootReadingID(int footReadingID) { this->footReadingID = footReadingID; }
+
+void Snapshot::setDBM(DBManager* d){dbm = d;}
+
+QVector<QString> Snapshot::getOrganValues(){
+    QVector<QString> organVals;
+    QVector<int> readings = getRawReadings();
+    for(int i=0; i<12; i+=2){
+        float avg = (readings[i] + readings[i+1])/2;
+        if(avg > HandGoodReadEnd[i]) organVals.append("Above Normal");
+        else if(avg < HandGoodReadStart[i]) organVals.append("Below Normal");
+        else organVals.append("Normal");
+    }
+
+    for(int i=12; i<24; i+=2){
+        float avg = (readings[i] + readings[i+1])/2;
+        if(avg > FootGoodReadEnd[i]) organVals.append("Above Normal");
+        else if(avg < FootGoodReadStart[i]) organVals.append("Below Normal");
+        else organVals.append("Normal");
+    }
+
+    return organVals;
+}
+
+QVector<int> Snapshot::getRawReadings(){
+    QVector<int> hands =  dbm->getHandReadingsById(handReadingID);
+    QVector<int> feet = dbm->getFootReadingsById(footReadingID);
+
+    //hands.append(feet);
+    return feet + feet;
+}
+
+QString Snapshot::getRecommendations(){
+    return "This is a placeholder for a professional recommendation. It will tell you do do xyz and buy these supplements";
+}

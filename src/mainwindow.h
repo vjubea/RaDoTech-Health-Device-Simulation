@@ -17,7 +17,9 @@
 #include <QComboBox>
 #include <QInputDialog>
 #include <QTimer>
+#include <QTextEdit>
 #include <QRandomGenerator>
+#include <QThread>
 // #include <QSqlQuery>
 // #include <QSqlDatabase>
 // #include <QSqlError>
@@ -49,14 +51,13 @@ public:
 
 private slots:
   void onLoginButtonClicked(); // Slot for login button
-  void onLogoutButtonClicked(); // Slot for logout button
   void onCreateProfButtonClicked(); // Slot for create profile button
   void onProfileRowClicked(int row, int col); // Slot for selecting profile
   void onSaveProfButtonClicked(); // Slot for save profile button
   void onDeleteProfileClicked(); // Slot for delete profile button
   void onEditProfileClicked(); // Slot for edit profile button
+  void onSaveSnapshotClicked();
   void onHistoryRowClicked(int row, int col); // Slot for history row click
-  void addMeasurementToHistory(const QString& result);
   void startMeasurement(); // Start the measurement
   void finishMeasurement(); // Slot for finishing measurement
 
@@ -68,14 +69,13 @@ private:
   Model model;
   Scanner* scanner;
   Snapshot* curSnap;
-  DBManager dbm;
+  QVector<Snapshot*>snaps;
+  DBManager *dbm;
 
 
   // GUI elements for Login Page
   QLabel *welcomeLabel;
   QLabel *pleaseLogInStatement;
-  QLabel *noAccLabel;
-  QPushButton *createProfButton;
   QComboBox *userDropdown;
 
 
@@ -97,6 +97,7 @@ private:
 
 
   // GUI elements for Menu Page
+  QWidget *menuPage;
   QLabel *userGreetingLabel;
   QLabel *userNameLabel;
   QString currentFirstName;
@@ -106,7 +107,20 @@ private:
   QPushButton *measureNowButton;
   QPushButton *profilesButton;
   QPushButton *historyButton;
-  QPushButton *logoutButton;
+
+
+  //Page Widgets
+  QWidget *loginPage;
+  QWidget *profilesPage;
+  QWidget *createProfPage;
+  QWidget *measurePage;
+  QWidget *scanningPage;
+  QWidget *snapshotDetailsPage;
+  QWidget *historyPage;
+  QWidget *bodyWidget;
+  QWidget *chartWidget;
+  QWidget *recommendationsWidget;
+  QWidget *indicatorsWidget;
 
 
   // GUI elements for History Page
@@ -117,7 +131,6 @@ private:
 
   //GUI elements for Profiles Page
   QLabel *profilesLabel;
-  QWidget *profilesPage;
   QTableWidget *profilesTable;    // Table for displaying profiles
   QPushButton *profilesBackButton;       // Back button on Profiles page
   QPushButton *editProfileButton; // Edit profile button
@@ -130,6 +143,22 @@ private:
   QTimer *batteryDepletionTimer; // Timer to simulate battery depletion
   QVBoxLayout *measureLayout;
 
+  // GUI elements for Scanning Page
+  QLabel scanHeaderLabel;
+  QLabel *scanningInstructionLabel;
+  QPushButton *contactWithSkinButton; // Contact with skin button
+
+  // GUI elements for Snapshots Page
+  QLineEdit *weightInputSnap;
+  QLineEdit *heartRateInput;
+  QLineEdit *bodyTempInput;
+  QLineEdit *sleepHoursInput;
+  QLineEdit *sleepMinutesInput;
+  QTextEdit *notesInput;
+  QPushButton *saveSnapshotButton;
+  QPushButton *backToMeasureButton;
+
+
 
   // GUI elements for Body Screen
   QLabel *bodyScreenLabel;
@@ -137,20 +166,24 @@ private:
   QPushButton *indicatorsButton; // Indicators button
   QPushButton *recommendationsButton; // Recommendations button
   QPushButton *chartButton; // Chart button
+  QTableWidget *organTable;
 
 
   // GUI elements for Chart Page
   QLabel *chartLabel;
   QPushButton *chartBackButton;// Back button on Chart page
+  QHBoxLayout *barLayout;
 
 
   // GUI elements for Indicators Page
   QLabel *indicatorsLabel;
+  QTextEdit *indBox;
   QPushButton *indicatorsBackButton;// Back button on Indicators page
 
 
   // GUI elements for Recommendations Page
   QLabel *recommendationsLabel;
+  QTextEdit *recBox;
   QPushButton *recommendationsBackButton;// Back button on Recommendations page
 
 
@@ -160,26 +193,54 @@ private:
 
 
   // Functions
-  void setupLoginPage(); // Function to initialize Login Page
-  void setupCreateProfilePage(); // Function to initialize Create Profile Page
+  //Page Setups
+  void setupLoginPage();
+  void setupCreateProfilePage();
+  void setupMenuPage();
+  void setupMeasurePage();
+  void setupBattery();
+  void setupProfilesPage();
+  void setupChartPage();
+  void setupIndicatorsPage();
+  void setupRecommendationsPage();
+  void setupSnapshotDetailsPage();
+  void setupHistoryPage();
+  void setupBodyScreen();
+
+
+  // Page Switches
+  void showLoginPage();
+  void showCreateProfilePage();
+  void showMenuPage();
+  void showMeasurePage();
+  void showProfilesPage();
+  void showChartPage();
+  void showIndicatorsPage();
+  void showRecommendationsPage();
+  void showSnapshotDetailsPage();
+  void showHistoryPage();
+  void showBodyScreen();
+  void showScanningPage();
+
+
+  //Misc
   void populateUserDropdown(); // Populate the user dropdown
-  void setupMenuPage();  // Function to initialize Menu Page
+
   void updateGreeting(const QString &firstName, const QString &lastName);  // Update greeting labels
-  void setupMeasurePage(); // Set up the Measure page
+
   void measureHands(const QString &side);
   void measureFeet(const QString &side);
-  void setupBattery();
+
   void depleteBattery(); // Deplete the battery
-  void setupHistoryPage();// Set up the History page
-  void setupBodyScreen(); // Show the body screen
-  void showChartPage(); // Show the chart page
-  void showIndicatorsPage(); // Show the indicators page
-  void showRecommendationsPage(); // Show the recommendations page
-  void showHistoryPage(); // Show the history page
-  void setupProfilesPage(); // Set up the Profiles page
-  void setupChartPage(); // Set up the Chart page
-  void setupIndicatorsPage(); // Set up the Indicators page
-  void setupRecommendationsPage(); // Set up the Recommendations page
+  void setupScanningPage(); // Set up the Scanning page
+  void startScanningProcess();
+
+
+
+
+
+
+
 
 
 };

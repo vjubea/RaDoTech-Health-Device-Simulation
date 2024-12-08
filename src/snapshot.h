@@ -3,6 +3,8 @@
 
 #include <QString>
 
+class DBManager;
+
 class Snapshot {
 public:
     // Constructors
@@ -50,6 +52,12 @@ public:
     int getFootReadingID() const;
     void setFootReadingID(int footReadingID);
 
+    void setDBM(DBManager*);
+
+    QVector<QString> getOrganValues();
+    QVector<int> getRawReadings();
+    QString getRecommendations();
+
 private:
     int profileID;  // Foreign key linking to Profile
     QString timestamp;  // Date and time of the snapshot
@@ -63,6 +71,8 @@ private:
     QString notes;  // Optional notes
     int handReadingID;  // Foreign key for hand readings
     int footReadingID;  // Foreign key for leg readings
+
+    DBManager* dbm;
 };
 
 #endif // SNAPSHOT_H
