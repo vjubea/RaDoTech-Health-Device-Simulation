@@ -1,4 +1,4 @@
-title Success Scenario 3: User Logs In and Modifies Profile
+title Success Scenario 3: User Creates, Modifies, and Deletes Profile
 
 participant "User" as usr
 participant "mw: MainWindow" as mw
@@ -18,27 +18,7 @@ dbm-->model:Vector:profiles*
 deactivate model
 deactivate mw
 
-usr->mw: selectProfile(i)
-activate mw
-mw->model: setCurProfile(i)
-activate model
-alt index invalid
-model-->mw: false
-deactivate model
-note over mw: mw knows that \nthis is not a valid\nprofile; does \nnothing.
-deactivate mw
 
-else valid index
-activate model
-activate mw
-model->model: curProf = profiles[i]
-model-->mw: true
-deactivate model
-mw->mw: setupMenuPage()
-mw->mw:showMenuPage()
-deactivate mw
-
-end
 
 
 usr->mw: ProfilesClicked()
@@ -53,11 +33,49 @@ deactivate mw
 mw->mw:ShowProfilesPage()
 deactivate mw
 
+
+usr->mw: createProfileClicked()
+activate mw
+mw->mw: SetupCreateProfilePage()
+mw->mw: ShowCreateProfilePage()
+deactivate mw
+
+usr->mw: enterProfAtt(att,val)
+note over mw: user is filling out\ntext boxes with \nattribute values
+
+usr->mw: SaveProfileClicked()
+activate mw
+alt not all fields filled out
+mw->mw: ShowWarning("Fill All Fields")
+else all fields filled out
+mw->model: createProfile([...])
+activate model
+model->dbm: createProfile([...])
+activate dbm
+dbm->prof: new Profile()
+loop 
+dbm->prof:setVal(val)
+end
+dbm-->model: ProfileA*
+deactivate dbm
+model-->mw: true
+deactivate model
+mw->mw:SetupProfilesPage()
+mw->mw: ShowProfilesPage()
+note over mw: Return to newly updated\nprofiles page
+deactivate mw
+end
+
+
+usr->mw:ClickProfileRow()
+usr->mw: EditProfileClicked()
+activate mw
+
+loop until all attributes entered
 usr->mw: modProfAtt(att,val)
 note over mw: user is filling some\ntext boxes to change\nprofile values \n(hasn't yet saved)
+end
 
-usr->mw: SaveProfClicked()
-activate mw
 mw->model: editCurProfile([...])
 activate model
 model->dbm: updateProfile(curProf, [...])
@@ -74,6 +92,24 @@ mw->mw: ShowProfilesPage()
 note over mw: profiles display refreshes\nto reflect changes.
 deactivate mw
 
+
+usr->mw: ClickProfileRow()
+usr->mw: DeleteProfileClicked()
+activate mw
+mw->mw:ShowWarning("Are you sure?")
+alt User clicks "yes"
+mw->model: setCurProfile(selectedRow)
+mw->model: deleteCurProfile()
+activate model
+model->dbm: deleteProfile(profilei)
+dbm-->model: true
+model-->mw: true
+mw->mw: SetupProfilesPage()
+mw->mw:ShowProfilesPage()
+deactivate model
+else User clicks "no"
+deactivate mw
+end
 
 
 
