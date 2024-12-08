@@ -172,6 +172,7 @@ private:
   // GUI elements for Chart Page
   QLabel *chartLabel;
   QPushButton *chartBackButton;// Back button on Chart page
+  QHBoxLayout *barLayout;
 
 
   // GUI elements for Indicators Page

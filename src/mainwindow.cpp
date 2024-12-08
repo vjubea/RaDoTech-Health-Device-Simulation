@@ -720,7 +720,7 @@ void MainWindow::setupChartPage()
 
 
    // Create a horizontal layout for the bar graph
-   QHBoxLayout *barLayout = new QHBoxLayout();
+   barLayout = new QHBoxLayout();
 
 
    // Example data
@@ -758,6 +758,29 @@ void MainWindow::setupChartPage()
 
    else{
        //POPULAATE BAR CHART HERE
+       if(curSnap  == nullptr) return;
+
+
+       // Example data
+       QVector<int> data = curSnap->getRawReadings();
+
+       while (QLayoutItem *item = barLayout->takeAt(0)) {
+           if (QWidget *widget = item->widget()) {
+               widget->deleteLater(); // Schedule widget for deletion
+           }
+           delete item; // Delete the layout item
+       }
+
+       // Create bars as QLabels with QPixmap
+       for (int value : data) {
+           QLabel *barLabel = new QLabel();
+           QPixmap pixmap(20, value*2);  // Set width to 50, height based on value
+           pixmap.fill(Qt::blue);  // Fill the pixmap with a color (e.g., blue)
+           barLabel->setPixmap(pixmap);
+           barLabel->setAlignment(Qt::AlignBottom);  // Align to bottom of the bar
+           barLayout->addWidget(barLabel);
+       }
+
 
 
    }
@@ -1166,6 +1189,7 @@ void MainWindow::onHistoryRowClicked(int row, int column) {
 
     // Example: Navigate to the Body Screen and display detailed info
     setupBodyScreen(); // Ensure this method sets up the Body Screen if not already done
+    setupChartPage();
     // TBD
     showBodyScreen();
 }
