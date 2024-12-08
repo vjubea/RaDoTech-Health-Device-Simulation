@@ -146,3 +146,6 @@ QVector<QString> Model::getProfileNames(){
     return names;
 
 }
+
+
+DBManager* Model::getDBM() {return dbManager;}

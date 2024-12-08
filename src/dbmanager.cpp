@@ -302,6 +302,7 @@ bool DBManager::getAllSnapshots(QVector<Snapshot*>& snaps)
         snap->setNotes(query.value("notes").toString());
         snap->setHandReadingID(query.value("handReadingsID").toInt());
         snap->setFootReadingID(query.value("footReadingsID").toInt());
+        snap->setDBM(this);
 
         // Add the Snapshot object to the vector
         snaps.append(snap);

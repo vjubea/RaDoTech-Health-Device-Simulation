@@ -1,6 +1,8 @@
 #ifndef DEFS_H
 #define DEFS_H
 
+#include<QString>
+
 // Hand (R/L) Reading Good Ranges
 #define H1_GoodReadSTART 58
 #define H1_GoodReadEND 83
@@ -56,6 +58,12 @@ const int FootGoodReadStart[] = {
 const int FootGoodReadEnd[] = {
     F1_GoodReadEND, F2_GoodReadEND, F3_GoodReadEND,
     F4_GoodReadEND, F5_GoodReadEND, F6_GoodReadEND
+};
+
+
+const QString organs[] = {
+    "Lungs", "Pericardium", "Heart", "Small Intestine", "Lymph", "Large Intestine",
+    "Spleen & Pancreas", "Liver", "Kidney", "Bladder", "Gall Bladder", "Stomach"
 };
 
 #endif // DEFS_H

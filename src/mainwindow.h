@@ -69,7 +69,8 @@ private:
   Model model;
   Scanner* scanner;
   Snapshot* curSnap;
-  DBManager dbm;
+  QVector<Snapshot*>snaps;
+  DBManager *dbm;
 
 
   // GUI elements for Login Page
@@ -215,6 +216,7 @@ private:
   void showSnapshotDetailsPage();
   void showHistoryPage();
   void showBodyScreen();
+  void showScanningPage();
 
 
   //Misc

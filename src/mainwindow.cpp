@@ -23,6 +23,11 @@ MainWindow::MainWindow(QWidget *parent)
     recommendationsWidget = nullptr;
     indicatorsWidget = nullptr;
 
+    curSnap  = nullptr;
+    scanner=nullptr;
+
+    dbm = model.getDBM();
+
 
     // Set up the stacked widget
     stackedWidget = new QStackedWidget(this);
@@ -535,16 +540,17 @@ void MainWindow::setupHistoryPage(){
 
 
     // Create a table widget for displaying history data
-    QTableWidget *historyTable = new QTableWidget(this);
+    historyTable = new QTableWidget(this);
     historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
     historyTable->setColumnCount(3); // Date & Time, Profile, Notes
 
-    QVector<Snapshot*> snaps = model.getCurSnapshots();
+    if(snaps.length() == 0) {dbm->getAllSnapshots(snaps);}
     historyTable->setRowCount(snaps.length());
+
 
     for(int i = 0; i< snaps.length(); i++){
         historyTable->setItem(i, 0, new QTableWidgetItem(snaps[i]->getTimestamp()));
-        historyTable->setItem(i, 1, new QTableWidgetItem(model.getCurProfile()->getFullName()));
+        historyTable->setItem(i, 1, new QTableWidgetItem(snaps[i]->getProfileID()));
         historyTable->setItem(i, 2, new QTableWidgetItem(snaps[i]->getNotes()));
     }
 
@@ -585,7 +591,15 @@ void MainWindow::setupHistoryPage(){
     }
 
     else{
-    //POPULATE HISTORY PAGE HERE
+    //refresh case
+        if(snaps.length() == 0) {dbm->getAllSnapshots(snaps);}
+        historyTable->setRowCount(snaps.length());
+
+        for(int i = 0; i< snaps.length(); i++){
+            historyTable->setItem(i, 0, new QTableWidgetItem(snaps[i]->getTimestamp()));
+            historyTable->setItem(i, 1, new QTableWidgetItem(snaps[i]->getProfileID()));
+            historyTable->setItem(i, 2, new QTableWidgetItem(snaps[i]->getNotes()));
+        }
     }
 }
 
@@ -617,36 +631,8 @@ void MainWindow::setupBodyScreen()
    QFont labelFont5("Arial", 14, QFont::Bold);
 
 
-   // Sample snapshot data - assuming snapshot data is available from a previous scan
-   //Snapshot currentSnapshot = getCurrentSnapshot(); // This should be obtained dynamically from the current snapshot
-
-
-   // Populate the table with organ data and color
-   struct Organ {
-       QString name;
-       int reading;
-       int goodStart;
-       int goodEnd;
-   };
-
-
    // Define organ readings and ranges (from defs.h)
    /*
-   QList<Organ> organs = {
-       {"Lung (H1)", currentSnapshot.getLeftHandPressReadId(), H1_GoodReadSTART, H1_GoodReadEND},
-       {"Pericardium (H2)", currentSnapshot.getRightHandPressReadId(), H2_GoodReadSTART, H2_GoodReadEND},
-       {"Heart (H3)", currentSnapshot.getHeartRate(), H3_GoodReadSTART, H3_GoodReadEND},
-       {"Small Intestine (H4)", currentSnapshot.getLeftHandPressReadId(), H4_GoodReadSTART, H4_GoodReadEND},
-       {"Lymph Vessels (H5)", currentSnapshot.getRightHandPressReadId(), H5_GoodReadSTART, H5_GoodReadEND},
-       {"Large Intestine (H6)", currentSnapshot.getHeartRate(), H6_GoodReadSTART, H6_GoodReadEND},
-       {"Lung (F1)", currentSnapshot.getLeftHandPressReadId(), F1_GoodReadSTART, F1_GoodReadEND},
-       {"Pericardium (F2)", currentSnapshot.getRightHandPressReadId(), F2_GoodReadSTART, F2_GoodReadEND},
-       {"Heart (F3)", currentSnapshot.getHeartRate(), F3_GoodReadSTART, F3_GoodReadEND},
-       {"Small Intestine (F4)", currentSnapshot.getLeftHandPressReadId(), F4_GoodReadSTART, F4_GoodReadEND},
-       {"Lymph Vessels (F5)", currentSnapshot.getRightHandPressReadId(), F5_GoodReadSTART, F5_GoodReadEND},
-       {"Large Intestine (F6)", currentSnapshot.getHeartRate(), F6_GoodReadSTART, F6_GoodReadEND}
-   };
-  `
 
    // Loop through the organs and set their color based on the reading
    for (int i = 0; i < organs.size(); ++i) {
@@ -714,7 +700,11 @@ void MainWindow::setupBodyScreen()
    }
 
    else{
+       if(curSnap == nullptr){return;}
+
        //POPULATE BODY CHART HERE
+
+
 
    }
 
@@ -834,7 +824,7 @@ void MainWindow::setupIndicatorsPage()
 
     QPushButton *indBackButton = new QPushButton("Back");
     connect(indBackButton, &QPushButton::clicked, this, [this]() {
-        stackedWidget->setCurrentIndex(6);
+        showBodyScreen();
     });
     indicatorsLayout->addWidget(indBackButton);
 
@@ -897,6 +887,10 @@ void MainWindow::showRecommendationsPage()
     stackedWidget->setCurrentIndex(11);
 }
 
+void MainWindow::showScanningPage() {
+    stackedWidget->setCurrentIndex(4);
+}
+
 void MainWindow::showSnapshotDetailsPage()
 {
     stackedWidget->setCurrentIndex(6);
@@ -904,6 +898,7 @@ void MainWindow::showSnapshotDetailsPage()
 
 void MainWindow::showHistoryPage()
 {
+    setupHistoryPage();
     stackedWidget->setCurrentIndex(7);
 }
 
@@ -1032,6 +1027,7 @@ void MainWindow::finishMeasurement()
         }
 
        curSnap = scanner->getFinishedSnap();
+       snaps.append(curSnap);
        delete scanner;
        scanner = nullptr;
     } else {
@@ -1043,7 +1039,6 @@ void MainWindow::finishMeasurement()
 void MainWindow::startScanningProcess() {
     const int totalPoints = 24;
     for (int i = 0; i < totalPoints; i++) {
-        qDebug() <<"scan step " << i;
 
         QString pointType = (i < 12) ? "Hand" : "Foot";
         QString side = (i%12 < 6) ? "Right" : "Left";
@@ -1073,9 +1068,9 @@ void MainWindow::startScanningProcess() {
         }
     }
 
-    // After 24 points, go to snapshot page
-    setupBodyScreen();
-    showBodyScreen();
+    setupSnapshotDetailsPage();
+    showSnapshotDetailsPage();
+
 }
 
 void MainWindow::onSaveSnapshotClicked() {
@@ -1093,8 +1088,8 @@ void MainWindow::onSaveSnapshotClicked() {
 void MainWindow::onLoginButtonClicked() {
     int selectedIndex = userDropdown->currentIndex() - 1;
     if (selectedIndex >= 0 && model.selectProfile(selectedIndex)) {
-        showMeasurePage();
-        startMeasurement();
+
+        showScanningPage();
     } else {
         QMessageBox::warning(this, "Login Error", "Please select a valid user");
     }
@@ -1164,12 +1159,14 @@ void MainWindow::updateGreeting(const QString &firstName, const QString &lastNam
 
 void MainWindow::onHistoryRowClicked(int row, int column) {
 
+
+
     // Access the QTableWidget (history table)
     QTableWidget *historyTable = qobject_cast<QTableWidget *>(sender());
     if (!historyTable) return; // Safety check
 
     //This sets current snapshot to be displayed as the profile's snap at associated index
-    curSnap = nullptr;
+    curSnap = snaps[row];
 
     // Example: Navigate to the Body Screen and display detailed info
     setupBodyScreen(); // Ensure this method sets up the Body Screen if not already done
