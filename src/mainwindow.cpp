@@ -466,9 +466,9 @@ void MainWindow::setupSnapshotDetailsPage() {
     // Other measurements
     QLabel *weightLabel = new QLabel("Weight (kg):", this);
     weightLabel->setFont(labelFont);
-    weightInput = new QLineEdit(this);
+    weightInputSnap = new QLineEdit(this);
     snapshotLayout->addWidget(weightLabel);
-    snapshotLayout->addWidget(weightInput);
+    snapshotLayout->addWidget(weightInputSnap);
 
     QLabel *heartRateLabel = new QLabel("Heart Rate:", this);
     heartRateLabel->setFont(labelFont);
@@ -519,7 +519,7 @@ void MainWindow::setupSnapshotDetailsPage() {
     }
 
     else {
-        weightInput->clear();
+        weightInputSnap->clear();
         bodyTempInput->clear();
         heartRateInput->clear();
         notesInput->clear();
@@ -1107,7 +1107,7 @@ void MainWindow::finishMeasurement()
 
     if (scanner) {
 
-        float weight = weightInput->text().toFloat();
+        float weight = weightInputSnap->text().toFloat();
         float bodyTemp = bodyTempInput->text().toFloat();
         int heartRate = heartRateInput->text().toInt();
         QString notes = notesInput->toPlainText()   ;
@@ -1198,7 +1198,7 @@ void MainWindow::startScanningProcess() {
 
 void MainWindow::onSaveSnapshotClicked() {
     // Check if all fields are filled
-    if (weightInput->text().isEmpty() || heartRateInput->text().isEmpty() ||
+    if (weightInputSnap->text().isEmpty() || heartRateInput->text().isEmpty() ||
         bodyTempInput->text().isEmpty() || sleepHoursInput->text().isEmpty() ||
         sleepMinutesInput->text().isEmpty() || notesInput->toPlainText().isEmpty()) {
         QMessageBox::warning(this, "Incomplete Data", "Please fill all the input fields.");
