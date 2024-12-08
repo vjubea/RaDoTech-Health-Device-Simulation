@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QDateTime>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -1062,6 +1063,13 @@ void MainWindow::finishMeasurement()
         int sleepHours = sleepHoursInput->text().toInt();
         int sleepMinutes = sleepMinutesInput->text().toInt();
 
+
+        int currentYear = QDateTime::currentDateTime().date().year();
+        int currentMonth = QDateTime::currentDateTime().date().month();
+        int currentDay = QDateTime::currentDateTime().date().day();
+        int currentHour = QDateTime::currentDateTime().time().hour();
+        int currentMinute = QDateTime::currentDateTime().time().minute();
+
         if (weight <= 0 || bodyTemp <= 0 || heartRate <= 0 || sleepHours < 0 || sleepMinutes < 0) {
             QMessageBox::warning(this, "Input Error", "Please enter positive numbers in numerical  fields.");
             return;
@@ -1074,9 +1082,9 @@ void MainWindow::finishMeasurement()
         scanner->registerBodyTemp(bodyTemp);
         scanner->registerHeartRate(heartRate);
         scanner->registerSleepTime(sleepHours,sleepMinutes);
-        scanner->registerTime(0,0); //might want to get current from system
-        scanner->registerDate(0,0,0); //might want to geet current from system
-        scanner->registerNotes(notes); // let user write these
+        scanner->registerTime(currentHour,currentMinute);
+        scanner->registerDate(currentMonth, currentDay,currentYear);
+        scanner->registerNotes(notes);
         // -----
 
         if(!scanner->finishScan()) {

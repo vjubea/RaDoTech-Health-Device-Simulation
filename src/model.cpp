@@ -88,6 +88,10 @@ bool Model::selectProfile(int index) {
 }
 
 QVector<Profile*> Model::getAllProfiles() {
+    for(int i = 0; i< profiles.length(); i++){
+        delete profiles[i];
+    }
+    profiles.clear();
     dbManager->getAllProfiles(profiles);
     return profiles;
 }
