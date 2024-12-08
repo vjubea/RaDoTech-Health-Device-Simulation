@@ -505,7 +505,9 @@ void MainWindow::setupSnapshotDetailsPage() {
 
     connect(saveSnapshotButton, &QPushButton::clicked, this, &MainWindow::onSaveSnapshotClicked);
     connect(backToMeasureButton, &QPushButton::clicked, [this]() {
-        showMeasurePage();
+
+        delete scanner;
+        showMenuPage();
     });
 
     snapshotDetailsPage->setLayout(snapshotLayout);
@@ -678,6 +680,9 @@ void MainWindow::setupBodyScreen()
 
    else{
       if(curSnap == nullptr){return;}
+      setupChartPage();
+      setupRecommendationsPage();
+      setupIndicatorsPage();
 
       //POPULATE BODY CHART HERE
       QVector<QString> organVals = curSnap->getOrganValues();
@@ -774,11 +779,22 @@ void MainWindow::setupChartPage()
        // Create bars as QLabels with QPixmap
        for (int value : data) {
            QLabel *barLabel = new QLabel();
-           QPixmap pixmap(20, value*2);  // Set width to 50, height based on value
+           QPixmap pixmap(20, value*3);  // Set width to 20, height based on value
            pixmap.fill(Qt::blue);  // Fill the pixmap with a color (e.g., blue)
            barLabel->setPixmap(pixmap);
            barLabel->setAlignment(Qt::AlignBottom);  // Align to bottom of the bar
-           barLayout->addWidget(barLabel);
+
+           QLabel *valueLabel = new QLabel(QString::number(value));
+           valueLabel->setAlignment(Qt::AlignBottom);
+
+           QVBoxLayout *barWithLabelLayout = new QVBoxLayout();
+           barWithLabelLayout->addWidget(barLabel);
+           barWithLabelLayout->addWidget(valueLabel);
+
+           barWithLabelLayout->setAlignment(Qt::AlignBottom);
+
+           barLayout->addLayout(barWithLabelLayout);
+
        }
 
 
@@ -1037,17 +1053,31 @@ void MainWindow::finishMeasurement()
         batteryDepletionTimer->stop();
     }
 
-    //!!USER INPUTS POST MEASUREMENT GO HERE -- To remove after
+
     if (scanner) {
-        scanner->registerWeight(0.0f);
+
+        float weight = weightInput->text().toFloat();
+        float bodyTemp = bodyTempInput->text().toFloat();
+        int heartRate = heartRateInput->text().toInt();
+        QString notes = notesInput->toPlainText()   ;
+        int sleepHours = sleepHoursInput->text().toInt();
+        int sleepMinutes = sleepMinutesInput->text().toInt();
+
+        if (weight <= 0 || bodyTemp <= 0 || heartRate <= 0 || sleepHours < 0 || sleepMinutes < 0) {
+            QMessageBox::warning(this, "Input Error", "Please enter positive numbers in numerical  fields.");
+            return;
+        }
+
+
+        scanner->registerWeight(weight);
         scanner->registerBlood('L', 0,0);
         scanner->registerBlood('R',0,0);
-        scanner->registerBodyTemp(0.0);
-        scanner->registerHeartRate(0);
-        scanner->registerSleepTime(0,0);
+        scanner->registerBodyTemp(bodyTemp);
+        scanner->registerHeartRate(heartRate);
+        scanner->registerSleepTime(sleepHours,sleepMinutes);
         scanner->registerTime(0,0); //might want to get current from system
         scanner->registerDate(0,0,0); //might want to geet current from system
-        scanner->registerNotes("Normal scan"); // let user write these
+        scanner->registerNotes(notes); // let user write these
         // -----
 
         if(!scanner->finishScan()) {
@@ -1059,6 +1089,13 @@ void MainWindow::finishMeasurement()
        snaps.append(curSnap);
        delete scanner;
        scanner = nullptr;
+
+
+       QMessageBox::information(this, "Measurement Complete", "The measurement is complete." +
+                                QString::number(curSnap->getBodyTemp()));
+       setupBodyScreen();
+       showBodyScreen();
+
     } else {
         QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
     }
@@ -1092,7 +1129,7 @@ void MainWindow::startScanningProcess() {
         if (scanner) {
             char sideChar = (side == "Left") ? 'L' : 'R';
             char limbChar = (pointType == "Hand") ? 'H' : 'F';
-            int reading = QRandomGenerator::global()->bounded(0, 100); // Replace with actual reading
+            int reading = scanner->genScanVal(limbChar, i%6);
             scanner->registerReading(sideChar, limbChar, reading);
         }
     }
@@ -1109,8 +1146,7 @@ void MainWindow::onSaveSnapshotClicked() {
         sleepMinutesInput->text().isEmpty() || notesInput->toPlainText().isEmpty()) {
         QMessageBox::warning(this, "Incomplete Data", "Please fill all the input fields.");
     } else {
-        QMessageBox::information(this, "Snapshot Saved", "Snapshot details have been successfully saved.");
-        showBodyScreen();
+        finishMeasurement();
     }
 }
 
@@ -1198,9 +1234,7 @@ void MainWindow::onHistoryRowClicked(int row, int column) {
     curSnap = snaps[row];
 
     // Example: Navigate to the Body Screen and display detailed info
-    setupBodyScreen(); // Ensure this method sets up the Body Screen if not already done
-    setupChartPage();
-    setupRecommendationsPage();
+    setupBodyScreen(); // Ensure this method sets up the Body Screen if not already do
     // TBD
     showBodyScreen();
 }

@@ -42,6 +42,18 @@ Model::Model() {
     scanner->registerDate(10, 4, 2024);
     scanner->registerTime(23, 59);
     scanner->finishScan(); // Saves snapshot to DB with all its required fields
+    //gen three more scans
+    delete scanner;
+    scanner  = startScan();
+    scanner->genRandomSnap();
+    delete scanner;
+    scanner  = startScan();
+    scanner->genRandomSnap();
+    delete scanner;
+    scanner  = startScan();
+    scanner->genRandomSnap();
+
+
     QVector<Snapshot*> snaps;
     dbManager->getAllSnapshots(snaps);
     qWarning() << (snaps.size());
@@ -56,13 +68,7 @@ Model::Model() {
         //qWarning() <<"Hand Reading at ("<<i<<") is: "<<hreadings.at(i);
     }
 
-    /*
-    -For scans, we create them in model, then use dbManager->createLeg/HandReadings()
-        id& parameter passed used to save the auto-incremented id of the insertion, and the QVector<int>& will
-        pass values by reference (for efficiency), using it for DB insertion.
-    - We should use id& in the creation ofa Snapshot object that is then passed
-        into the dbManager->addSnapshotToHistory(), where we
-    */
+
 }
 
 Scanner* Model::startScan() {

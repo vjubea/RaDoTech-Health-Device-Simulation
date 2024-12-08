@@ -2,6 +2,9 @@
 #include "profile.h"
 #include "dbmanager.h"
 
+#include <QRandomGenerator>
+#include "defs.h"
+
 Scanner::Scanner(Profile* profile, DBManager* dbm) : profile(profile), dbm(dbm)
 {
     //initialize to -1s to indicate things not being ready yet.
@@ -48,7 +51,7 @@ void Scanner::registerReading(char side, char limb, int reading){
 
 void Scanner::registerBlood(char side, int dyst, int syst){
     int* arr;
-    if(side == 'l'){arr = lHandBlood;}
+    if(side == 'L'){arr = lHandBlood;}
     else {arr = rHandBlood;}
     arr[0] = dyst;
     arr[1] = syst;
@@ -159,3 +162,38 @@ bool Scanner::finishScan(){
 Snapshot* Scanner::getFinishedSnap(){
     return newSnap;
 }
+
+
+void Scanner::genRandomSnap(){
+    for(int i = 0; i< 6; i++){
+        registerReading('L','H',genScanVal('H',i));
+        registerReading('R','H',genScanVal('H',i));
+        registerReading('L','F',genScanVal('F',i));
+        registerReading('R','F',genScanVal('F',i));
+    }
+
+    registerWeight(0.0f);
+    registerBlood('L', 0,0);
+    registerBlood('R',0,0);
+    registerBodyTemp(0.0);
+    registerHeartRate(0);
+    registerSleepTime(0,0);
+    registerTime(QRandomGenerator::global()->bounded(1,24),QRandomGenerator::global()->bounded(0,59));
+    registerDate(QRandomGenerator::global()->bounded(1,12),QRandomGenerator::global()->bounded(1,30),QRandomGenerator::global()->bounded(2000,2024));
+    registerNotes("Normal scan");
+
+    finishScan();
+
+}
+
+int Scanner::genScanVal(char limb, int index){
+    int reading;
+    if(limb == 'H') reading = QRandomGenerator::global()->bounded(HandGoodReadStart[index] - 5, HandGoodReadEnd[index] +5); // Generate a random reading in range
+    else reading = reading = QRandomGenerator::global()->bounded(FootGoodReadStart[index] - 5, FootGoodReadEnd[index] +5);
+    return reading;
+}
+
+
+
+
+

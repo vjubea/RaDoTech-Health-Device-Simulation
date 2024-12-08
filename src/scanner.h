@@ -51,6 +51,9 @@ There should only ever be one scanner object at a time for this application's de
         void registerSleepTime(int h, int m);
         void registerNotes(QString n);
 
+        void genRandomSnap();
+        int genScanVal(char limb, int index);
+
         bool finishScan();
         Snapshot* getFinishedSnap();
 };
