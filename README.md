@@ -5,9 +5,9 @@ Team project for Developing and testing a simulation of RaDoTech  health monitor
 Nigel Wanga, Thomas Roche, Vlad Jubea
 
 # Member Contributions:
-Nigel Wanga - GUI Interface (majority of code in mainwindow; all code designing the graphical side of GUI)
+Nigel Wanga - GUI Interface (over half of code in mainwindow; almost all code designing the graphical side of GUI)
 
-Thomas Roche - design + implementation for model, scanner, and about half of the design + implementation for profile and snapshot. Most documentation
+Thomas Roche - design + implementation for model, scanner, and about half of the design + implementation for profile and snapshot. Integrations betweenn model/snapshot and mainwindow. Most documentation. Video Demo.
 
 Vlad Jubea - Use cases, database design + implementation, half the work on profile and snapshot, integrating DBManager with the model, and much of the work integrating model etc. with mainwindow.
 
@@ -26,4 +26,4 @@ dbmanager.[h/cpp]
 /documentation has all documentation. See DOCS_README.txt for more info
 
 # Video Demo
-NOTE DONE YET!!
+https://youtu.be/HWb03fQWFBg
