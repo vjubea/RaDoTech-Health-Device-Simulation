@@ -138,8 +138,8 @@ void MainWindow::setupProfilesPage()
 
         // Table to display profiles
         profilesTable = new QTableWidget(this);
-        profilesTable->setColumnCount(2); // Columns: First Name, Last Name
-        profilesTable->setHorizontalHeaderLabels({"First Name", "Last Name"});
+        profilesTable->setColumnCount(4); // Columns: First Name, Last Name
+        profilesTable->setHorizontalHeaderLabels({"First Name", "Last Name", "Weight", "Height"});
 
         QVector<Profile*> profiles = model.getAllProfiles();
         profilesTable->clearContents();
@@ -150,6 +150,9 @@ void MainWindow::setupProfilesPage()
         for(int i = 0; i < profiles.length(); i++){
             profilesTable->setItem(i, 0, new QTableWidgetItem(profiles.at(i)->getFname()));
             profilesTable->setItem(i, 1, new QTableWidgetItem(profiles.at(i)->getLname()));
+            profilesTable->setItem(i, 2, new QTableWidgetItem(QString::number( profiles.at(i)->getWeight())));
+            profilesTable->setItem(i, 3, new QTableWidgetItem(QString::number( profiles.at(i)->getHeight())));
+
         }
 
         // Set table properties
@@ -194,6 +197,8 @@ void MainWindow::setupProfilesPage()
         for(int i = 0; i < profiles.length(); i++){
             profilesTable->setItem(i, 0, new QTableWidgetItem(profiles.at(i)->getFname()));
             profilesTable->setItem(i, 1, new QTableWidgetItem(profiles.at(i)->getLname()));
+            profilesTable->setItem(i, 2, new QTableWidgetItem(QString::number( profiles.at(i)->getWeight())));
+            profilesTable->setItem(i, 3, new QTableWidgetItem(QString::number( profiles.at(i)->getHeight())));
         }
     }
 }
@@ -449,9 +454,9 @@ void MainWindow::setupSnapshotDetailsPage()
         // Other measurements
         QLabel *weightLabel = new QLabel("Weight (kg):", this);
         weightLabel->setFont(labelFont);
-        weightInput = new QLineEdit(this);
+        weightInputSnap = new QLineEdit(this);
         snapshotLayout->addWidget(weightLabel);
-        snapshotLayout->addWidget(weightInput);
+        snapshotLayout->addWidget(weightInputSnap);
 
         QLabel *heartRateLabel = new QLabel("Heart Rate:", this);
         heartRateLabel->setFont(labelFont);
@@ -528,8 +533,9 @@ void MainWindow::setupHistoryPage()
 
         // Create a table widget for displaying history data
         historyTable = new QTableWidget(this);
-        historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
         historyTable->setColumnCount(3); // Date & Time, Profile, Notes
+        historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
+
         for(int i = 0; i<3; i++) {
             historyTable->setColumnWidth(i,200);
         }
@@ -1061,7 +1067,7 @@ void MainWindow::finishMeasurement()
 
     if (scanner) {
 
-        float weight = weightInput->text().toFloat();
+        float weight = weightInputSnap->text().toFloat();
         float bodyTemp = bodyTempInput->text().toFloat();
         int heartRate = heartRateInput->text().toInt();
         QString notes = notesInput->toPlainText()   ;
@@ -1119,21 +1125,34 @@ void MainWindow::startScanningProcess() {
         QString pointType = (i < 12) ? "Hand" : "Foot";
         QString side = (i%12 < 6) ? "Right" : "Left";
         int pointNumber = (i % 6) + 1;
+        bool pointCmpl = false;
+        float sTime = QDateTime::currentDateTime().time().second() + QDateTime::currentDateTime().time().msec()/1000;
 
-        scanningInstructionLabel->setText("Press Device to " + side + " " + pointType + " point " + QString::number(pointNumber));
-        while(!contactWithSkinButton->isDown()){
-            QApplication::processEvents();
-        }
+        while(!pointCmpl){
+            scanningInstructionLabel->setText("Press Device to " + side + " " + pointType + " point " + QString::number(pointNumber));
+            while(!contactWithSkinButton->isDown()){
+                QApplication::processEvents();
+            }
 
-        if(contactWithSkinButton->isDown()){
             scanningInstructionLabel->setText("Scanning...");
-            QApplication::processEvents();
-            QThread::msleep(600);
-        }
 
-        scanningInstructionLabel->setText("Remove Device From Skin");
-        while(contactWithSkinButton->isDown()){
-            QApplication::processEvents();
+            while(contactWithSkinButton->isDown()){
+                QApplication::processEvents();
+                if(QDateTime::currentDateTime().time().second() + QDateTime::currentDateTime().time().msec()/1000 - sTime > 1.0)  break; //if more than 5 seconds have passed, exit loop
+            }
+
+            if(!contactWithSkinButton->isDown()){
+                QMessageBox::warning(this, "Device Removed Early", "Do not remove the device until told");
+                sTime = QDateTime::currentDateTime().time().second() + QDateTime::currentDateTime().time().msec()/1000;
+                continue;
+            }
+
+            scanningInstructionLabel->setText("Remove Device From Skin");
+            while(contactWithSkinButton->isDown()){
+                QApplication::processEvents();
+                pointCmpl = true;
+            }
+
         }
 
         if (scanner) {
@@ -1149,7 +1168,7 @@ void MainWindow::startScanningProcess() {
 
 void MainWindow::onSaveSnapshotClicked() {
     // Check if all fields are filled
-    if (weightInput->text().isEmpty() || heartRateInput->text().isEmpty() ||
+    if (weightInputSnap->text().isEmpty() || heartRateInput->text().isEmpty() ||
         bodyTempInput->text().isEmpty() || sleepHoursInput->text().isEmpty() ||
         sleepMinutesInput->text().isEmpty() || notesInput->toPlainText().isEmpty()) {
 
