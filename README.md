@@ -8,7 +8,10 @@ Nigel Wanga, Thomas Roche, Vlad Jubea
 Nigel Wanga - GUI Interface (over half of code in mainwindow; almost all code designing the graphical side of GUI)
 
 Thomas Roche - design + implementation for model, scanner, and about half of the design + implementation for profile and snapshot.
-                Integrations betweenn model/snapshot and mainwindow. Most documentation. Video Demo.
+                Integrations between model/snapshot and mainwindow; limited mainwindow UI improvements and the addition of some data. 
+                Most documentation except use cases. 
+                Video Demos.
+                Misc tweaks and improvements. 
 
 Vlad Jubea - Use cases, all Database design + implementation + testing, partly integrating DBManager with the model, 
               half the work on profile and snapshot, full Profile page and subpages from it in mainwindow, and 
@@ -29,4 +32,5 @@ dbmanager.[h/cpp]
 /documentation has all documentation. See DOCS_README.txt for more info
 
 # Video Demo
-https://youtu.be/HWb03fQWFBg
+GUI demo + success scenarios: https://youtu.be/HWb03fQWFBg
+Safety scenario demo: https://youtu.be/ptwNnFw3YFQ
