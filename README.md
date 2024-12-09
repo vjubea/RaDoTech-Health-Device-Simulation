@@ -7,9 +7,12 @@ Nigel Wanga, Thomas Roche, Vlad Jubea
 # Member Contributions:
 Nigel Wanga - GUI Interface (over half of code in mainwindow; almost all code designing the graphical side of GUI)
 
-Thomas Roche - design + implementation for model, scanner, and about half of the design + implementation for profile and snapshot. Integrations betweenn model/snapshot and mainwindow. Most documentation. Video Demo.
+Thomas Roche - design + implementation for model, scanner, and about half of the design + implementation for profile and snapshot.
+                Integrations betweenn model/snapshot and mainwindow. Most documentation. Video Demo.
 
-Vlad Jubea - Use cases, database design + implementation, half the work on profile and snapshot, integrating DBManager with the model, and much of the work integrating model etc. with mainwindow.
+Vlad Jubea - Use cases, all Database design + implementation + testing, partly integrating DBManager with the model, 
+              half the work on profile and snapshot, full Profile page and subpages from it in mainwindow, and 
+              much of the work integrating other pages of mainwindow with the model.
 
 # Codebase & Executables:
 /src contains all .cpp and .h files. It can be built using the VM's QTcreator or run like any other program. 
