@@ -138,8 +138,8 @@ void MainWindow::setupProfilesPage()
 
         // Table to display profiles
         profilesTable = new QTableWidget(this);
-        profilesTable->setColumnCount(2); // Columns: First Name, Last Name
-        profilesTable->setHorizontalHeaderLabels({"First Name", "Last Name"});
+        profilesTable->setColumnCount(4); // Columns: First Name, Last Name
+        profilesTable->setHorizontalHeaderLabels({"First Name", "Last Name", "Weight", "Height"});
 
         QVector<Profile*> profiles = model.getAllProfiles();
         profilesTable->clearContents();
@@ -150,6 +150,9 @@ void MainWindow::setupProfilesPage()
         for(int i = 0; i < profiles.length(); i++){
             profilesTable->setItem(i, 0, new QTableWidgetItem(profiles.at(i)->getFname()));
             profilesTable->setItem(i, 1, new QTableWidgetItem(profiles.at(i)->getLname()));
+            profilesTable->setItem(i, 2, new QTableWidgetItem(QString::number( profiles.at(i)->getWeight())));
+            profilesTable->setItem(i, 3, new QTableWidgetItem(QString::number( profiles.at(i)->getHeight())));
+
         }
 
         // Set table properties
@@ -194,6 +197,8 @@ void MainWindow::setupProfilesPage()
         for(int i = 0; i < profiles.length(); i++){
             profilesTable->setItem(i, 0, new QTableWidgetItem(profiles.at(i)->getFname()));
             profilesTable->setItem(i, 1, new QTableWidgetItem(profiles.at(i)->getLname()));
+            profilesTable->setItem(i, 2, new QTableWidgetItem(QString::number( profiles.at(i)->getWeight())));
+            profilesTable->setItem(i, 3, new QTableWidgetItem(QString::number( profiles.at(i)->getHeight())));
         }
     }
 }
@@ -528,8 +533,9 @@ void MainWindow::setupHistoryPage()
 
         // Create a table widget for displaying history data
         historyTable = new QTableWidget(this);
-        historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
         historyTable->setColumnCount(3); // Date & Time, Profile, Notes
+        historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
+
         for(int i = 0; i<3; i++) {
             historyTable->setColumnWidth(i,200);
         }
@@ -1120,7 +1126,7 @@ void MainWindow::startScanningProcess() {
         QString side = (i%12 < 6) ? "Right" : "Left";
         int pointNumber = (i % 6) + 1;
         bool pointCmpl = false;
-        int sTime = QDateTime::currentDateTime().time().second();
+        float sTime = QDateTime::currentDateTime().time().second() + QDateTime::currentDateTime().time().msec()/1000;
 
         while(!pointCmpl){
             scanningInstructionLabel->setText("Press Device to " + side + " " + pointType + " point " + QString::number(pointNumber));
@@ -1132,12 +1138,12 @@ void MainWindow::startScanningProcess() {
 
             while(contactWithSkinButton->isDown()){
                 QApplication::processEvents();
-                if(QDateTime::currentDateTime().time().second() - sTime > 4)  break; //if more than 5 seconds have passed,, exit loop
+                if(QDateTime::currentDateTime().time().second() + QDateTime::currentDateTime().time().msec()/1000 - sTime > 1.0)  break; //if more than 5 seconds have passed, exit loop
             }
 
             if(!contactWithSkinButton->isDown()){
                 QMessageBox::warning(this, "Device Removed Early", "Do not remove the device until told");
-                sTime = QDateTime::currentDateTime().time().second();
+                sTime = QDateTime::currentDateTime().time().second() + QDateTime::currentDateTime().time().msec()/1000;
                 continue;
             }
 
