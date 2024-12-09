@@ -11,7 +11,7 @@ public:
     Snapshot();
     Snapshot(int profileID, const QString& timestamp, float bodyTemp, int leftHandPressReadId, int rightHandPressReadId, 
              int heartRate, int sleepHrs, int sleepMins, float currWeight, const QString& notes, 
-             int handReadingID, int footReadingID);
+             int handReadingsID, int footReadingsID);
 
     bool operator==(const Snapshot& other) const;
 
@@ -46,11 +46,11 @@ public:
     QString getNotes() const;
     void setNotes(const QString& notes);
 
-    int getHandReadingID() const;
-    void setHandReadingID(int handReadingID);
+    int getHandReadingsID() const;
+    void setHandReadingsID(int handReadingsID);
 
-    int getFootReadingID() const;
-    void setFootReadingID(int footReadingID);
+    int getFootReadingsID() const;
+    void setFootReadingsID(int footReadingsID);
 
     void setDBM(DBManager*);
 
@@ -69,8 +69,8 @@ private:
     int sleepMins;  // Minutes of sleep
     float currWeight;  // Current weight in kg
     QString notes;  // Optional notes
-    int handReadingID;  // Foreign key for hand readings
-    int footReadingID;  // Foreign key for leg readings
+    int handReadingsID;  // Foreign key for hand readings
+    int footReadingsID;  // Foreign key for leg readings
 
     DBManager* dbm;
 };

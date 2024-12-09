@@ -69,8 +69,7 @@ private:
   Model model;
   Scanner* scanner;
   Snapshot* curSnap;
-  QVector<Snapshot*>snaps;
-  DBManager *dbm;
+  QVector<Snapshot*> snaps;
 
 
   // GUI elements for Login Page

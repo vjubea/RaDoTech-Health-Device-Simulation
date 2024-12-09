@@ -24,10 +24,9 @@ MainWindow::MainWindow(QWidget *parent)
     recommendationsWidget = nullptr;
     indicatorsWidget = nullptr;
 
+    snaps = QVector<Snapshot*>();
     curSnap  = nullptr;
-    scanner=nullptr;
-
-    dbm = model.getDBM();
+    scanner = nullptr;
 
 
     // Set up the stacked widget
@@ -61,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupRecommendationsPage();
 
 
-    // Connect buttons to respective slots   
+    // Connect buttons to respective slots
     connect(measureNowButton, &QPushButton::clicked, [this] () { showLoginPage();});
     connect(profilesButton, &QPushButton::clicked, [this]() {
         setupProfilesPage();    // Ensure the Profiles Page is initialized
@@ -83,47 +82,47 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupMenuPage()
 {
-   if(menuPage == nullptr){
+   if(menuPage == nullptr) {
 
-    // Create a layout for the Menu Page
-    menuPage = new QWidget();
-    QVBoxLayout *verticalLayout_3 = new QVBoxLayout(menuPage);
-
-
-    // Create and configure user greeting labels
-    //userGreetingLabel = new QLabel("Hello, ");
-    userNameLabel = new QLabel("");
+        // Create a layout for the Menu Page
+        menuPage = new QWidget();
+        QVBoxLayout *verticalLayout_3 = new QVBoxLayout(menuPage);
 
 
-    QHBoxLayout *horizantalLayout_2 = new QHBoxLayout();
-    //horizantalLayout_2->addWidget(userGreetingLabel);
-    horizantalLayout_2->addWidget(userNameLabel);
+        // Create and configure user greeting labels
+        //userGreetingLabel = new QLabel("Hello, ");
+        userNameLabel = new QLabel("");
 
 
-    // Add greeting to the layout
-    verticalLayout_3->addLayout(horizantalLayout_2);
+        QHBoxLayout *horizantalLayout_2 = new QHBoxLayout();
+        //horizantalLayout_2->addWidget(userGreetingLabel);
+        horizantalLayout_2->addWidget(userNameLabel);
 
 
-    // Add the buttons (Measure Now, Profiles, History, Log Out)
-    measureNowButton = new QPushButton("Measure Now");
-    profilesButton = new QPushButton("Profiles");
-    historyButton = new QPushButton("History");
+        // Add greeting to the layout
+        verticalLayout_3->addLayout(horizantalLayout_2);
 
 
-    verticalLayout_3->addWidget(measureNowButton);
-    verticalLayout_3->addWidget(profilesButton);
-    verticalLayout_3->addWidget(historyButton);
+        // Add the buttons (Measure Now, Profiles, History, Log Out)
+        measureNowButton = new QPushButton("Measure Now");
+        profilesButton = new QPushButton("Profiles");
+        historyButton = new QPushButton("History");
 
 
-    // Set the layout for the menu page
-    menuPage->setLayout(verticalLayout_3);
-    stackedWidget->addWidget(menuPage);
+        verticalLayout_3->addWidget(measureNowButton);
+        verticalLayout_3->addWidget(profilesButton);
+        verticalLayout_3->addWidget(historyButton);
 
-    qDebug() << "Menu page index: " << stackedWidget->indexOf(menuPage);
-   }
-   else{
-       // should be emptyy
-   }
+
+        // Set the layout for the menu page
+        menuPage->setLayout(verticalLayout_3);
+        stackedWidget->addWidget(menuPage);
+
+        qDebug() << "Menu page index: " << stackedWidget->indexOf(menuPage);
+    }
+    else{
+        // should be empty
+    }
 }
 
 void MainWindow::setupProfilesPage()
@@ -141,9 +140,6 @@ void MainWindow::setupProfilesPage()
         profilesTable = new QTableWidget(this);
         profilesTable->setColumnCount(2); // Columns: First Name, Last Name
         profilesTable->setHorizontalHeaderLabels({"First Name", "Last Name"});
-
-        //profilesTable->clearContents(); //clears existing data
-        //profilesTable->setRowCount(0); display curr user
 
         QVector<Profile*> profiles = model.getAllProfiles();
         profilesTable->clearContents();
@@ -190,13 +186,11 @@ void MainWindow::setupProfilesPage()
         qDebug() << "Profiles page index: " << stackedWidget->indexOf(profilesPage);
     }
     else {
-        //profilesTable->clearContents(); //clears existing data
-        //profilesTable->setRowCount(0); display curr user
         profilesTable->clearContents();
         QVector<Profile*> profiles = model.getAllProfiles();
         // Populate profilesTable with profiles
         profilesTable->setRowCount(profiles.length());
-        qInfo() << profiles.length();
+
         for(int i = 0; i < profiles.length(); i++){
             profilesTable->setItem(i, 0, new QTableWidgetItem(profiles.at(i)->getFname()));
             profilesTable->setItem(i, 1, new QTableWidgetItem(profiles.at(i)->getLname()));
@@ -208,49 +202,47 @@ void MainWindow::setupLoginPage()
 {
     if(loginPage == nullptr){
 
-    // Initialize the login page widgets
-    welcomeLabel = new QLabel("Select User", this);
-    pleaseLogInStatement = new QLabel("Please Select User", this);
+        // Initialize the login page widgets
+        welcomeLabel = new QLabel("Select User", this);
+        pleaseLogInStatement = new QLabel("Please Select User", this);
 
-    userDropdown = new QComboBox(this);
-    userDropdown->setEditable(false); // Prevent manual entry
-    userDropdown->addItem("Select User"); // Default placeholder
-    //Connect the dropdown's signal to the login slot
-    //connect(userDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) { if (index > 0) { onLoginButtonClicked(); } });
-    connect(userDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
-        if (index > 0) {
-            onLoginButtonClicked();
-        }
-    });
-
-
-    // Create a QFont for customizing the font
-    QFont labelFont("Arial", 16, QFont::Bold);
-
-    // Apply the font to the labels
-    welcomeLabel->setFont(labelFont);
-    pleaseLogInStatement->setFont(labelFont);
+        userDropdown = new QComboBox(this);
+        userDropdown->setEditable(false); // Prevent manual entry
+        userDropdown->addItem("Select User"); // Default placeholder
+        //Connect the dropdown's signal to the login slot
+        //connect(userDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) { if (index > 0) { onLoginButtonClicked(); } });
+        connect(userDropdown, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+            if (index > 0) {
+                onLoginButtonClicked();
+            }
+        });
 
 
+        // Create a QFont for customizing the font
+        QFont labelFont("Arial", 16, QFont::Bold);
 
-    // Create layout for login page
-    QVBoxLayout *loginLayout = new QVBoxLayout;
-    loginLayout->addWidget(welcomeLabel);
-    loginLayout->addWidget(pleaseLogInStatement);
-    loginLayout->addWidget(userDropdown);
+        // Apply the font to the labels
+        welcomeLabel->setFont(labelFont);
+        pleaseLogInStatement->setFont(labelFont);
 
-    loginPage = new QWidget(this);
-    loginPage->setLayout(loginLayout);
 
-    // Add the login page to stacked widget
-    stackedWidget->addWidget(loginPage);
+        // Create layout for login page
+        QVBoxLayout *loginLayout = new QVBoxLayout;
+        loginLayout->addWidget(welcomeLabel);
+        loginLayout->addWidget(pleaseLogInStatement);
+        loginLayout->addWidget(userDropdown);
 
-    // Populate the dropdown with existing profiles
-    populateUserDropdown();
+        loginPage = new QWidget(this);
+        loginPage->setLayout(loginLayout);
 
-    qDebug() << "Log in page index: " << stackedWidget->indexOf(loginPage);
+        // Add the login page to stacked widget
+        stackedWidget->addWidget(loginPage);
+
+        // Populate the dropdown with existing profiles
+        populateUserDropdown();
+
+        qDebug() << "Log in page index: " << stackedWidget->indexOf(loginPage);
     }
-
     else{
         //can be empty
     }
@@ -326,200 +318,190 @@ void MainWindow::setupCreateProfilePage()
 
 void MainWindow::setupMeasurePage()
 {
+    if(measurePage == nullptr){
 
-   if(measurePage == nullptr){
+        // Create the measure page
+        measurePage = new QWidget(this);
 
-
-   // Create the measure page
-   measurePage = new QWidget(this);
-
-   // Create layout
-   QVBoxLayout *measureLayout = new QVBoxLayout;
+        // Create layout
+        QVBoxLayout *measureLayout = new QVBoxLayout;
 
 
-   // Instruction Label
-   QLabel *instructionLabel = new QLabel("Follow the instructions to measure your body parts:", this);
-   QFont labelFont5("Arial", 16, QFont::Bold);
-   instructionLabel->setFont(labelFont5);
-   measureLayout->addWidget(instructionLabel);
+        // Instruction Label
+        QLabel *instructionLabel = new QLabel("Follow the instructions to measure your body parts:", this);
+        QFont labelFont5("Arial", 16, QFont::Bold);
+        instructionLabel->setFont(labelFont5);
+        measureLayout->addWidget(instructionLabel);
 
-   // Start button for measurement
-   QPushButton *startMeasureButton = new QPushButton("Start Measurement", this);
-   connect(startMeasureButton, &QPushButton::clicked, this, &MainWindow::startMeasurement);
-   measureLayout->addWidget(startMeasureButton);
-
-
-   // Finish Button to go back to History or Menu page
-   QPushButton* finishButton = new QPushButton("Finish Measurement", this);
-   connect(finishButton, &QPushButton::clicked, this, &MainWindow::finishMeasurement);
-   measureLayout->addWidget(finishButton);
-
-   // Create a "Back" button
-   QPushButton *measureBackButton = new QPushButton("Back", this);
-   connect(measureBackButton, &QPushButton::clicked, [this]() {
-       showMenuPage();
-   });
-
-   // Add Back button to layout
-   measureLayout->addWidget(measureBackButton);
-
-   // Set the layout for the measure page
-   measurePage->setLayout(measureLayout);
+        // Start button for measurement
+        QPushButton *startMeasureButton = new QPushButton("Start Measurement", this);
+        connect(startMeasureButton, &QPushButton::clicked, this, &MainWindow::startMeasurement);
+        measureLayout->addWidget(startMeasureButton);
 
 
-   // Add the history page to stacked widget
-   stackedWidget->addWidget(measurePage);
+        // Finish Button to go back to History or Menu page
+        QPushButton* finishButton = new QPushButton("Finish Measurement", this);
+        connect(finishButton, &QPushButton::clicked, this, &MainWindow::finishMeasurement);
+        measureLayout->addWidget(finishButton);
 
-   qDebug() << "Measure Now page index: " << stackedWidget->indexOf(measurePage);
-   }
+        // Create a "Back" button
+        QPushButton *measureBackButton = new QPushButton("Back", this);
+        connect(measureBackButton, &QPushButton::clicked, [this]() {
+            showMenuPage();
+        });
 
-   else{
+        // Add Back button to layout
+        measureLayout->addWidget(measureBackButton);
 
-       if (!model.getCurProfile()) {
-           QMessageBox::warning(this, "Error", "No profile selected. Please log in first.");
-           showLoginPage();
-           return;
-       }
+        // Set the layout for the measure page
+        measurePage->setLayout(measureLayout);
 
 
+        // Add the history page to stacked widget
+        stackedWidget->addWidget(measurePage);
+
+        qDebug() << "Measure Now page index: " << stackedWidget->indexOf(measurePage);
     }
-
+    else if (!model.getCurProfile()) {
+        QMessageBox::warning(this, "Error", "No profile selected. Please log in first.");
+        showLoginPage();
+        return;
+    }
 }
 
 void MainWindow::setupBattery()
 {
-   batteryLevel = 100;
-   // Timer setup
-   if (!batteryDepletionTimer) {
-       batteryDepletionTimer = new QTimer(this);
-       connect(batteryDepletionTimer, &QTimer::timeout, this, &MainWindow::depleteBattery);
-       qDebug() << "Battery timer initialized.";
-   }
+    batteryLevel = 100;
+    // Timer setup
+    if (!batteryDepletionTimer) {
+        batteryDepletionTimer = new QTimer(this);
+        connect(batteryDepletionTimer, &QTimer::timeout, this, &MainWindow::depleteBattery);
+        qDebug() << "Battery timer initialized.";
+    }
 }
 
-void MainWindow::setupScanningPage() {
-
+void MainWindow::setupScanningPage()
+{
     if(scanningPage == nullptr){
-    scanningPage = new QWidget(this);
-    QVBoxLayout *scanningLayout = new QVBoxLayout;
+        scanningPage = new QWidget(this);
+        QVBoxLayout *scanningLayout = new QVBoxLayout;
 
-    QLabel *scanHeaderLabel = new QLabel("Scanning Page", this);
-    QFont labelFont8("Arial", 16, QFont::Bold);
-    scanHeaderLabel->setFont(labelFont8);
-    scanningLayout->addWidget(scanHeaderLabel);
+        QLabel *scanHeaderLabel = new QLabel("Scanning Page", this);
+        QFont labelFont8("Arial", 16, QFont::Bold);
+        scanHeaderLabel->setFont(labelFont8);
+        scanningLayout->addWidget(scanHeaderLabel);
 
-    // Add the battery label
-    batteryLabel = new QLabel("Battery: 100%", this);
-    batteryLabel->setAlignment(Qt::AlignCenter);
-    scanningLayout->addWidget(batteryLabel);
+        // Add the battery label
+        batteryLabel = new QLabel("Battery: 100%", this);
+        batteryLabel->setAlignment(Qt::AlignCenter);
+        scanningLayout->addWidget(batteryLabel);
 
 
-    scanningInstructionLabel = new QLabel("Place the device on your skin and press the button below:", this);
-    QFont labelFont7("Arial", 14, QFont::Bold);
-    scanningInstructionLabel->setFont(labelFont7);
-    scanningLayout->addWidget(scanningInstructionLabel);
+        scanningInstructionLabel = new QLabel("Place the device on your skin and press the button below:", this);
+        QFont labelFont7("Arial", 14, QFont::Bold);
+        scanningInstructionLabel->setFont(labelFont7);
+        scanningLayout->addWidget(scanningInstructionLabel);
 
-    contactWithSkinButton = new QPushButton("Contact with Skin", this);
-    //connect(contactWithSkinButton, &QPushButton::clicked, this, &MainWindow::startScanningProcess);
-    scanningLayout->addWidget(contactWithSkinButton);
+        contactWithSkinButton = new QPushButton("Contact with Skin", this);
+        //connect(contactWithSkinButton, &QPushButton::clicked, this, &MainWindow::startScanningProcess);
+        scanningLayout->addWidget(contactWithSkinButton);
 
-    scanningPage->setLayout(scanningLayout);
-    stackedWidget->addWidget(scanningPage);
+        scanningPage->setLayout(scanningLayout);
+        stackedWidget->addWidget(scanningPage);
 
-    qDebug() << "scannings page index: " << stackedWidget->indexOf(scanningPage);
+        qDebug() << "scannings page index: " << stackedWidget->indexOf(scanningPage);
     }
-
-    else{
+    else {
         //probably won't need this else
     }
 }
 
-void MainWindow::setupSnapshotDetailsPage() {
+void MainWindow::setupSnapshotDetailsPage()
+{
+    if(snapshotDetailsPage ==  nullptr)
+    {
+        snapshotDetailsPage = new QWidget(this);
+        QVBoxLayout *snapshotLayout = new QVBoxLayout;
 
-    if(snapshotDetailsPage ==  nullptr){
-    snapshotDetailsPage = new QWidget(this);
-    QVBoxLayout *snapshotLayout = new QVBoxLayout;
+        QLabel *snapshotTitle = new QLabel("Snapshot Details", this);
+        QFont titleFont("Arial", 18, QFont::Bold);
+        snapshotTitle->setFont(titleFont);
+        snapshotLayout->addWidget(snapshotTitle);
 
-    QLabel *snapshotTitle = new QLabel("Snapshot Details", this);
-    QFont titleFont("Arial", 18, QFont::Bold);
-    snapshotTitle->setFont(titleFont);
-    snapshotLayout->addWidget(snapshotTitle);
+        QFont labelFont("Arial", 14, QFont::Bold);
 
-    QFont labelFont("Arial", 14, QFont::Bold);
+        // Blood Pressure
+        for (const auto& hand : {"Left Hand", "Right Hand"}) {
+            QLabel *pressureLabel = new QLabel(QString("%1 Pressure:").arg(hand), this);
+            pressureLabel->setFont(labelFont);
+            snapshotLayout->addWidget(pressureLabel);
 
-    // Blood Pressure
-    for (const auto& hand : {"Left Hand", "Right Hand"}) {
-        QLabel *pressureLabel = new QLabel(QString("%1 Pressure:").arg(hand), this);
-        pressureLabel->setFont(labelFont);
-        snapshotLayout->addWidget(pressureLabel);
+            QHBoxLayout *pressureLayout = new QHBoxLayout;
+            QLineEdit *systolicInput = new QLineEdit(this);
+            systolicInput->setPlaceholderText("Systolic");
+            QLineEdit *diastolicInput = new QLineEdit(this);
+            diastolicInput->setPlaceholderText("Diastolic");
+            pressureLayout->addWidget(systolicInput);
+            pressureLayout->addWidget(diastolicInput);
+            snapshotLayout->addLayout(pressureLayout);
+        }
 
-        QHBoxLayout *pressureLayout = new QHBoxLayout;
-        QLineEdit *systolicInput = new QLineEdit(this);
-        systolicInput->setPlaceholderText("Systolic");
-        QLineEdit *diastolicInput = new QLineEdit(this);
-        diastolicInput->setPlaceholderText("Diastolic");
-        pressureLayout->addWidget(systolicInput);
-        pressureLayout->addWidget(diastolicInput);
-        snapshotLayout->addLayout(pressureLayout);
+        // Other measurements
+        QLabel *weightLabel = new QLabel("Weight (kg):", this);
+        weightLabel->setFont(labelFont);
+        weightInputSnap = new QLineEdit(this);
+        snapshotLayout->addWidget(weightLabel);
+        snapshotLayout->addWidget(weightInputSnap);
+
+        QLabel *heartRateLabel = new QLabel("Heart Rate:", this);
+        heartRateLabel->setFont(labelFont);
+        heartRateInput = new QLineEdit(this);
+        snapshotLayout->addWidget(heartRateLabel);
+        snapshotLayout->addWidget(heartRateInput);
+
+        QLabel *bodyTempLabel = new QLabel("Body Temperature (°C):", this);
+        bodyTempLabel->setFont(labelFont);
+        bodyTempInput = new QLineEdit(this);
+        snapshotLayout->addWidget(bodyTempLabel);
+        snapshotLayout->addWidget(bodyTempInput);
+
+        QLabel *sleepTimeLabel = new QLabel("Sleep Time (hh:mm):", this);
+        sleepTimeLabel->setFont(labelFont);
+        snapshotLayout->addWidget(sleepTimeLabel);
+        QHBoxLayout *sleepTimeLayout = new QHBoxLayout;
+        sleepHoursInput = new QLineEdit(this);
+        sleepHoursInput->setPlaceholderText("Hours");
+        sleepMinutesInput = new QLineEdit(this);
+        sleepMinutesInput->setPlaceholderText("Minutes");
+        sleepTimeLayout->addWidget(sleepHoursInput);
+        sleepTimeLayout->addWidget(sleepMinutesInput);
+        snapshotLayout->addLayout(sleepTimeLayout);
+
+        QLabel *notesLabel = new QLabel("Notes:", this);
+        notesLabel->setFont(labelFont);
+        notesInput = new QTextEdit(this);
+        snapshotLayout->addWidget(notesLabel);
+        snapshotLayout->addWidget(notesInput);
+
+        saveSnapshotButton = new QPushButton("Save Snapshot", this);
+        backToMeasureButton = new QPushButton("Back", this);
+        snapshotLayout->addWidget(saveSnapshotButton);
+        snapshotLayout->addWidget(backToMeasureButton);
+
+        connect(saveSnapshotButton, &QPushButton::clicked, this, &MainWindow::onSaveSnapshotClicked);
+        connect(backToMeasureButton, &QPushButton::clicked, [this]()
+        {
+            delete scanner;
+            showMenuPage();
+        });
+
+        snapshotDetailsPage->setLayout(snapshotLayout);
+        stackedWidget->addWidget(snapshotDetailsPage);
+
+        qDebug() << "Snapshot details page index: " << stackedWidget->indexOf(snapshotDetailsPage);
     }
-
-    // Other measurements
-    QLabel *weightLabel = new QLabel("Weight (kg):", this);
-    weightLabel->setFont(labelFont);
-    weightInputSnap = new QLineEdit(this);
-    snapshotLayout->addWidget(weightLabel);
-    snapshotLayout->addWidget(weightInputSnap);
-
-    QLabel *heartRateLabel = new QLabel("Heart Rate:", this);
-    heartRateLabel->setFont(labelFont);
-    heartRateInput = new QLineEdit(this);
-    snapshotLayout->addWidget(heartRateLabel);
-    snapshotLayout->addWidget(heartRateInput);
-
-    QLabel *bodyTempLabel = new QLabel("Body Temperature (°C):", this);
-    bodyTempLabel->setFont(labelFont);
-    bodyTempInput = new QLineEdit(this);
-    snapshotLayout->addWidget(bodyTempLabel);
-    snapshotLayout->addWidget(bodyTempInput);
-
-    QLabel *sleepTimeLabel = new QLabel("Sleep Time (hh:mm):", this);
-    sleepTimeLabel->setFont(labelFont);
-    snapshotLayout->addWidget(sleepTimeLabel);
-    QHBoxLayout *sleepTimeLayout = new QHBoxLayout;
-    sleepHoursInput = new QLineEdit(this);
-    sleepHoursInput->setPlaceholderText("Hours");
-    sleepMinutesInput = new QLineEdit(this);
-    sleepMinutesInput->setPlaceholderText("Minutes");
-    sleepTimeLayout->addWidget(sleepHoursInput);
-    sleepTimeLayout->addWidget(sleepMinutesInput);
-    snapshotLayout->addLayout(sleepTimeLayout);
-
-    QLabel *notesLabel = new QLabel("Notes:", this);
-    notesLabel->setFont(labelFont);
-    notesInput = new QTextEdit(this);
-    snapshotLayout->addWidget(notesLabel);
-    snapshotLayout->addWidget(notesInput);
-
-    saveSnapshotButton = new QPushButton("Save Snapshot", this);
-    backToMeasureButton = new QPushButton("Back", this);
-    snapshotLayout->addWidget(saveSnapshotButton);
-    snapshotLayout->addWidget(backToMeasureButton);
-
-    connect(saveSnapshotButton, &QPushButton::clicked, this, &MainWindow::onSaveSnapshotClicked);
-    connect(backToMeasureButton, &QPushButton::clicked, [this]() {
-
-        delete scanner;
-        showMenuPage();
-    });
-
-    snapshotDetailsPage->setLayout(snapshotLayout);
-    stackedWidget->addWidget(snapshotDetailsPage);
-
-    qDebug() << "Snapshot details page index: " << stackedWidget->indexOf(snapshotDetailsPage);
-    }
-
     else {
-        weightInputSnap->clear();
+        weightInput->clear();
         bodyTempInput->clear();
         heartRateInput->clear();
         notesInput->clear();
@@ -528,85 +510,90 @@ void MainWindow::setupSnapshotDetailsPage() {
     }
 }
 
-void MainWindow::setupHistoryPage(){
-    if(historyPage == nullptr){
+void MainWindow::setupHistoryPage()
+{
+    if(historyPage == nullptr)
+    {
+        // Create the history page
+        historyPage = new QWidget(this);
 
-    // Create the history page
-    historyPage = new QWidget(this);
+        // Create layout
+        QVBoxLayout *historyLayout = new QVBoxLayout;
 
-    // Create layout
-    QVBoxLayout *historyLayout = new QVBoxLayout;
-
-    historyLabel = new QLabel("History", this);
-    QFont labelFont3("Arial", 16, QFont::Bold);
-    historyLabel->setFont(labelFont3);
-    historyLayout->addWidget(historyLabel);
-
-
-    // Create a table widget for displaying history data
-    historyTable = new QTableWidget(this);
-    historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
-    historyTable->setColumnCount(3); // Date & Time, Profile, Notes
-    for(int i = 0; i<3; i++){
-        historyTable->setColumnWidth(i,200);
-    }
-    historyTable->setColumnWidth(2,400);
+        historyLabel = new QLabel("History", this);
+        QFont labelFont3("Arial", 16, QFont::Bold);
+        historyLabel->setFont(labelFont3);
+        historyLayout->addWidget(historyLabel);
 
 
-    if(snaps.length() == 0) {dbm->getAllSnapshots(snaps);}
-    historyTable->setRowCount(snaps.length());
+        // Create a table widget for displaying history data
+        historyTable = new QTableWidget(this);
+        historyTable->setHorizontalHeaderLabels({"Date & Time", "Profile", "Notes"});
+        historyTable->setColumnCount(3); // Date & Time, Profile, Notes
+        for(int i = 0; i<3; i++) {
+            historyTable->setColumnWidth(i,200);
+        }
+        historyTable->setColumnWidth(2,400);
 
 
-    for(int i = 0; i< snaps.length(); i++){
-        historyTable->setItem(i, 0, new QTableWidgetItem(snaps[i]->getTimestamp()));
-        historyTable->setItem(i, 1, new QTableWidgetItem(snaps[i]->getProfileID()));
-        historyTable->setItem(i, 2, new QTableWidgetItem(snaps[i]->getNotes()));
-    }
-
-    // Set table properties
-    historyTable->setEditTriggers(QAbstractItemView::NoEditTriggers); // Disable editing
-    historyTable->setSelectionBehavior(QAbstractItemView::SelectRows); // Entire row selection
-    historyTable->setSelectionMode(QAbstractItemView::SingleSelection);
-
-
-    // Connect the row click signal to the slot
-    connect(historyTable, &QTableWidget::cellClicked, this, &MainWindow::onHistoryRowClicked);
-
-
-    // Add the table to the layout
-    historyLayout->addWidget(historyTable);
-
-
-    // Create a "Back" button
-    QPushButton *historyBackButton = new QPushButton("Back", this);
-    connect(historyBackButton, &QPushButton::clicked, [this]() {
-        showMenuPage();
-    });
-
-
-    // Add Back button to layout
-    historyLayout->addWidget(historyBackButton);
-
-
-    // Set the layout for the history page
-    historyPage->setLayout(historyLayout);
-
-
-    // Add the history page to stacked widget
-    stackedWidget->addWidget(historyPage);
-
-    qDebug() << "History page index: " << stackedWidget->indexOf(historyPage);
-
-    }
-
-    else{
-    //refresh case
-        if(snaps.length() == 0) {dbm->getAllSnapshots(snaps);}
+        model.getAllSnapshots(snaps);
         historyTable->setRowCount(snaps.length());
 
         for(int i = 0; i< snaps.length(); i++){
             historyTable->setItem(i, 0, new QTableWidgetItem(snaps[i]->getTimestamp()));
-            historyTable->setItem(i, 1, new QTableWidgetItem(model.getAllProfiles()[snaps[i]->getProfileID()-1]->getFullName()));
+            Profile* prof = model.getProfileByID(snaps[i]->getProfileID());
+            if (prof != nullptr) {
+                historyTable->setItem(i, 1, new QTableWidgetItem(prof->getFullName()));
+            }
+            historyTable->setItem(i, 2, new QTableWidgetItem(snaps[i]->getNotes()));
+        }
+
+        // Set table properties
+        historyTable->setEditTriggers(QAbstractItemView::NoEditTriggers); // Disable editing
+        historyTable->setSelectionBehavior(QAbstractItemView::SelectRows); // Entire row selection
+        historyTable->setSelectionMode(QAbstractItemView::SingleSelection);
+
+
+        // Connect the row click signal to the slot
+        connect(historyTable, &QTableWidget::cellClicked, this, &MainWindow::onHistoryRowClicked);
+
+
+        // Add the table to the layout
+        historyLayout->addWidget(historyTable);
+
+
+        // Create a "Back" button
+        QPushButton *historyBackButton = new QPushButton("Back", this);
+        connect(historyBackButton, &QPushButton::clicked, [this]() {
+            showMenuPage();
+        });
+        // Add Back button to layout
+        historyLayout->addWidget(historyBackButton);
+
+
+        // Set the layout for the history page
+        historyPage->setLayout(historyLayout);
+
+        // Add the history page to stacked widget
+        stackedWidget->addWidget(historyPage);
+
+        qDebug() << "History page index: " << stackedWidget->indexOf(historyPage);
+    }
+    else {
+        //refresh case
+        historyTable->clearContents();
+        snaps.clear();
+        model.getAllSnapshots(snaps);
+
+        qWarning() << snaps.length();
+        historyTable->setRowCount(snaps.length());
+
+        for(int i = 0; i< snaps.length(); i++){
+            historyTable->setItem(i, 0, new QTableWidgetItem(snaps[i]->getTimestamp()));
+            Profile* prof = model.getProfileByID(snaps[i]->getProfileID());
+            if (prof != nullptr) {
+                historyTable->setItem(i, 1, new QTableWidgetItem(prof->getFullName()));
+            }
             historyTable->setItem(i, 2, new QTableWidgetItem(snaps[i]->getNotes()));
         }
     }
@@ -614,239 +601,222 @@ void MainWindow::setupHistoryPage(){
 
 void MainWindow::setupBodyScreen()
 {
-   if(bodyWidget == nullptr){
-   bodyWidget = new QWidget(this);
-   QVBoxLayout *bodyLayout = new QVBoxLayout;
+    if(bodyWidget == nullptr){
+        bodyWidget = new QWidget(this);
+        QVBoxLayout *bodyLayout = new QVBoxLayout;
 
 
-   QLabel *bodyScreenLabel = new QLabel("Body Screen", this);
-   QFont labelFont4("Arial", 16, QFont::Bold);
-   bodyScreenLabel->setFont(labelFont4);
-   bodyLayout->addWidget(bodyScreenLabel);
+        QLabel *bodyScreenLabel = new QLabel("Body Screen", this);
+        QFont labelFont4("Arial", 16, QFont::Bold);
+        bodyScreenLabel->setFont(labelFont4);
+        bodyLayout->addWidget(bodyScreenLabel);
 
 
-   // Create table for organ readings
-   organTable = new QTableWidget(this);
-   organTable->setRowCount(12); // 12 organs to display (6 from H1-H6 and 6 from F1-F6)
-   organTable->setColumnCount(2); // Column 1: Organ, Column 2: Status
+        // Create table for organ readings
+        organTable = new QTableWidget(this);
+        organTable->setRowCount(12); // 12 organs to display (6 from H1-H6 and 6 from F1-F6)
+        organTable->setColumnCount(2); // Column 1: Organ, Column 2: Status
 
 
-   // Set table headers
-   QStringList headers = {"Organ", "Status"};
-   organTable->setHorizontalHeaderLabels(headers);
-   organTable->setColumnWidth(0, 200);
-   organTable->setColumnWidth(1,200);
+        // Set table headers
+        QStringList headers = {"Organ", "Status"};
+        organTable->setHorizontalHeaderLabels(headers);
+        organTable->setColumnWidth(0, 200);
+        organTable->setColumnWidth(1,200);
 
-   // Define font for organ rows
-   QFont labelFont5("Arial", 14, QFont::Bold);
+        // Define font for organ rows
+        QFont labelFont5("Arial", 14, QFont::Bold);
+
+        // Define organ readings and ranges (from defs.h)
 
 
-   // Define organ readings and ranges (from defs.h)
+        // Loop through the organs and set their color based on the reading
+        for (int i = 0; i < 12; ++i) {
+            QTableWidgetItem *organItem = new QTableWidgetItem(organs[i]);
+            organItem->setFont(labelFont5);
+            organTable->setItem(i, 0, organItem);
+        }
+
+        // Add the table to the layout
+        bodyLayout->addWidget(organTable);
 
 
-   // Loop through the organs and set their color based on the reading
-   for (int i = 0; i < 12; ++i) {
-       QTableWidgetItem *organItem = new QTableWidgetItem(organs[i]);
-       organItem->setFont(labelFont5);
-       organTable->setItem(i, 0, organItem);
+        // Add buttons for navigation
+        QPushButton *chartButton = new QPushButton("Chart", this);
+        QPushButton *indicatorsButton = new QPushButton("Indicators", this);
+        QPushButton *recommendationsButton = new QPushButton("Recommendations", this);
+        QPushButton *backBodyButton = new QPushButton("Back", this);
+
+
+        // Add buttons to the layout
+        bodyLayout->addWidget(chartButton);
+        bodyLayout->addWidget(indicatorsButton);
+        bodyLayout->addWidget(recommendationsButton);
+        bodyLayout->addWidget(backBodyButton);
+
+
+        // Connect buttons to respective slots (or pages in stackedWidget)
+        connect(chartButton, &QPushButton::clicked, this, &MainWindow::showChartPage);
+        connect(indicatorsButton, &QPushButton::clicked, this, &MainWindow::showIndicatorsPage);
+        connect(recommendationsButton, &QPushButton::clicked, this, &MainWindow::showRecommendationsPage);
+        connect(backBodyButton, &QPushButton::clicked, this, [this]() {
+            showHistoryPage();
+        });
+
+        bodyWidget->setLayout(bodyLayout);
+        stackedWidget->addWidget(bodyWidget);
+
+        qDebug() << "Body page index: " << stackedWidget->indexOf(bodyWidget);
     }
 
-   // Add the table to the layout
-   bodyLayout->addWidget(organTable);
+    else{
+        if(curSnap == nullptr) {return;}
+
+        setupChartPage();
+        setupRecommendationsPage();
+        setupIndicatorsPage();
+
+        //POPULATE BODY CHART HERE
+        QVector<QString> organVals = curSnap->getOrganValues();
+        QFont labelFont5("Arial", 16, QFont::Bold);
 
 
-   // Add buttons for navigation
-   QPushButton *chartButton = new QPushButton("Chart", this);
-   QPushButton *indicatorsButton = new QPushButton("Indicators", this);
-   QPushButton *recommendationsButton = new QPushButton("Recommendations", this);
-   QPushButton *backBodyButton = new QPushButton("Back", this);
+        for(int i = 0; i < organVals.length(); i++) {
 
+            QColor color;
+            if (organVals[i] == "Below Normal") {
+                color = Qt::red;
+            }
+            else if (organVals[i] == "Above Normal") {
+                color = Qt::blue;
+            }
+            else {
+                color = Qt::green;
+            }
 
-   // Add buttons to the layout
-   bodyLayout->addWidget(chartButton);
-   bodyLayout->addWidget(indicatorsButton);
-   bodyLayout->addWidget(recommendationsButton);
-   bodyLayout->addWidget(backBodyButton);
-
-
-   // Connect buttons to respective slots (or pages in stackedWidget)
-   connect(chartButton, &QPushButton::clicked, this, &MainWindow::showChartPage);
-   connect(indicatorsButton, &QPushButton::clicked, this, &MainWindow::showIndicatorsPage);
-   connect(recommendationsButton, &QPushButton::clicked, this, &MainWindow::showRecommendationsPage);
-   connect(backBodyButton, &QPushButton::clicked, this, [this]() {
-       showHistoryPage();
-   });
-
-
-   bodyWidget->setLayout(bodyLayout);
-   stackedWidget->addWidget(bodyWidget);
-
-    qDebug() << "Body page index: " << stackedWidget->indexOf(bodyWidget);
-
-   }
-
-   else{
-      if(curSnap == nullptr){return;}
-      setupChartPage();
-      setupRecommendationsPage();
-      setupIndicatorsPage();
-
-      //POPULATE BODY CHART HERE
-      QVector<QString> organVals = curSnap->getOrganValues();
-      QFont labelFont5("Arial", 16, QFont::Bold);
-
-
-      for(int i = 0; i < organVals.length(); i++){
-
-          QColor color;
-          if (organVals[i] == "Below Normal") {color = Qt::red;
-          } else if (organVals[i] == "Above Normal") {color = Qt::blue;
-          } else {color = Qt::green;
-          }
-
-          QTableWidgetItem *statusItem = new QTableWidgetItem(organVals[i]);
-          statusItem->setBackground(color);
-          statusItem->setFont(labelFont5);
-          organTable->setItem(i, 1, statusItem);
-
-      }
-
-
-
-
-   }
-
+            QTableWidgetItem *statusItem = new QTableWidgetItem(organVals[i]);
+            statusItem->setBackground(color);
+            statusItem->setFont(labelFont5);
+            organTable->setItem(i, 1, statusItem);
+        }
+    }
 }
 
 void MainWindow::setupChartPage()
 {
-   if(chartWidget == nullptr){
-   chartWidget = new QWidget(this);
-   QVBoxLayout *chartLayout = new QVBoxLayout(chartWidget);
+    if(chartWidget == nullptr){
+        chartWidget = new QWidget(this);
+        QVBoxLayout *chartLayout = new QVBoxLayout(chartWidget);
 
 
-   // Add label for the chart
-   QLabel *chartLabel = new QLabel("Chart Page");
-   chartLabel->setAlignment(Qt::AlignCenter);
-   chartLayout->addWidget(chartLabel);
+        // Add label for the chart
+        QLabel *chartLabel = new QLabel("Chart Page");
+        chartLabel->setAlignment(Qt::AlignCenter);
+        chartLayout->addWidget(chartLabel);
 
 
-   // Create a horizontal layout for the bar graph
-   barLayout = new QHBoxLayout();
+        // Create a horizontal layout for the bar graph
+        barLayout = new QHBoxLayout();
 
-   chartLayout->addLayout(barLayout);
-
-
-   // Add the Back button
-   QPushButton *chartBackButton = new QPushButton("Back");
-   connect(chartBackButton, &QPushButton::clicked, this, [this]() {
-       showBodyScreen();
-   });
-   chartLayout->addWidget(chartBackButton);
+        chartLayout->addLayout(barLayout);
 
 
-   // Set the layout and add to the stacked widget
-   chartWidget->setLayout(chartLayout);
-   stackedWidget->addWidget(chartWidget);
-
-    qDebug() << "Chart page index: " << stackedWidget->indexOf(chartWidget);
-   }
-
-   else{
-       //POPULATE BAR CHART HERE
-       if(curSnap  == nullptr) return;
+        // Add the Back button
+        QPushButton *chartBackButton = new QPushButton("Back");
+        connect(chartBackButton, &QPushButton::clicked, this, [this]() {
+            showBodyScreen();
+        });
+        chartLayout->addWidget(chartBackButton);
 
 
-       // Example data
-       QVector<int> data = curSnap->getRawReadings();
+        // Set the layout and add to the stacked widget
+        chartWidget->setLayout(chartLayout);
+        stackedWidget->addWidget(chartWidget);
 
-       while (barLayout->count()) {
-               QLayoutItem *item = barLayout->takeAt(0);  // Take out each child layout
+        qDebug() << "Chart page index: " << stackedWidget->indexOf(chartWidget);
+    }
+    else{
+        //POPULATE BAR CHART HERE
+        if(curSnap  == nullptr) return;
 
-               if (item->layout()) {  // If it's a QVBoxLayout
-                   QVBoxLayout *subLayout = qobject_cast<QVBoxLayout *>(item->layout());
+        // Example data
+        QVector<int> data = curSnap->getRawReadings();
 
-                   while (subLayout->count()) {
-                       QLayoutItem *childItem = subLayout->takeAt(0);
+        while (barLayout->count()) {
+            QLayoutItem *item = barLayout->takeAt(0);  // Take out each child layout
 
-                       if (childItem->widget()) {
-                           delete childItem->widget();  // Delete the QLabel (barLabel or valueLabel)
-                       }
-                   }
+            if (item->layout()) {  // If it's a QVBoxLayout
+                QVBoxLayout *subLayout = qobject_cast<QVBoxLayout *>(item->layout());
 
-                   delete subLayout;  // Delete the QVBoxLayout itself
-               }
-           }
+                while (subLayout->count()) {
+                    QLayoutItem *childItem = subLayout->takeAt(0);
 
-       // Create bars as QLabels with QPixmap
-       for (int value : data) {
-           QLabel *barLabel = new QLabel();
-           QPixmap pixmap(20, value*3);  // Set width to 20, height based on value
-           pixmap.fill(Qt::blue);  // Fill the pixmap with a color (e.g., blue)
-           barLabel->setPixmap(pixmap);
-           barLabel->setAlignment(Qt::AlignBottom);  // Align to bottom of the bar
+                    if (childItem->widget()) {
+                        delete childItem->widget();  // Delete the QLabel (barLabel or valueLabel)
+                    }
+                }
+                delete subLayout;  // Delete the QVBoxLayout itself
+            }
+        }
 
-           QLabel *valueLabel = new QLabel(QString::number(value));
-           valueLabel->setAlignment(Qt::AlignBottom);
+        // Create bars as QLabels with QPixmap
+        for (int value : data) {
+            QLabel *barLabel = new QLabel();
+            QPixmap pixmap(20, value*3);  // Set width to 20, height based on value
+            pixmap.fill(Qt::blue);  // Fill the pixmap with a color (e.g., blue)
+            barLabel->setPixmap(pixmap);
+            barLabel->setAlignment(Qt::AlignBottom);  // Align to bottom of the bar
 
-           QVBoxLayout *barWithLabelLayout = new QVBoxLayout();
-           barWithLabelLayout->addWidget(barLabel);
-           barWithLabelLayout->addWidget(valueLabel);
+            QLabel *valueLabel = new QLabel(QString::number(value));
+            valueLabel->setAlignment(Qt::AlignBottom);
 
-           barWithLabelLayout->setAlignment(Qt::AlignBottom);
+            QVBoxLayout *barWithLabelLayout = new QVBoxLayout();
+            barWithLabelLayout->addWidget(barLabel);
+            barWithLabelLayout->addWidget(valueLabel);
 
-           barLayout->addLayout(barWithLabelLayout);
+            barWithLabelLayout->setAlignment(Qt::AlignBottom);
 
-      }
-
-   }
-
+            barLayout->addLayout(barWithLabelLayout);
+        }
+    }
 }
 
 void MainWindow::setupRecommendationsPage()
 {
     if(recommendationsWidget == nullptr){
 
-    recommendationsWidget = new QWidget(this);
-    QVBoxLayout *recommendationsLayout = new QVBoxLayout(recommendationsWidget);
+        recommendationsWidget = new QWidget(this);
+        QVBoxLayout *recommendationsLayout = new QVBoxLayout(recommendationsWidget);
 
+        QFont labelFont5("Arial", 16, QFont::Bold);
 
-    QFont labelFont5("Arial", 16, QFont::Bold);
+        QLabel *recommendationsLabel = new QLabel("Recommendations Page");
+        recommendationsLabel->setFont(labelFont5);
+        recommendationsLabel->setAlignment(Qt::AlignCenter);
+        recommendationsLayout->addWidget(recommendationsLabel);
 
+        recBox = new QTextEdit();
+        recBox->setText("");
+        recBox->setWordWrapMode(QTextOption::WordWrap); // Ensure wrapping
+        recBox->setReadOnly(true);
+        recommendationsLayout->addWidget(recBox);
 
+        QPushButton *recBackButton = new QPushButton("Back");
+        connect(recBackButton, &QPushButton::clicked, this, [this]() {
+            showBodyScreen();
+        });
+        recommendationsLayout->addWidget(recBackButton);
 
+        recommendationsWidget->setLayout(recommendationsLayout);
+        stackedWidget->addWidget(recommendationsWidget);
 
-    QLabel *recommendationsLabel = new QLabel("Recommendations Page");
-    recommendationsLabel->setFont(labelFont5);
-    recommendationsLabel->setAlignment(Qt::AlignCenter);
-    recommendationsLayout->addWidget(recommendationsLabel);
-
-
-    recBox = new QTextEdit();
-    recBox->setText("");
-    recBox->setWordWrapMode(QTextOption::WordWrap); // Ensure wrapping
-    recBox->setReadOnly(true);
-    recommendationsLayout->addWidget(recBox);
-
-    QPushButton *recBackButton = new QPushButton("Back");
-    connect(recBackButton, &QPushButton::clicked, this, [this]() {
-        showBodyScreen();
-    });
-    recommendationsLayout->addWidget(recBackButton);
-
-
-    recommendationsWidget->setLayout(recommendationsLayout);
-    stackedWidget->addWidget(recommendationsWidget);
-
-    qDebug() << "Recommendations page index: " << stackedWidget->indexOf(recommendationsWidget);
+        qDebug() << "Recommendations page index: " << stackedWidget->indexOf(recommendationsWidget);
     }
-
     else{
         //POPULATE  RECOMMENDATIONS HERE
         if(curSnap == nullptr) return;
 
         recBox->setText(curSnap->getRecommendations());
-
     }
 
 }
@@ -854,37 +824,37 @@ void MainWindow::setupRecommendationsPage()
 void MainWindow::setupIndicatorsPage()
 {
     if(indicatorsWidget == nullptr){
-    indicatorsWidget = new QWidget(this);
-    QVBoxLayout *indicatorsLayout = new QVBoxLayout(indicatorsWidget);
+        indicatorsWidget = new QWidget(this);
+        QVBoxLayout *indicatorsLayout = new QVBoxLayout(indicatorsWidget);
 
 
-    QFont labelFont5("Arial", 16, QFont::Bold);
+        QFont labelFont5("Arial", 16, QFont::Bold);
 
 
-    QLabel *indicatorsLabel = new QLabel("Indicators Page");
-    indicatorsLabel->setFont(labelFont5);
-    indicatorsLabel->setAlignment(Qt::AlignCenter);
-    indicatorsLayout->addWidget(indicatorsLabel);
+        QLabel *indicatorsLabel = new QLabel("Indicators Page");
+        indicatorsLabel->setFont(labelFont5);
+        indicatorsLabel->setAlignment(Qt::AlignCenter);
+        indicatorsLayout->addWidget(indicatorsLabel);
 
-    indBox = new QTextEdit();
-    indBox->setText("");
-    indBox->setWordWrapMode(QTextOption::WordWrap); // Ensure wrapping
-    indBox->setReadOnly(true);
-    indBox->setText("This is text which stands as a placeholder for the indicators. Some specific  data aboout energy levels tc. goes here.");
-    indicatorsLayout->addWidget(indBox);
-
-
-    QPushButton *indBackButton = new QPushButton("Back");
-    connect(indBackButton, &QPushButton::clicked, this, [this]() {
-        showBodyScreen();
-    });
-    indicatorsLayout->addWidget(indBackButton);
+        indBox = new QTextEdit();
+        indBox->setText("");
+        indBox->setWordWrapMode(QTextOption::WordWrap); // Ensure wrapping
+        indBox->setReadOnly(true);
+        indBox->setText("This is text which stands as a placeholder for the indicators.\nome specific  data aboout energy levels tc. goes here.");
+        indicatorsLayout->addWidget(indBox);
 
 
-    indicatorsWidget->setLayout(indicatorsLayout);
-    stackedWidget->addWidget(indicatorsWidget);
+        QPushButton *indBackButton = new QPushButton("Back");
+        connect(indBackButton, &QPushButton::clicked, this, [this]() {
+            showBodyScreen();
+        });
+        indicatorsLayout->addWidget(indBackButton);
 
-    qDebug() << "Indicators page index: " << stackedWidget->indexOf(indicatorsWidget);
+
+        indicatorsWidget->setLayout(indicatorsLayout);
+        stackedWidget->addWidget(indicatorsWidget);
+
+        qDebug() << "Indicators page index: " << stackedWidget->indexOf(indicatorsWidget);
     }
 
     else{
@@ -903,7 +873,6 @@ void MainWindow::setupIndicatorsPage()
         QString emLevel = (emo < 0.3) ? "Below Normal" : (emo < 1.2) ? "Normal" : "Above Normal";
         float mus =( raw[22] + raw[8] + raw[13] + raw[23]) / 41.0;
         QString musLevel = (mus < 3.5) ? "Below Normal" : (mus < 5.6) ? "Normal" : "Above Normal";
-
 
 
         QString preppedText = QString(R"(Your scan results show the following to be true:
@@ -927,12 +896,7 @@ void MainWindow::setupIndicatorsPage()
 
 
         indBox->setText(preppedText);
-
-
-
     }
-
-
 }
 
 
@@ -988,7 +952,6 @@ void MainWindow::showSnapshotDetailsPage()
 
 void MainWindow::showHistoryPage()
 {
-    setupHistoryPage();
     stackedWidget->setCurrentIndex(7);
 }
 
@@ -996,8 +959,6 @@ void MainWindow::showBodyScreen()
 {
     stackedWidget->setCurrentIndex(8);
 }
-
-
 
 
 
@@ -1092,18 +1053,11 @@ void MainWindow::depleteBattery()
    }
 }
 
-// Change to be used by SnapshotDetails page into "SaveSnapshot"
 void MainWindow::finishMeasurement()
 {
-    if (!scanner) {
-        QMessageBox::warning(this, "Error", "No active scan in progress.");
-        return;
-    }
-
     if (batteryDepletionTimer && batteryDepletionTimer->isActive()) {
         batteryDepletionTimer->stop();
     }
-
 
     if (scanner) {
 
@@ -1126,7 +1080,6 @@ void MainWindow::finishMeasurement()
             return;
         }
 
-
         scanner->registerWeight(weight);
         scanner->registerBlood('L', 0,0);
         scanner->registerBlood('R',0,0);
@@ -1136,27 +1089,27 @@ void MainWindow::finishMeasurement()
         scanner->registerTime(currentHour,currentMinute);
         scanner->registerDate(currentMonth, currentDay,currentYear);
         scanner->registerNotes(notes);
-        // -----
 
-        if(!scanner->finishScan()) {
+        // Checks if snapshot was saved to DB
+        if (!scanner->finishScan()) {
             QMessageBox::warning(this, "Scan Incomplete", "Scan parameters incomplete");
             return;
         }
 
-       curSnap = scanner->getFinishedSnap();
-       snaps.append(curSnap);
-       delete scanner;
-       scanner = nullptr;
+        curSnap = scanner->getFinishedSnap();
+        delete scanner;
+        scanner = nullptr;
 
+        QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
 
-       QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
-       setupBodyScreen();
-       showBodyScreen();
+        setupHistoryPage();
+        setupBodyScreen();
+        showBodyScreen();
 
-    } else {
+    }
+    else {
         QMessageBox::information(this, "Measurement Complete", "The measurement is complete.");
     }
-
 }
 
 void MainWindow::startScanningProcess() {
@@ -1166,21 +1119,34 @@ void MainWindow::startScanningProcess() {
         QString pointType = (i < 12) ? "Hand" : "Foot";
         QString side = (i%12 < 6) ? "Right" : "Left";
         int pointNumber = (i % 6) + 1;
+        bool pointCmpl = false;
+        int sTime = QDateTime::currentDateTime().time().second();
 
-        scanningInstructionLabel->setText("Press Device to " + side + " " + pointType + " point " + QString::number(pointNumber));
-        while(!contactWithSkinButton->isDown()){
+        while(!pointCmpl){
+            scanningInstructionLabel->setText("Press Device to " + side + " " + pointType + " point " + QString::number(pointNumber));
+            while(!contactWithSkinButton->isDown()){
                 QApplication::processEvents();
-        }
+            }
 
-        if(contactWithSkinButton->isDown()){
             scanningInstructionLabel->setText("Scanning...");
-            QApplication::processEvents();
-            QThread::msleep(600);
-        }
 
-        scanningInstructionLabel->setText("Remove Device From Skin");
-        while(contactWithSkinButton->isDown()){
-            QApplication::processEvents();
+            while(contactWithSkinButton->isDown()){
+                QApplication::processEvents();
+                if(QDateTime::currentDateTime().time().second() - sTime > 4)  break; //if more than 5 seconds have passed,, exit loop
+            }
+
+            if(!contactWithSkinButton->isDown()){
+                QMessageBox::warning(this, "Device Removed Early", "Do not remove the device until told");
+                sTime = QDateTime::currentDateTime().time().second();
+                continue;
+            }
+
+            scanningInstructionLabel->setText("Remove Device From Skin");
+            while(contactWithSkinButton->isDown()){
+                QApplication::processEvents();
+                pointCmpl = true;
+            }
+
         }
 
         if (scanner) {
@@ -1190,10 +1156,8 @@ void MainWindow::startScanningProcess() {
             scanner->registerReading(sideChar, limbChar, reading);
         }
     }
-
     setupSnapshotDetailsPage();
     showSnapshotDetailsPage();
-
 }
 
 void MainWindow::onSaveSnapshotClicked() {
@@ -1201,16 +1165,18 @@ void MainWindow::onSaveSnapshotClicked() {
     if (weightInputSnap->text().isEmpty() || heartRateInput->text().isEmpty() ||
         bodyTempInput->text().isEmpty() || sleepHoursInput->text().isEmpty() ||
         sleepMinutesInput->text().isEmpty() || notesInput->toPlainText().isEmpty()) {
+
         QMessageBox::warning(this, "Incomplete Data", "Please fill all the input fields.");
+
     } else {
         finishMeasurement();
+        showMenuPage();
     }
 }
 
 void MainWindow::onLoginButtonClicked() {
     int selectedIndex = userDropdown->currentIndex() - 1;
     if (selectedIndex >= 0 && model.selectProfile(selectedIndex)) {
-
         showScanningPage();
     } else {
         QMessageBox::warning(this, "Login Error", "Please select a valid user");
@@ -1280,8 +1246,6 @@ void MainWindow::updateGreeting(const QString &firstName, const QString &lastNam
 }
 
 void MainWindow::onHistoryRowClicked(int row, int column) {
-
-
 
     // Access the QTableWidget (history table)
     QTableWidget *historyTable = qobject_cast<QTableWidget *>(sender());

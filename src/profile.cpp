@@ -65,7 +65,3 @@ void Profile::setHeight(float height) { this->height = height; }
 
 QString Profile::getBday() const { return bday; }
 void Profile::setBday(const QString& bday) { this->bday = bday; }
-
-void Profile::addSnap(Snapshot* snap){
-    if(snap != nullptr) snapshots.append(snap);
-}
