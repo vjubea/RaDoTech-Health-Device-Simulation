@@ -1126,7 +1126,7 @@ void MainWindow::startScanningProcess() {
         QString side = (i%12 < 6) ? "Right" : "Left";
         int pointNumber = (i % 6) + 1;
         bool pointCmpl = false;
-        float sTime = QDateTime::currentDateTime().time().second() + QDateTime::currentDateTime().time().msec()/1000;
+        float sTime = QDateTime::currentDateTime().time().msecsSinceStartOfDay();
 
         while(!pointCmpl){
             scanningInstructionLabel->setText("Press Device to " + side + " " + pointType + " point " + QString::number(pointNumber));
@@ -1138,12 +1138,12 @@ void MainWindow::startScanningProcess() {
 
             while(contactWithSkinButton->isDown()){
                 QApplication::processEvents();
-                if(QDateTime::currentDateTime().time().second() + QDateTime::currentDateTime().time().msec()/1000 - sTime > 1.0)  break; //if more than 5 seconds have passed, exit loop
+                if(QDateTime::currentDateTime().time().msecsSinceStartOfDay() - sTime > 5000)  break; //if more than 5 seconds have passed, exit loop
             }
 
             if(!contactWithSkinButton->isDown()){
                 QMessageBox::warning(this, "Device Removed Early", "Do not remove the device until told");
-                sTime = QDateTime::currentDateTime().time().second() + QDateTime::currentDateTime().time().msec()/1000;
+                sTime = QDateTime::currentDateTime().time().msecsSinceStartOfDay();
                 continue;
             }
 
