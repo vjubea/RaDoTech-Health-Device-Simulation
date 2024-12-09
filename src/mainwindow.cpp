@@ -1068,7 +1068,7 @@ void MainWindow::startMeasurement() {
 
 void MainWindow::depleteBattery()
 {
-    batteryLevel -= 2;
+    batteryLevel--;
     if (batteryLevel > 0) {
         if (batteryLabel) {
             batteryLabel->setText("Battery: " + QString::number(batteryLevel) + "%");
