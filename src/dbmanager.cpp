@@ -142,11 +142,21 @@ bool DBManager::deleteProfile(int id)
     query.bindValue(":id", id);
 
     if (query.exec()) {
-        qWarning() << "Profile by ID:" << id << " and corresponding snapshots deleted successfully.";
-        return true;
+        qWarning() << "Profile by ID:" << id << " deleted successfully.";
     }
     else {
         qWarning() << "Failed to delete profile:" << query.lastError().text();
+        return false;
+    }
+    
+    query.prepare("DELETE FROM Snapshots WHERE profileID = :id;");
+    query.bindValue(":id", id);
+    if (query.exec()) {
+        qWarning() << "Corresponding snapshots deleted successfully.";
+        return true;
+    }
+    else {
+        qWarning() << "Failed to delete snapshots for profileID:" << id << query.lastError().text();
         return false;
     }
 }

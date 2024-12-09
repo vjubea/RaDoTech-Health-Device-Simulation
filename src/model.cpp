@@ -11,7 +11,7 @@ Model::Model() {
     // Vlad's Test for Profile creation+deletion+updating
     QString name = "ADMIN";
     QString lname = "GO";
-    QString bday = "yyyy/MM/dd";
+    QString bday = "yyyy-MM-dd hh:mm";
     createProfile(name, lname, 70, 150, bday); // returns Profile Object only if succeeds being added to DB.
     getAllProfiles();
     selectProfile(0);
